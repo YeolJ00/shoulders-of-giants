@@ -146,17 +146,21 @@ def main():
 
     # ---- headline numbers
     P.append("<h2>The axes</h2>")
-    P.append('<p class="sub">Spread across the sweep, measured in units of the render '
-             'noise floor σ. Anything under 3σ is not a reading.</p>')
+    P.append('<p class="sub">Spread across the sweep in units of the render noise floor σ, '
+             'on the <b>shuffle-normalised</b> reading — surprise(clip) ÷ surprise(the same '
+             "clip's frames shuffled). Anything under 3σ is not a reading.</p>")
     P.append('<div class="grid">')
     for probe in ("bounce", "settle", "tilt", "null"):
         st = stats.get(probe)
         if not st:
             continue
-        note = "null control — must stay flat" if probe == "null" else \
-            f"ρ = {st['rho_vs_dist']:+.2f} vs |log θ − log θref|"
-        P.append(card(f"{probe} · {st['param']}", f"{st['spread_sigma']:.1f}σ",
-                      note, min(st["spread_sigma"] / 12.0, 1.0)))
+        rs = st.get("ratio_spread_sigma")
+        note = ("null control — must stay flat" if probe == "null"
+                else f"raw {st['spread_sigma']:.1f}σ, ρ {st['rho_vs_dist']:+.2f} · "
+                     f"normalised ρ {st['rho_ratio_vs_dist']:+.2f}")
+        shown = rs if rs is not None else st["spread_sigma"]
+        P.append(card(f"{probe} · {st['param']}", f"{shown:.1f}σ", note,
+                      min(shown / 12.0, 1.0)))
     P.append(card("noise floor σ", f"{sigma:.4f}",
                   f"seed {V['sigma_seed']:.4f} · jitter {V['sigma_jitter']:.4f}"))
     P.append("</div>")
@@ -180,14 +184,16 @@ def main():
     P.append('<p class="sub">σ is distance from the floor mean. Motion is mean '
              '|frame difference| — carried here because surprise tracks it.</p>')
     P.append('<div class="scroll"><table><tr><th>clip</th><th>θ</th>'
-             "<th>surprise</th><th>σ from floor</th><th>motion</th></tr>")
+             "<th>surprise</th><th>shuffled</th><th>ratio</th>"
+             "<th>σ from floor</th><th>motion</th></tr>")
     order = {"bounce": 0, "settle": 1, "tilt": 2, "null": 3, "violation": 4, "floor": 5}
     for r in sorted(rows, key=lambda r: (order.get(r["probe"], 9), r["value"])):
         z = (r["surprise"] - fmean) / sigma if sigma else float("nan")
         hi = ' class="hi"' if r["probe"] == "violation" else ""
         val = r["param"] if r["probe"] in ("violation", "floor") else f"{r['value']:.3f}"
         P.append(f"<tr{hi}><td>{r['probe']} · {val}</td><td>{val}</td>"
-                 f"<td>{r['surprise']:.5f}</td><td>{z:+.1f}</td>"
+                 f"<td>{r['surprise']:.5f}</td><td>{r.get('shuffled', float('nan')):.5f}</td>"
+                 f"<td>{r.get('ratio', float('nan')):.4f}</td><td>{z:+.1f}</td>"
                  f"<td>{r['motion']:.2f}</td></tr>")
     P.append("</table></div>")
 
@@ -232,12 +238,14 @@ def main():
         "<p>The simulator makes every motion here; the model only reacts to it. That is "
         "the whole architecture — hallucination cannot enter θ because no external "
         "model ever manufactures a trajectory.</p>"
-        "<div class='note'><b>The caveat that matters.</b> A θ that damps harder also "
-        "<i>moves less</i>, and V0 showed surprise tracks motion within a scene. So a "
-        "monotone surprise-vs-θ curve may be reading how much moved rather than how "
-        "implausible it was. The two are told apart by shape: a plausibility signal has a "
-        "minimum inside the sweep; a motion-mediated artefact is monotone. "
-        "<code>rho_vs_motion</code> in the verdict JSON is the number to watch.</div>"
+        "<div class='note'><b>Why the verdict uses a ratio, not the raw number.</b> A θ that "
+        "damps harder also <i>moves less</i> — measured, motion 4.05 → 1.53 across the cd "
+        "sweep — and V0 showed surprise tracks motion within a scene. Raw surprise falls "
+        "monotonically with cd, but so does motion, so the raw curve cannot tell "
+        "\"implausible\" from \"moved more\". Shuffling one clip's own frames keeps its "
+        "appearance, object, framing and roughly its motion budget and destroys only the "
+        "temporal order, so surprise(real) ÷ surprise(shuffled) asks how much the "
+        "<i>order</i> of the frames helped — the only part that can be about physics.</div>"
         "<p>The noise floor is not a guess. It is the spread of surprise over "
         "re-renders of one identical rollout, with only a Cycles sampling seed or a "
         "3&nbsp;mm camera shift changed — nuisances no physics depends on.</p>")

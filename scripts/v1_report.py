@@ -47,14 +47,22 @@ def main():
     floor = by.get("floor", [])
     seeds = [r for r in floor if r["param"].startswith("seed")]
     jits = [r for r in floor if r["param"].startswith("jit")]
-    s_seed = float(np.std([r["surprise"] for r in seeds], ddof=1)) if len(seeds) > 1 else 0.0
-    s_jit = float(np.std([r["surprise"] for r in jits], ddof=1)) if len(jits) > 1 else 0.0
+    def sd(rs, key):
+        return float(np.std([r[key] for r in rs], ddof=1)) if len(rs) > 1 else 0.0
+
+    s_seed, s_jit = sd(seeds, "surprise"), sd(jits, "surprise")
     sigma = max(s_seed, s_jit)
     f_mean = float(np.mean([r["surprise"] for r in floor])) if floor else float("nan")
+    # the floor has to be measured on BOTH readings: the ratio is a different statistic
+    # and there is no reason its nuisance spread should match the raw one
+    r_seed, r_jit = sd(seeds, "ratio"), sd(jits, "ratio")
+    sigma_r = max(r_seed, r_jit)
+    r_mean = float(np.mean([r["ratio"] for r in floor])) if floor else float("nan")
     print(f"noise floor  ({len(seeds)} render seeds, {len(jits)} camera jitters)")
-    print(f"  sigma(render seed)   {s_seed:.6f}")
-    print(f"  sigma(camera jitter) {s_jit:.6f}")
-    print(f"  sigma used           {sigma:.6f}   mean {f_mean:.5f}")
+    print(f"  raw surprise:  sigma(seed) {s_seed:.6f}  sigma(jitter) {s_jit:.6f}"
+          f"  -> {sigma:.6f}   mean {f_mean:.5f}")
+    print(f"  shuffle ratio: sigma(seed) {r_seed:.6f}  sigma(jitter) {r_jit:.6f}"
+          f"  -> {sigma_r:.6f}   mean {r_mean:.5f}")
 
     # ---- per-axis statistics ---------------------------------------------------
     stats, verdict = {}, {}
@@ -83,8 +91,13 @@ def main():
               # by that clip's own difficulty, so appearance and motion budget cancel and
               # what is left is how much the ORDER of the frames helped.
               "ratio": [r.get("ratio") for r in rs],
-              "ratio_spread_sigma": None,
+              "ratio_spread": float(np.nanmax([r["ratio"] for r in rs])
+                                    - np.nanmin([r["ratio"] for r in rs])),
+              "ratio_spread_sigma": float((np.nanmax([r["ratio"] for r in rs])
+                                           - np.nanmin([r["ratio"] for r in rs])) / sigma_r)
+              if sigma_r else float("inf"),
               "rho_ratio_vs_dist": spearman(dist, [r.get("ratio", np.nan) for r in rs]),
+              "rho_ratio_vs_theta": spearman(np.log(v), [r.get("ratio", np.nan) for r in rs]),
               "argmin_ratio": float(v[int(np.argmin([r.get("ratio", np.inf) for r in rs]))]),
               "argmin": float(v[int(np.argmin(y))])}
         stats[probe] = st
@@ -101,11 +114,19 @@ def main():
               f"   <- if this is large, the curve may be reading motion, not plausibility")
         if st["ratio"][0] is not None:
             print(f"   normalised by each clip's own shuffled copy:"
-                  f"  rho = {st['rho_ratio_vs_dist']:+.3f}"
-                  f"   minimum at {st['param']} = {st['argmin_ratio']:.3f}")
+                  f"  spread {st['ratio_spread']:.5f} = {st['ratio_spread_sigma']:.1f} sigma"
+                  f"   rho = {st['rho_ratio_vs_dist']:+.3f}"
+                  f"   (vs log theta {st['rho_ratio_vs_theta']:+.3f})")
+            print(f"   minimum of the ratio at {st['param']} = {st['argmin_ratio']:.3f}")
             print("      " + "  ".join(f"{x:.4f}" for x in st["ratio"]))
         if probe != "null":
-            verdict[probe] = bool(st["spread_sigma"] >= 3.0 and abs(st["rho_vs_dist"]) >= 0.7)
+            # Judged on the shuffle-normalised reading. The raw one cannot separate
+            # "implausible" from "moved more", and motion is monotone in theta by
+            # construction on both damping axes -- so a raw pass would prove nothing.
+            verdict[probe] = {
+                "raw": bool(st["spread_sigma"] >= 3.0 and abs(st["rho_vs_dist"]) >= 0.7),
+                "normalised": bool(st["ratio_spread_sigma"] >= 3.0
+                                   and abs(st["rho_ratio_vs_dist"]) >= 0.7)}
 
     # ---- controls ---------------------------------------------------------------
     viol = sorted(by.get("violation", []), key=lambda r: -r["surprise"])
@@ -123,12 +144,20 @@ def main():
     print(f"\ncontrols:  violations {'PASS' if v_ok else 'FAIL'}"
           f"   mass null {'PASS' if n_ok else 'FAIL'}"
           f" (spread {stats.get('null', {}).get('spread_sigma', float('nan')):.1f} sigma)")
-    passed = [k for k, ok in verdict.items() if ok]
-    print(f"KILL TEST: {'PASS on ' + ', '.join(passed) if passed else 'FAIL -- no axis clears the bar'}")
+    passed = [k for k, v in verdict.items() if v["normalised"]]
+    raw_only = [k for k, v in verdict.items() if v["raw"] and not v["normalised"]]
+    print(f"\nKILL TEST: "
+          f"{'PASS on ' + ', '.join(passed) if passed else 'FAIL -- no axis clears the bar'}")
+    if raw_only:
+        print(f"  ({', '.join(raw_only)} clears the bar on RAW surprise only -- and raw "
+              f"surprise tracks clip motion, which is monotone in theta by construction, "
+              f"so that is not evidence of a plausibility reading)")
 
     _plots(stats, viol, f_mean, sigma, legal_max)
     (OUT / "v1_verdict.json").write_text(json.dumps(
         {"sigma": sigma, "sigma_seed": s_seed, "sigma_jitter": s_jit, "floor_mean": f_mean,
+         "sigma_ratio": sigma_r, "ratio_seed": r_seed, "ratio_jitter": r_jit,
+         "ratio_floor_mean": r_mean,
          "stats": stats, "violations": [{"kind": r["param"], "surprise": r["surprise"]}
                                         for r in viol],
          "controls": {"violations_pass": v_ok, "null_pass": bool(n_ok)},

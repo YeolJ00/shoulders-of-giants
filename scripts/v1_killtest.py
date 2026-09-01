@@ -453,7 +453,7 @@ def do_score(args):
                 sc["motion"] = C.motion(frames)
                 rng = np.random.default_rng(0)          # same permutation for every clip
                 shuf = frames[rng.permutation(len(frames))]
-                sc["shuffled"] = m.score(shuf, profile=None)["causal"]["mean"]
+                sc["shuffled"] = m.score(shuf)["causal"]["mean"]
                 sc["motion_shuffled"] = C.motion(shuf)
                 hit = cache.put(clip, sc)
             info = dict(spec.get(key, {"key": key, "probe": "floor", "param": lab.name,
