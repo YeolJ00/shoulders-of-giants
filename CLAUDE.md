@@ -5,13 +5,31 @@
 We make authored 3D assets **simulation-ready**: recover physical parameters **θ**
 (mass, friction, restitution/damping, centre of mass, stiffness) so an asset moves the way
 its material should. Authored assets never physically existed — there is no footage and no
-ground truth — so a video-prior VLM (**Cosmos 3**) supplies the only available definition of
-"moves right," and the simulator guarantees every output is physical.
+ground truth — so the definition of "moves right" must come from a model that has watched the
+real world, and the simulator guarantees every output is physical.
 
-**Core design: the video model is a judge, never a witness.** We never fit to generated
-pixels. The simulator (Newton/Warp) produces candidate rollouts under different θ; the judge
-compares rendered candidates and we optimise θ against its preference plus a prior.
-Hallucination cannot enter θ: the judge only ranks motions we manufactured.
+**Core design: video models never generate our targets.** We never fit to generated pixels.
+The simulator (Newton/Warp) produces candidate rollouts under different θ — every one physical
+by construction — and an external plausibility signal scores them. Hallucination cannot enter
+θ because no external model ever manufactures a motion; it only reacts to motions we made.
+
+**Which external signal, as of now:**
+- **Cosmos 3 as a chat judge (yes/no logits, absolute or pairwise) is retired as the
+  optimisation signal.** Measured: approves 52.8% of clips at p > 0.90; ρ = −0.02 with
+  density, −0.07 damping, −0.25 friction over 10× sweeps; bounce counts 1–2 against a true
+  1–21; three fits of one object gave densities 244 / 188 / 356. This matches the literature:
+  multimodal LLMs score near untrained networks on intuitive-physics benchmarks. It is kept as
+  a **baseline** and for **one-bit threshold questions** (see Next, item 1).
+- **Candidate replacement: predictive-model surprise (V-JEPA 2).** A self-supervised
+  *predictive* video model — not a generator, not a chat model — sees the first part of one
+  of our clips, predicts the continuation in representation space, and the prediction error is
+  "surprise." Plausible dynamics ⇒ low surprise. We would optimise θ to **minimise surprise.**
+  No prompt, no language, no sampling: a deterministic network, so `d(surprise)/d(pixels)`
+  exists and, through the differentiable render + contact path, gives true gradient MAP.
+  **Unvalidated in our regime** — see the V-track below. Rule 1 applies to it exactly as to
+  any probe: it must be shown to depend on θ before it is trusted.
+- **Absolute scale** never comes from a video model (they see ratios and mismatches). It comes
+  from the **balance probe** against a reference block, plus the prior.
 
 ## Non-negotiable rules (each bought with a failure)
 
@@ -19,6 +37,7 @@ Hallucination cannot enter θ: the judge only ranks motions we manufactured.
    parameter, report the correlation or threshold shift, *then* report a recovery. The
    `collide` probe was built to recover mass and measures nothing — a body shoved at fixed
    velocity slides `v²/(2μg)`, independent of mass. No amount of tuning could have fixed it.
+   **This rule applies to supervision signals too**: the judge failed it; surprise must pass it.
 2. **Check against invariants, not reference values.** Scale invariance, energy conservation,
    "does the reading respond to its input", two routes to one quantity agreeing. Every
    diagnosis made this way held; every one made by comparing against a handbook number had to
@@ -28,11 +47,12 @@ Hallucination cannot enter θ: the judge only ranks motions we manufactured.
    455 m footprint.
 4. **Fixed target-material appearance in renders.** Magenta missing-texture surfaces are a
    different material than the one being asked about, not merely ugly.
-5. **Any judge change invalidates calibration.** Model, version, thinking mode, prompt or
-   render style ⇒ rerun the pairwise kill test before trusting a fit.
+5. **Any change to the scoring model invalidates calibration.** Model, version, layer, prompt,
+   thinking mode or render style ⇒ rerun the relevant kill test before trusting a fit. (Applies
+   to the judge and to the surprise model alike.)
 6. **Run, don't assume.** Print the trajectory before theorising about it. Five physically
    sensible hypotheses about a scale bug failed in a row; looking at the numbers found it.
-7. **Deterministic, seeded, cached.** Renders and judge calls are the cost centres.
+7. **Deterministic, seeded, cached.** Renders and scoring calls are the cost centres.
 
 ## State
 
@@ -63,19 +83,18 @@ Hallucination cannot enter θ: the judge only ranks motions we manufactured.
 
 `collide` (×3) and `drop` are **retired** — see `docs/PROBE_SPIN_STACK.md`. Collide's
 observable is provably mass-independent; drop is superseded by bounce. Both are absent from
-`PROBE_MASK`, not zero-weighted, because a retired probe still costs a sim + render + judge
+`PROBE_MASK`, not zero-weighted, because a retired probe still costs a sim + render + scoring
 call per iteration. `shove` remains but predates the mesh solver and is unverified.
 
 **`PROBE_W` is provisional**: the two retired probes held the only measured Fisher weights, so
 every surviving probe now starts at the unmeasured mean until the yes-region sample is re-run.
 
-### The judge is the bottleneck, and is unchanged
+### The reading side is the bottleneck
 
-Approves 52.8% of clips at p > 0.90. Correlates −0.02 with density, −0.07 with damping,
-−0.25 with friction across a 10× sweep. Names materials 4/4 correctly but answers bounce
-counts 1–2 against a true 1–21. Three fits of the same object gave densities 244 / 188 / 356.
-
-**We can now manufacture excellent evidence and still cannot read it off a video.**
+Every number in the probe table above was **read by the simulator** (a slip angle, a pan
+going down, a decay rate). The judge contributed to none of them. **We can manufacture
+excellent evidence and still cannot read it off a video** — that is the problem the V-track
+attacks.
 
 ## Findings that changed the plan
 
@@ -83,7 +102,7 @@ counts 1–2 against a true 1–21. Three fits of the same object gave densities
   came from measurements taken *across objects*, where shape dominates (a drop probe gave
   ρ = −0.186 over 14 objects). Holding object and excitation fixed and sweeping only the
   parameter, the same observable gives −0.995. Magnitudes are fine *within* an object — which
-  is the regime per-object θ already puts us in.
+  is the regime per-object θ already puts us in, and the regime every V-track sweep must use.
 - **Solver parameter sets are validated jointly, not individually.** `configs/flag.yaml` is a
   stable point; changing mass alone (0.05 → 0.02) diverges. Stability couples
   `dt·sqrt(ke/m) < 0.3` and `kd/m·dt << 1`.
@@ -114,26 +133,71 @@ counts 1–2 against a true 1–21. Three fits of the same object gave densities
 
 ## Next, in order
 
-1. **Ask the judge a threshold question.** Several probes are now one-bit — *which pan went
-   down*, *did it slide at this angle*. That is a question a VLM plausibly answers, unlike
-   bounce counting, and the balance gives ground truth to score it against. Cheapest decisive
-   test available; do this before building anything else.
-2. **Fix the soft-body probe.** Copy `DiffSoft`'s validated set (`k_mu=6000, lam_ratio=2,
-   k_damp=10, density=800, substeps=64, radius = spacing/6`) verbatim, then sweep only `k_mu`.
-   Tetrahedralisation is already verified.
-3. **Finer cloth grid.** ρ = −0.786 saturates because a 7×5 grid cannot represent a fold.
-   Needs a re-derived stable (mass, cell, ke, kd) point, not a changed cell alone.
-4. **Render bounce and settle.** Each needs a `*_render_prep.py` exporting poses in
-   `blender_render_scene.py`'s format — `balance_render_prep.py` shows the pattern, including
-   the COM-offset convention.
-5. **Per-object focus in the fit**: full-frame global term alongside the per-object crops.
-   `multiprobe_build.py` already writes `_FULL.mp4`; `joint_fit.py` ignores it.
+1. **Ask the judge a one-bit threshold question** (unchanged, still first — it is the cheapest
+   decisive test we have). Several probes are now one-bit: *which pan went down*, *did it slide
+   at this angle*. The balance gives ground truth to score the answer against. Whatever the
+   result, the judge stays a baseline; a pass here only earns it the threshold-question role.
+
+2. **V0 — surprise harness.** Install V-JEPA 2 (verify weights/API on the model card; do not
+   assume). `surprise(clip) -> float`: context = first K frames, target = the rest, error =
+   distance between predicted and actual *representations*, not pixels. Use **middle encoder
+   layers** (interpretability work shows the violation-of-expectation signal lives there, not
+   in the final layers); make the layer a config knob. Determinism check (same clip twice ⇒
+   identical score). **Measure the noise floor**: same physics, different render seed / tiny
+   camera jitter. Cache by clip hash.
+
+3. **V1 — KILL TEST: does surprise depend on θ?** This is rule 1 applied to the new signal.
+   Reuse existing probe scenes (start with **rigid** probes — pot drop, tilt, bounce, settle —
+   not cloth: flutter is chaotic and real footage of it has high prediction error too, which
+   would swamp any θ signal). Fixed appearance, one object, sweep one parameter at a time —
+   the within-object regime the findings above validate. Forward-only; Cycles renders are fine.
+   Plot surprise vs θ per probe/parameter with the noise floor drawn on; report Spearman ρ
+   against |log θ − log θ_true| and whether the minimum sits near ground truth.
+   **Control:** authored gross violations (teleport, pass-through, vanish) must score clearly
+   higher surprise than any legal θ. If the control fails the harness is broken; fix it.
+   **Pass:** monotone-ish, minimum near truth, above the floor, for the axes each probe is
+   validated to expose. **Fail** (control passes, legal θ flat): surprise only sees gross
+   violations. Stop, write it up as the negative result it is, do not build V2.
+   Published evidence covers gross violations only (98% on IntPhys); subtle wrong-but-legal
+   dynamics — our whole regime — is genuinely untested. Expect either outcome.
+
+4. **V2 — gradient path** (only after V1 passes). `d(surprise)/d(pixels)` on one clip: finite,
+   and spatially concentrated on the moving object. Route through the **differentiable render
+   path** (`diff_preprocess`, `diff_splat`), **not** Blender Cycles (no gradients), and through
+   `SolverSemiImplicit` — `SolverVBD` gradients are exactly 0.0 in newton 1.4.0. Verify
+   `d(surprise)/dθ` against finite differences per parameter. The two render paths differ in
+   appearance, so compare V3's optimum to V1's Cycles-based minimum rather than assuming they
+   coincide.
+
+5. **V3 — gradient MAP on one probe**: `surprise(render(sim(θ))) − log p(θ)`, one object, one
+   probe with known θ_true (balance for mass, tilt for μ). Compare against ground truth and
+   against the CEM/SPSA fits on the same probe. Multi-start; report scatter (pinned vs
+   unconstrained). **V4** — joint multi-probe via `joint_fit.py`, surprise replacing the judge
+   margin as `s_p`, weights from measured sign-consistency as before.
+
+6. **Instrument work, independent of the V-track verdict** (can interleave):
+   - **Fix the soft-body probe.** Copy `DiffSoft`'s validated set (`k_mu=6000, lam_ratio=2,
+     k_damp=10, density=800, substeps=64, radius = spacing/6`) verbatim, then sweep only `k_mu`.
+   - **Finer cloth grid.** ρ = −0.786 saturates because a 7×5 grid cannot represent a fold.
+     Needs a re-derived stable (mass, cell, ke, kd) point, not a changed cell alone.
+   - **Render bounce and settle** via a `*_render_prep.py` in `blender_render_scene.py`'s
+     format — `balance_render_prep.py` shows the pattern, including the COM-offset convention.
+   - **Per-object focus in the fit**: full-frame global term alongside per-object crops.
+     `multiprobe_build.py` already writes `_FULL.mp4`; `joint_fit.py` ignores it.
+
+## Rules specific to the V-track
+
+- Surprise is a **plausibility** signal, never a mass gauge. Absolute scale = balance + prior.
+- If V1 passes for some probes only, use surprise for those and keep sim-side threshold
+  reading for the rest. Mixed supervision is fine; unvalidated supervision is not.
+- Every V1 plot goes in `docs/results/` with the noise floor drawn on it.
+- Keep all judge code and results; they are the baseline rows of the paper.
 
 ## Environment & layout
 
 NVIDIA GPU (use one, don't hold idle ones); Newton 1.4.0 / Warp 1.15.0 (alpha, expect churn)
-+ Cosmos 3; VRAM-tight ⇒ judge as a separate pass over cached clips.
-Python at `/home/jooyeolyun/anaconda3/envs/warp/bin/python`.
++ Cosmos 3 (+ V-JEPA 2 for the V-track); VRAM-tight ⇒ scoring as a separate pass over cached
+clips. Python at `/home/jooyeolyun/anaconda3/envs/warp/bin/python`.
 Blender at `/home/nas5/jaeseonglee/blender-4.4.3-linux-x64/blender`.
 `SolverVBD` gradients are exactly 0.0 in newton 1.4.0 — use `SolverSemiImplicit` for anything
 differentiable.
@@ -143,10 +207,12 @@ configs/
 src/
   sim/        mesh_contact · mesh_scene · deformable · probe_scene (legacy sphere cover)
   render/     Cycles harness (RENDER_SCALE, CAM_PULL, TABLE_SX/SY) · crop · camera · views
-  judge/      Cosmos 3 pairwise + absolute; fp32 head, full-frame decode
-  optimize/   CEM · SPSA with per-object θ
-scripts/      probe_*.py · bigscene_sim.py · joint_fit.py · iter_report.py
-docs/         PROBE_*.md · SCALE_RANGE.md · MESH_CONTACT.md · BIGSCENE.md · iters/
+              · diff_preprocess (differentiable path, for V2+)
+  judge/      Cosmos 3 pairwise + absolute; fp32 head, full-frame decode  [baseline]
+  surprise/   V-JEPA 2 harness  [V0 — to build]
+  optimize/   CEM · SPSA with per-object θ · gradient MAP  [V3 — to build]
+scripts/      probe_*.py · bigscene_sim.py · joint_fit.py · iter_report.py · v0_*.py v1_*.py
+docs/         PROBE_*.md · SCALE_RANGE.md · MESH_CONTACT.md · BIGSCENE.md · iters/ · results/
 ```
 
 `scripts/iter_report.py [RUN] --max-clips N` emits one page per object: θ per iteration, the
