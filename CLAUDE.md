@@ -21,13 +21,13 @@ by construction — and an external plausibility signal scores them. Hallucinati
   multimodal LLMs score near untrained networks on intuitive-physics benchmarks. It is kept as
   a **baseline** and for **one-bit threshold questions** (see Next, item 1).
 - **Candidate replacement: predictive-model surprise (V-JEPA 2).** A self-supervised
-  *predictive* video model — not a generator, not a chat model — sees the first part of one
-  of our clips, predicts the continuation in representation space, and the prediction error is
+  *predictive* video model — not a generator, not a chat model — sees part of one of our
+  clips, predicts what happens next in representation space, and the prediction error is
   "surprise." Plausible dynamics ⇒ low surprise. We would optimise θ to **minimise surprise.**
   No prompt, no language, no sampling: a deterministic network, so `d(surprise)/d(pixels)`
   exists and, through the differentiable render + contact path, gives true gradient MAP.
-  **Unvalidated in our regime** — see the V-track below. Rule 1 applies to it exactly as to
-  any probe: it must be shown to depend on θ before it is trusted.
+  **The harness is built and passes V0** (`src/surprise/`, 7/7 gates, `docs/PROBE_SURPRISE.md`).
+  Whether it depends on θ is what V1 answers. Rule 1 applies to it exactly as to any probe.
 - **Absolute scale** never comes from a video model (they see ratios and mismatches). It comes
   from the **balance probe** against a reference block, plus the prior.
 
@@ -98,6 +98,28 @@ attacks.
 
 ## Findings that changed the plan
 
+- **V-JEPA's target must be layer-normed before the distance is taken.** Its training loss
+  is `smooth_l1(z, F.layer_norm(h))`, no affine; `VJEPA2Model` hands the target back raw,
+  and the raw encoder output has `mean|·| = 2.15` against a predictor emitting `0.32`. So
+  an un-normalised L1 is a large constant plus a rounding error: measured that way, a
+  **static** clip scored as *more* surprising than a real one and every variant sat within
+  2.4% of 2.03.
+- **Surprise must be read causally, on a short horizon that slides.** CLAUDE.md's own V0
+  sketch — context = first K frames, target = all the rest — is far outside what the
+  predictor was trained on and separates a real clip from a frame-shuffled one by **+0.12%**.
+  Sliding a 2-frame horizon across the clip gives **+2.54%** on the same clips.
+- **The across-object confound reappeared in the new signal, unchanged.** Slowing one clip
+  down monotonically destroys the harness's ability to tell it from a shuffled version of
+  itself (ρ **+0.95** and **+0.83** on two reference clips). Pooled across those two clips
+  the same correlation is **−0.01**. Clip motion is therefore a render design target
+  compared *within* one scene, never a threshold applied across scenes — and every clip we
+  had rendered before V1 sat at motion 0.4–2.3 against natural video's ~17.
+- **Framing is part of the calibration, not a presentation choice.** A crop box computed
+  per clip grows with whatever the object did, so surprise would read the framing — which
+  varies with θ. One box per probe, from that probe's reference θ. And zooming buys nothing
+  on its own: cropping to the trajectory normalises the zoom away, so motion-in-crop is set
+  by object size against *trajectory extent*. The lever is a shorter trajectory.
+
 - **Magnitude observables are not inherently confounded.** The rule that only thresholds work
   came from measurements taken *across objects*, where shape dominates (a drop probe gave
   ρ = −0.186 over 14 objects). Holding object and excitation fixed and sweeping only the
@@ -138,13 +160,14 @@ attacks.
    at this angle*. The balance gives ground truth to score the answer against. Whatever the
    result, the judge stays a baseline; a pass here only earns it the threshold-question role.
 
-2. **V0 — surprise harness.** Install V-JEPA 2 (verify weights/API on the model card; do not
-   assume). `surprise(clip) -> float`: context = first K frames, target = the rest, error =
-   distance between predicted and actual *representations*, not pixels. Use **middle encoder
-   layers** (interpretability work shows the violation-of-expectation signal lives there, not
-   in the final layers); make the layer a config knob. Determinism check (same clip twice ⇒
-   identical score). **Measure the noise floor**: same physics, different render seed / tiny
-   camera jitter. Cache by clip hash.
+2. ~~**V0 — surprise harness.**~~ **DONE** — `src/surprise/`, `scripts/v0_surprise.py`,
+   7/7 gates, `docs/PROBE_SURPRISE.md`. No install was needed: the **cosmos** env already
+   has `VJEPA2Model`. Two gates are exact — `encode()+predict()` reproduces
+   `VJEPA2Model.forward` bit for bit, and perturbing a known frame window moves exactly the
+   token ids the code claims. Three parts of the sketch above were wrong and are corrected
+   in the findings section: the target normalisation, the context regime, and the
+   middle-layer knob (the predictor consumes the encoder's **last** hidden state by
+   construction, so that knob cannot apply to it).
 
 3. **V1 — KILL TEST: does surprise depend on θ?** This is rule 1 applied to the new signal.
    Reuse existing probe scenes (start with **rigid** probes — pot drop, tilt, bounce, settle —
@@ -191,13 +214,24 @@ attacks.
 - If V1 passes for some probes only, use surprise for those and keep sim-side threshold
   reading for the rest. Mixed supervision is fine; unvalidated supervision is not.
 - Every V1 plot goes in `docs/results/` with the noise floor drawn on it.
+- **Clip framing is fixed per probe and reported.** A crop box that varies with θ, or a
+  clip whose object leaves the frame, is a confound and not a reading.
+- **Carry the motion caveat into every verdict.** A θ that damps harder also moves less, and
+  surprise tracks motion within a scene. A monotone surprise-vs-θ curve is separated from a
+  motion-mediated artefact by *shape*: a plausibility signal has a minimum inside the sweep.
 - Keep all judge code and results; they are the baseline rows of the paper.
 
 ## Environment & layout
 
 NVIDIA GPU (use one, don't hold idle ones); Newton 1.4.0 / Warp 1.15.0 (alpha, expect churn)
 + Cosmos 3 (+ V-JEPA 2 for the V-track); VRAM-tight ⇒ scoring as a separate pass over cached
-clips. Python at `/home/jooyeolyun/anaconda3/envs/warp/bin/python`.
+clips. **Two envs, and it matters**: sim and plots run in `warp`
+(`/home/jooyeolyun/anaconda3/envs/warp/bin/python`), which has **no torch and no
+matplotlib-free scoring stack**; all scoring runs in `cosmos`
+(`/home/jooyeolyun/anaconda3/envs/cosmos/bin/python`, torch 2.11.0+cu128,
+transformers 5.14.1, `VJEPA2Model` present). `matplotlib` is in `warp` only, so every
+pipeline ends with a separate report stage. `src/gpu.py::wait_for_gpu` polls for a free
+card and pins one stage to it — the box is shared and a card is held only while computing.
 Blender at `/home/nas5/jaeseonglee/blender-4.4.3-linux-x64/blender`.
 `SolverVBD` gradients are exactly 0.0 in newton 1.4.0 — use `SolverSemiImplicit` for anything
 differentiable.
@@ -209,7 +243,7 @@ src/
   render/     Cycles harness (RENDER_SCALE, CAM_PULL, TABLE_SX/SY) · crop · camera · views
               · diff_preprocess (differentiable path, for V2+)
   judge/      Cosmos 3 pairwise + absolute; fp32 head, full-frame decode  [baseline]
-  surprise/   V-JEPA 2 harness  [V0 — to build]
+  surprise/   V-JEPA 2 harness: clips · vjepa · regions · cache  [V0 done, 7/7 gates]
   optimize/   CEM · SPSA with per-object θ · gradient MAP  [V3 — to build]
 scripts/      probe_*.py · bigscene_sim.py · joint_fit.py · iter_report.py · v0_*.py v1_*.py
 docs/         PROBE_*.md · SCALE_RANGE.md · MESH_CONTACT.md · BIGSCENE.md · iters/ · results/

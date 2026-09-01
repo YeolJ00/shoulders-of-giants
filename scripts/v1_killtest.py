@@ -90,15 +90,22 @@ PIVOT = np.array([-0.05, -0.06, GZ])
 # value used in the reference render", NOT a handbook number (rule 2).
 CD = np.geomspace(400.0, 12800.0, 9)
 CD_REF = float(np.sqrt(400.0 * 12800.0))
-# mu tops out at 0.50, and the ramp at 30 deg, because both ends have to stay READABLE.
-# At mu = 1.0 the bowl travels 0.4 cm in the whole clip -- a static clip, which V0 showed
-# the harness cannot read; at 40 deg the mu = 0.1 case slides 2.5 m off a 1.58 m table and
-# the crop box grows until the object is a speck. Measured, not guessed.
-MU = np.geomspace(0.10, 0.50, 9)
-MU_REF = float(np.sqrt(0.10 * 0.50))
+# Every one of these four numbers is pinned by FRAMING, checked by projecting the whole
+# trajectory through the render camera before spending any Cycles time:
+#   * at 40 deg the mu = 0.1 case slides 2.5 m off a 1.58 m table;
+#   * at 30 deg from x = -0.60 the bowl STARTS half outside the left edge (uv x = -50);
+#   * at 26 deg the table's down-slope end swings below the bottom of the frame, so the
+#     low-mu cases slide out of view -- it is the TABLE's rotation that runs out of frame
+#     first, not the object's travel;
+#   * at mu = 0.5 the bowl travels 0.4 cm in the whole clip, which is a static clip, and
+#     V0 showed the harness cannot read those.
+# 24 deg from x = -0.42 over mu 0.10-0.35 keeps every theta in frame (>= 99.7% of the
+# object's projected points) with a 30x range in slide distance, 56.8 cm down to 1.9 cm.
+MU = np.geomspace(0.10, 0.35, 9)
+MU_REF = float(np.sqrt(0.10 * 0.35))
 MASSES = np.geomspace(0.05, 1.60, 5)          # the null control
-TILT0, TILT1 = 0.0, 30.0
-TILT_X0 = -0.60
+TILT0, TILT1 = 0.0, 24.0
+TILT_X0 = -0.42
 
 VIOLATIONS = ("teleport", "through", "vanish", "freeze", "rewind")
 N_FLOOR = 5
