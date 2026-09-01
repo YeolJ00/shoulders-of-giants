@@ -1,0 +1,221 @@
+{
+ "clip": "outputs/judge/yesregion/s0_tilt__brass_pot@a.mp4",
+ "model": "facebook/vjepa2-vitl-fpc64-256",
+ "config": {
+  "model": "facebook/vjepa2-vitl-fpc64-256",
+  "dtype": "torch.float32",
+  "frames": 64,
+  "size": 256,
+  "causal_start": 4,
+  "horizon": 1,
+  "target_norm": "layer_norm",
+  "metric": "l1"
+ },
+ "results": {
+  "determinism": {
+   "a": 0.5779100209474564,
+   "b": 0.5779100209474564,
+   "identical": true,
+   "seconds_per_clip": 4.509350061416626
+  },
+  "two_routes": {
+   "max_abs_delta": 0.0
+  },
+  "token_order": {
+   "temporal_ok": true,
+   "spatial_ok": true,
+   "encoder_concentration": 2.016449451446533
+  },
+  "beats_zero": {
+   "model": 0.5779100209474564,
+   "zero": 0.6648944233145032
+  },
+  "ordering_reference": {
+   "archery": {
+    "static": 0.5371551545602935,
+    "real": 0.583343118429184,
+    "reversed": 0.5899197778531483,
+    "shuffled": 0.6049373235021319
+   },
+   "bowling": {
+    "static": 0.5800564757415226,
+    "real": 0.5871779024600983,
+    "reversed": 0.584857531956264,
+    "shuffled": 0.5985133137021746
+   }
+  },
+  "motion_sweep": [
+   {
+    "clip": "archery",
+    "src_frames": 64,
+    "motion": 11.69268798828125,
+    "real": 0.5656062534877232,
+    "static_pct": -5.030195255443237,
+    "shuffled_pct": 4.546720735996623
+   },
+   {
+    "clip": "archery",
+    "src_frames": 48,
+    "motion": 8.197014808654785,
+    "real": 0.558842135327203,
+    "static_pct": -3.8806989301570227,
+    "shuffled_pct": 2.4852440831182987
+   },
+   {
+    "clip": "archery",
+    "src_frames": 40,
+    "motion": 6.751266002655029,
+    "real": 0.5647230297327042,
+    "static_pct": -4.881662996010472,
+    "shuffled_pct": 0.07467315008804487
+   },
+   {
+    "clip": "archery",
+    "src_frames": 32,
+    "motion": 5.7898454666137695,
+    "real": 0.5617375160966601,
+    "static_pct": -4.3761295679843215,
+    "shuffled_pct": 0.5118363721893227
+   },
+   {
+    "clip": "archery",
+    "src_frames": 24,
+    "motion": 4.435697078704834,
+    "real": 0.558925239103181,
+    "static_pct": -3.894990424447198,
+    "shuffled_pct": -0.11283093224525587
+   },
+   {
+    "clip": "archery",
+    "src_frames": 16,
+    "motion": 3.089334726333618,
+    "real": 0.5563774747507912,
+    "static_pct": -3.4549062575021883,
+    "shuffled_pct": -0.8909815024904066
+   },
+   {
+    "clip": "archery",
+    "src_frames": 12,
+    "motion": 2.266613483428955,
+    "real": 0.5515085863215583,
+    "static_pct": -2.6025763002166524,
+    "shuffled_pct": -0.74567214081247
+   },
+   {
+    "clip": "archery",
+    "src_frames": 8,
+    "motion": 1.373241901397705,
+    "real": 0.5495843120983669,
+    "static_pct": -2.261556100576756,
+    "shuffled_pct": -1.357807916194409
+   },
+   {
+    "clip": "bowling",
+    "src_frames": 64,
+    "motion": 2.004246711730957,
+    "real": 0.5719743903194155,
+    "static_pct": 1.413015260629713,
+    "shuffled_pct": 4.058822607953849
+   },
+   {
+    "clip": "bowling",
+    "src_frames": 48,
+    "motion": 0.7425140142440796,
+    "real": 0.5692295921700341,
+    "static_pct": 1.9020240199062677,
+    "shuffled_pct": 3.14823544685503
+   },
+   {
+    "clip": "bowling",
+    "src_frames": 40,
+    "motion": 0.5470209121704102,
+    "real": 0.5726437164204461,
+    "static_pct": 1.2944801642831516,
+    "shuffled_pct": 2.126614253640957
+   },
+   {
+    "clip": "bowling",
+    "src_frames": 32,
+    "motion": 0.38621529936790466,
+    "real": 0.5689152947493962,
+    "static_pct": 1.9583198228189769,
+    "shuffled_pct": 2.5365743271513086
+   },
+   {
+    "clip": "bowling",
+    "src_frames": 24,
+    "motion": 0.26864051818847656,
+    "real": 0.5689120271376201,
+    "static_pct": 1.9589054321761834,
+    "shuffled_pct": 2.258514104143128
+   },
+   {
+    "clip": "bowling",
+    "src_frames": 16,
+    "motion": 0.19404956698417664,
+    "real": 0.5657729868377958,
+    "static_pct": 2.524597185800581,
+    "shuffled_pct": 2.3282586360380053
+   },
+   {
+    "clip": "bowling",
+    "src_frames": 12,
+    "motion": 0.16419295966625214,
+    "real": 0.5684764619384494,
+    "static_pct": 2.0370260825903985,
+    "shuffled_pct": 1.7580233793115907
+   },
+   {
+    "clip": "bowling",
+    "src_frames": 8,
+    "motion": 0.1166984885931015,
+    "real": 0.5743124165705272,
+    "static_pct": 1.0001628042966004,
+    "shuffled_pct": 0.22646376780426358
+   }
+  ],
+  "motion_rho": {
+   "per_clip": {
+    "archery": 0.9523809523809523,
+    "bowling": 0.8333333333333334
+   },
+   "pooled": -0.011764705882352941
+  },
+  "our_clips": {
+   "docs/videos/bigscene_tilt_a.mp4": 2.2640604972839355,
+   "outputs/judge/yesregion/s0_tilt__brass_pot@a.mp4": 1.7851781845092773,
+   "outputs/judge/yesregion/s0_collide__wooden_bowl@a.mp4": 1.0455530881881714,
+   "outputs/judge/yesregion/s0_drop__brass_pot@a.mp4": 0.3581603467464447
+  },
+  "curve": [
+   0.5741543769836426,
+   0.5558426380157471,
+   0.5615971088409424,
+   0.5736216306686401,
+   0.5715291500091553,
+   0.5579731464385986,
+   0.569573163986206,
+   0.558843731880188,
+   0.5592069625854492,
+   0.5694422125816345,
+   0.5764642953872681,
+   0.5522465705871582,
+   0.5689210891723633,
+   0.5717366933822632,
+   0.5888388752937317,
+   0.5894997119903564,
+   0.5835062265396118,
+   0.5879475474357605,
+   0.612431526184082,
+   0.599463164806366,
+   0.5910711288452148,
+   0.601952075958252,
+   0.5668612718582153,
+   0.5937131643295288,
+   0.5930052995681763,
+   0.5902022123336792,
+   0.578822910785675,
+   0.5830127000808716
+  ]
+ }
+}
