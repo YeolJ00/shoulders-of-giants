@@ -57,13 +57,20 @@ REPO = Path("/home/nas5/jooyeolyun/repos/simulation-assestization")
 sys.path.insert(0, str(REPO))
 
 LAB = Path(os.environ.get("LAB", "outputs/scene/v1"))
-FLOOR = Path("outputs/scene/v1_floor")
+# derived from LAB so a replicate on a second object gets its own floor rather than
+# silently borrowing the first object's
+FLOOR = Path(str(LAB) + "_floor")
 RESULTS = Path("docs/results/v1_surprise.json")
 
 GZ = 0.706
 FPS, SUBSTEPS, NF = 24.0, 60, 64
 TABLE = (0.79, 0.49)
-OBJ, SCALE, MASS = "rigid/wooden_bowl_01", 0.62, 0.40
+# The subject is swappable so the whole sweep can be replicated on a SECOND object.
+# One object is enough to answer "does surprise move with theta"; two are needed before
+# the answer can be attributed to theta rather than to this particular bowl.
+OBJ = os.environ.get("V1_OBJECT", "rigid/wooden_bowl_01")
+SCALE = float(os.environ.get("V1_SCALE", "0.62"))
+MASS = float(os.environ.get("V1_MASS", "0.40"))
 VIEW = "a"
 
 # CAM_PULL must be given to BOTH renderers -- Blender's camera and the Python one the crop
