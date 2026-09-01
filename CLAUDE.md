@@ -155,10 +155,17 @@ attacks.
 
 ## Next, in order
 
-1. **Ask the judge a one-bit threshold question** (unchanged, still first — it is the cheapest
-   decisive test we have). Several probes are now one-bit: *which pan went down*, *did it slide
-   at this angle*. The balance gives ground truth to score the answer against. Whatever the
-   result, the judge stays a baseline; a pass here only earns it the threshold-question role.
+1. ~~**Ask the judge a one-bit threshold question**~~ **DONE — FAILED**, on the same 57 V1
+   clips (`docs/results/v1_judge.json`), which is the strongest form of the test: identical
+   data, identical framing, both signals side by side.
+   *"Does the bowl bounce back up off the table?"* — p(yes) **0.016–0.110 on all nine**
+   bounce clips, every one of which rebounds; wrong 9/9, and the bounciest clip in the sweep
+   scores p(yes) = 0.026. *"Does it slide down the tilting table?"* — p(yes) **0.78–0.94 on
+   all nine**, from a clip that slides 57 cm to one that slides 1.9 cm; ρ with μ is −0.32.
+   *"Does the bowl move in a physically possible way?"* — p(yes) 0.57–0.78 on five authored
+   violations, with the **teleport rated the most plausible of them**.
+   The judge does not answer one-bit threshold questions either. It keeps only the baseline
+   row it already had.
 
 2. ~~**V0 — surprise harness.**~~ **DONE** — `src/surprise/`, `scripts/v0_surprise.py`,
    7/7 gates, `docs/PROBE_SURPRISE.md`. No install was needed: the **cosmos** env already
@@ -169,7 +176,30 @@ attacks.
    middle-layer knob (the predictor consumes the encoder's **last** hidden state by
    construction, so that knob cannot apply to it).
 
-3. **V1 — KILL TEST: does surprise depend on θ?** This is rule 1 applied to the new signal.
+3. ~~**V1 — KILL TEST**~~ **DONE — FAILED.** `docs/V1_SURPRISE.html`,
+   `docs/results/v1_verdict.json`. 57 clips, one object, 8 cm centre drop / dome rock /
+   24° ramp, plus 5 authored violations and a 10-clip noise floor.
+   **Raw surprise moves enormously with θ — 59σ on bounce, 29σ on settle, 12σ on tilt —
+   and is monotone in θ with ρ(log θ) = −0.98, −0.97, −0.78. It is also monotone in clip
+   MOTION at ρ = +0.98, +0.97, +0.85, and motion is monotone in θ by construction.** There
+   is no minimum anywhere inside any sweep: ρ against |log θ − log θ_ref| is −0.13, −0.17,
+   +0.27. Normalise each clip by a frame-shuffled copy of itself and the spreads collapse to
+   8.4σ / 3.3σ / 2.0σ against a mass **null control at 2.1–2.2σ** — i.e. once the motion
+   confound is removed, nothing survives above the null.
+   **The violation control fails, and explains why.** Matched against the clip they were
+   authored from, only 2 of 5 violations read as more surprising; *passing through the
+   table* reads **42σ more plausible** and *freezing in mid-air* **20σ more plausible** than
+   a legal bounce. Both are the ones that make motion smoother. A prediction-error signal
+   finds an impossible-but-smooth trajectory easy, because it is easy.
+   **The signal is real but the summary threw it away**: the authored teleport spikes
+   **+0.047 at exactly the frame it was authored** (slot 16 = frame 32), ~100× the floor,
+   which the 28-slot mean turns into −0.0007. Localised summaries (max, top-3, IQR) were
+   tried post-hoc and none produces a minimum near θ_ref either.
+   **Verdict: do not build V2.** Surprise as specified measures how much a clip moves, not
+   whether it is plausible. Confirmation on a second object (brass pot) is in flight.
+
+   *(original spec kept below for the record)*
+   **V1 — KILL TEST: does surprise depend on θ?** This is rule 1 applied to the new signal.
    Reuse existing probe scenes (start with **rigid** probes — pot drop, tilt, bounce, settle —
    not cloth: flutter is chaotic and real footage of it has high prediction error too, which
    would swamp any θ signal). Fixed appearance, one object, sweep one parameter at a time —
