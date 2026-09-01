@@ -183,6 +183,12 @@ def main():
         _eye = mathutils.Vector(vc["eye"]); _tgt = mathutils.Vector(vc["target"])
         _pull = float(os.environ.get("CAM_PULL", "1"))
         co.location = _tgt + (_eye - _tgt) * _pull
+        # CAM_JITTER moves the eye by a few millimetres without changing the target.
+        # Used to measure the surprise harness's noise floor: a nuisance change no
+        # physics depends on must move the score less than theta does.
+        _j = os.environ.get("CAM_JITTER")
+        if _j:
+            co.location = co.location + mathutils.Vector([float(x) for x in _j.split(",")])
         lk = _tgt - co.location
         co.rotation_euler = lk.to_track_quat("-Z", "Y").to_euler()
         cd_.sensor_fit = "HORIZONTAL"; cd_.angle = math.radians(vc["fov_deg"])
@@ -196,6 +202,10 @@ def main():
     sc.render.engine = os.environ.get("ENGINE", "CYCLES")
     if sc.render.engine == "CYCLES":
         sc.cycles.samples = int(os.environ.get("SAMPLES", 48))
+        # the other half of the noise floor: identical physics, different Monte-Carlo
+        # sampling. Cycles is deterministic at a fixed seed, so without this the
+        # "render noise" floor would come out as exactly zero and mean nothing.
+        sc.cycles.seed = int(os.environ.get("SEED", 0))
         try:
             prefs = bpy.context.preferences.addons["cycles"].preferences
             prefs.compute_device_type = "CUDA"; prefs.get_devices()
