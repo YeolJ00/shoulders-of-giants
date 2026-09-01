@@ -79,6 +79,13 @@ def main():
               # plausibility signal has a minimum somewhere inside the sweep, a
               # motion-mediated artefact is monotone and tracks this correlation.
               "rho_vs_motion": spearman([r["motion"] for r in rs], y),
+              # surprise(real)/surprise(frame-shuffled copy of the same clip): normalised
+              # by that clip's own difficulty, so appearance and motion budget cancel and
+              # what is left is how much the ORDER of the frames helped.
+              "ratio": [r.get("ratio") for r in rs],
+              "ratio_spread_sigma": None,
+              "rho_ratio_vs_dist": spearman(dist, [r.get("ratio", np.nan) for r in rs]),
+              "argmin_ratio": float(v[int(np.argmin([r.get("ratio", np.inf) for r in rs]))]),
               "argmin": float(v[int(np.argmin(y))])}
         stats[probe] = st
         print(f"\n{probe}  ({st['param']})")
@@ -92,6 +99,11 @@ def main():
         print(f"   minimum at {st['param']} = {st['argmin']:.3f}  (reference {ref:.3f})")
         print(f"   rho(surprise, clip motion) = {st['rho_vs_motion']:+.3f}"
               f"   <- if this is large, the curve may be reading motion, not plausibility")
+        if st["ratio"][0] is not None:
+            print(f"   normalised by each clip's own shuffled copy:"
+                  f"  rho = {st['rho_ratio_vs_dist']:+.3f}"
+                  f"   minimum at {st['param']} = {st['argmin_ratio']:.3f}")
+            print("      " + "  ".join(f"{x:.4f}" for x in st["ratio"]))
         if probe != "null":
             verdict[probe] = bool(st["spread_sigma"] >= 3.0 and abs(st["rho_vs_dist"]) >= 0.7)
 

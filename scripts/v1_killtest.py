@@ -421,12 +421,25 @@ def square_box(cam, pts, W, H, pad=CROP_PAD, min_px=160):
 # ----------------------------------------------------------------------------- score
 
 def do_score(args):
+    """Score every clip, and score a frame-shuffled copy of the SAME clip beside it.
+
+    The shuffled copy is the answer to the confound this sweep would otherwise have. A
+    theta that damps harder also MOVES less (motion 4.05 -> 1.54 across the cd sweep), and
+    V0 showed surprise tracks motion within a scene -- so a monotone surprise-vs-theta
+    curve could be reading "how much moved" rather than "how implausible it was".
+
+    Shuffling the frames of one clip keeps its appearance, its object, its framing and
+    roughly its motion budget, and destroys only the temporal coherence. So
+    surprise(real) / surprise(shuffled) is normalised by that clip's own difficulty: it
+    asks how much the ORDER of the frames helped, which is the only part of the reading
+    that can be about physics. Costs one extra encode per clip.
+    """
     from src.surprise import clips as C
     from src.surprise.cache import ScoreCache
     from src.surprise.vjepa import SurpriseModel
 
     m = SurpriseModel(device="cuda:0")
-    cache = ScoreCache(m.config())
+    cache = ScoreCache({**m.config(), "control": "shuffled_self"})
     spec = {r["key"]: r for r in json.loads((LAB / "spec.json").read_text())}
     rows = []
     labs = [LAB] + sorted(p for p in FLOOR.glob("*") if p.is_dir())
@@ -438,6 +451,10 @@ def do_score(args):
                 frames, _ = C.prepare(clip)
                 sc = m.score(frames)
                 sc["motion"] = C.motion(frames)
+                rng = np.random.default_rng(0)          # same permutation for every clip
+                shuf = frames[rng.permutation(len(frames))]
+                sc["shuffled"] = m.score(shuf, profile=None)["causal"]["mean"]
+                sc["motion_shuffled"] = C.motion(shuf)
                 hit = cache.put(clip, sc)
             info = dict(spec.get(key, {"key": key, "probe": "floor", "param": lab.name,
                                        "value": 0.0, "ref": 0.0}))
@@ -445,9 +462,12 @@ def do_score(args):
                 info = dict(info, probe="floor", param=lab.name)
             rows.append({**info, "lab": lab.name, "clip": str(clip),
                          "surprise": sc_mean(hit), "motion": hit["motion"],
+                         "shuffled": hit["shuffled"],
+                         "ratio": sc_mean(hit) / hit["shuffled"],
                          "curve": hit["causal"]["curve"]})
             print(f"  {lab.name:>12}/{key:<22} surprise {sc_mean(hit):.5f}"
-                  f"  motion {hit['motion']:5.2f}", flush=True)
+                  f"  shuffled {hit['shuffled']:.5f}"
+                  f"  ratio {rows[-1]['ratio']:.4f}  motion {hit['motion']:5.2f}", flush=True)
     RESULTS.parent.mkdir(parents=True, exist_ok=True)
     RESULTS.write_text(json.dumps({"config": m.config(), "rows": rows}, indent=1))
     print(f"\nwrote {RESULTS}  ({len(rows)} clips)")
