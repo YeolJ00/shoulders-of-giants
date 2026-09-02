@@ -98,6 +98,12 @@ attacks.
 
 ## Findings that changed the plan
 
+- **A published effect size is part of the calibration, not background reading.** The
+  intuitive-physics result rests on a within-scene gap of ~0.4%, and reverses sign when
+  pooled across scenes. Any experiment aimed at it needs matched pairs and tens of them;
+  a correlation over nine points against a 0.29% noise floor cannot see it. Check the
+  reference implementation's *statistical design*, not just its loss function.
+
 - **V-JEPA's target must be layer-normed before the distance is taken.** Its training loss
   is `smooth_l1(z, F.layer_norm(h))`, no affine; `VJEPA2Model` hands the target back raw,
   and the raw encoder output has `mean|·| = 2.15` against a predictor emitting `0.32`. So
@@ -176,43 +182,42 @@ attacks.
    middle-layer knob (the predictor consumes the encoder's **last** hidden state by
    construction, so that knob cannot apply to it).
 
-3. ~~**V1 — KILL TEST**~~ **DONE — FAILED.** `docs/V1_SURPRISE.html`,
-   `docs/results/v1_verdict.json`. 57 clips, one object, 8 cm centre drop / dome rock /
-   24° ramp, plus 5 authored violations and a 10-clip noise floor.
-   **Raw surprise moves enormously with θ — 59σ on bounce, 29σ on settle, 12σ on tilt —
-   and is monotone in θ with ρ(log θ) = −0.98, −0.97, −0.78. It is also monotone in clip
-   MOTION at ρ = +0.98, +0.97, +0.85, and motion is monotone in θ by construction.** There
-   is no minimum anywhere inside any sweep: ρ against |log θ − log θ_ref| is −0.13, −0.17,
-   +0.27. Normalise each clip by a frame-shuffled copy of itself and the spreads collapse to
-   8.4σ / 3.3σ / 2.0σ against a mass **null control at 2.1–2.2σ** — i.e. once the motion
-   confound is removed, nothing survives above the null.
-   **The violation control fails, and explains why.** Matched against the clip they were
-   authored from, only 2 of 5 violations read as more surprising; *passing through the
-   table* reads **42σ more plausible** and *freezing in mid-air* **20σ more plausible** than
-   a legal bounce. Both are the ones that make motion smoother. A prediction-error signal
-   finds an impossible-but-smooth trajectory easy, because it is easy.
-   **The signal is real but the summary threw it away**: the authored teleport spikes
-   **+0.047 at exactly the frame it was authored** (slot 16 = frame 32), ~100× the floor,
-   which the 28-slot mean turns into −0.0007. Localised summaries (max, top-3, IQR) were
-   tried post-hoc and none produces a minimum near θ_ref either.
-   **Verdict: do not build V2.** Surprise as specified measures how much a clip moves, not
-   whether it is plausible. Confirmation on a second object (brass pot) is in flight.
+3. **V1 — KILL TEST: RETRACTED AND RE-RUNNING.** The first run reported FAIL. That
+   verdict is withdrawn: two independent defects made it uninterpretable, and both were
+   found by someone looking at the clips and at the reference implementation rather than
+   at my numbers.
 
-   *(original spec kept below for the record)*
-   **V1 — KILL TEST: does surprise depend on θ?** This is rule 1 applied to the new signal.
-   Reuse existing probe scenes (start with **rigid** probes — pot drop, tilt, bounce, settle —
-   not cloth: flutter is chaotic and real footage of it has high prediction error too, which
-   would swamp any θ signal). Fixed appearance, one object, sweep one parameter at a time —
-   the within-object regime the findings above validate. Forward-only; Cycles renders are fine.
-   Plot surprise vs θ per probe/parameter with the noise floor drawn on; report Spearman ρ
-   against |log θ − log θ_true| and whether the minimum sits near ground truth.
-   **Control:** authored gross violations (teleport, pass-through, vanish) must score clearly
-   higher surprise than any legal θ. If the control fails the harness is broken; fix it.
-   **Pass:** monotone-ish, minimum near truth, above the floor, for the axes each probe is
-   validated to expose. **Fail** (control passes, legal θ flat): surprise only sees gross
-   violations. Stop, write it up as the negative result it is, do not build V2.
-   Published evidence covers gross violations only (98% on IntPhys); subtle wrong-but-legal
-   dynamics — our whole regime — is genuinely untested. Expect either outcome.
+   **Defect 1 — the scenes were wrong.** `rest_height()` was never called, so the tilt and
+   null scenes spawned the bowl **11.8 mm inside the table** (its lowest vertex sits 31.8 mm
+   below its body origin; it was placed with only 20 mm of clearance). The solver ejected
+   it, and the ejection scaled with mass: penetration ran 13.35 mm at 0.05 kg to 21.98 mm
+   at 1.6 kg. So the mass "null control" — the headline evidence that surprise reads noise
+   — was measuring a bowl visibly sinking further into a table. It also caused the
+   divergence at high stiffness that I had blamed on the solver. CLAUDE.md already recorded
+   this exact failure from the balance probe ("a bowl is a shell … a payload seated there
+   starts inside the floor and gets ejected") and it was repeated in a new scene.
+   Fixed: rotation-aware seating, `PEN_FRAC=1e-4`, `SUBSTEPS=420`. Tilt penetration is now
+   **4.57 mm at 0.05 kg and 4.59 mm at 1.6 kg** — actually independent of the swept parameter.
+
+   **Defect 2 — the experiment was underpowered by an order of magnitude, and the
+   statistic was on the wrong axis.** Measured from the reference repo's own
+   `raw_surprises`: ViT-L on IntPhys O1–O3 reaches 96.7–100% paired accuracy on a
+   **within-scene gap of just +0.29% to +0.61%**, and the *same data pooled across scenes*
+   gives **−1.77%** — the wrong sign. Their result depends entirely on never crossing a
+   scene boundary, over 30 matched groups per property. Against that: our render noise
+   floor is 0.29% of value, and V1 ran a 9-point correlation with 5 violation pairs from a
+   single source. A 3/5 result has a 95% CI of about [23%, 88%]; it never distinguished
+   anything from chance. Our own measured gaps (+1.0% pass-through, +0.86% teleport) are
+   **larger** than the published effect — the signal was never the problem, the design was.
+   Also: `eval.py` reduces with `loss.max(1)` over a sweep of **context lengths**, and V1
+   averaged over **time slots** instead.
+
+   **The re-run** (`scripts/v1_pairs.py`) copies the published statistical design and
+   ladders the pairs by how defensible the ground truth is:
+   **tier 1 violations** (30 pairs, categorically impossible), **tier 2 gravity**
+   (g ∈ 1.62–40 m/s² vs Earth — wrong but internally consistent, nothing teleports, and
+   the bridge between their regime and ours), **tier 3 θ** (no ground truth; θ_ref is an
+   assumed anchor and is reported as such). Paired accuracy with Wilson CIs, on two objects.
 
 4. **V2 — gradient path** (only after V1 passes). `d(surprise)/d(pixels)` on one clip: finite,
    and spatially concentrated on the moving object. Route through the **differentiable render

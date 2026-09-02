@@ -14,7 +14,18 @@ computable from that checkpoint alone -- it needs the 1664-wide teacher encoder,
 published V-JEPA 2 encoder is that wide (ViT-g is 1408, ViT-H 1280, ViT-L 1024). The 2.1
 port is usable for features and classification; it cannot produce surprise.
 
-    CUDA_VISIBLE_DEVICES=$G .../envs/cosmos/bin/python scripts/v0_models.py
+    CUDA_VISIBLE_DEVICES=$G .../envs/cosmos/bin/python scripts/v0_models.py [--paired]
+
+`--paired` is the version to believe. The two-reference-clip comparison is enough to
+disqualify a model that gets the sign wrong, but not enough to rank models: it is n = 2.
+Paired mode scores EVERY V1 clip under both models and compares the shuffled-vs-real
+margin clip by clip, which is a paired test on ~40 samples of exactly the footage we care
+about.
+
+Note what is NOT comparable across models: "beats zero-prediction by X%". Each model's
+target is layer-normed in its OWN representation space, and a wider representation is
+intrinsically harder to predict, so that number ranks nothing. Only within-model
+contrasts -- real vs shuffled, scored in the same space -- can be compared between models.
 """
 import json
 import sys
@@ -31,6 +42,46 @@ from src.surprise.vjepa import DEPTH, CAUSAL_START, slot_tokens        # noqa: E
 # (8192) and src/surprise/vjepa.py's constants hold for both without change.
 MODELS = ["facebook/vjepa2-vitl-fpc64-256", "facebook/vjepa2-vitg-fpc64-256"]
 OUT = Path("docs/results/v0_models.json")
+
+
+def paired():
+    """Shuffled-vs-real margin per clip, under each model. A paired test."""
+    from src.surprise.vjepa import SurpriseModel
+
+    paths = sorted(Path("outputs/scene/v1/clips").glob("*.mp4"))
+    if not paths:
+        sys.exit("no clips under outputs/scene/v1/clips -- run the clip stage first")
+    frames = {p.stem: C.prepare(p)[0] for p in paths}
+    print(f"{len(frames)} clips, paired across {len(MODELS)} models")
+    out = {}
+    for mid in MODELS:
+        m = SurpriseModel(model_id=mid, device="cuda:0")
+        rows = {}
+        for k, f in frames.items():
+            rng = np.random.default_rng(0)
+            real = m.score(f)["causal"]["mean"]
+            shuf = m.score(f[rng.permutation(len(f))])["causal"]["mean"]
+            rows[k] = 100 * (shuf / real - 1)
+            print(f"  {mid.split('-')[1]:5s} {k:<24} margin {rows[k]:+6.2f}%", flush=True)
+        out[mid] = rows
+        del m
+        import gc, torch
+        gc.collect(); torch.cuda.empty_cache()
+
+    a, b = [out[m] for m in MODELS]
+    keys = sorted(set(a) & set(b))
+    da = np.array([a[k] for k in keys]); db = np.array([b[k] for k in keys])
+    wins = int((da > db).sum())
+    print(f"\n{MODELS[0]}: mean margin {da.mean():+.2f}%  ({int((da > 0).sum())}/{len(keys)} correct sign)")
+    print(f"{MODELS[1]}: mean margin {db.mean():+.2f}%  ({int((db > 0).sum())}/{len(keys)} correct sign)")
+    print(f"paired: the first model has the larger margin on {wins}/{len(keys)} clips")
+    Path("docs/results/v0_models_paired.json").write_text(json.dumps(
+        {"per_clip": out, "summary": {"mean": {MODELS[0]: float(da.mean()),
+                                              MODELS[1]: float(db.mean())},
+                                      "correct_sign": {MODELS[0]: int((da > 0).sum()),
+                                                       MODELS[1]: int((db > 0).sum())},
+                                      "n": len(keys), "first_model_wins": wins}}, indent=1))
+    print("wrote docs/results/v0_models_paired.json")
 
 
 def main():
@@ -88,4 +139,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    if "--paired" in sys.argv:
+        paired()
+    else:
+        main()

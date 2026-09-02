@@ -83,12 +83,27 @@ class SurpriseModel:
         self.model = AutoModel.from_pretrained(
             model_id, dtype=self.dtype, attn_implementation="sdpa"
         ).to(device).eval()
+        # Geometry comes from the CHECKPOINT, never from the module constants. Those hold
+        # for the 256-crop models only; vjepa2-vitg-fpc64-384 is 24x24 patches and 18432
+        # tokens, and hard-coding 16x16 would silently mis-address every rope position.
+        c = self.model.config
+        self.size, self.patch = int(c.crop_size), int(c.patch_size)
+        self.frames, self.tubelet = int(c.frames_per_clip), int(c.tubelet_size)
+        self.grid = self.size // self.patch
+        self.tps = self.grid * self.grid
+        self.depth = self.frames // self.tubelet
+        self.n_tokens = self.depth * self.tps
         self._checked = False
+
+    def slot_tokens(self, s0, s1, spatial=None):
+        """Token ids for temporal slots [s0, s1) at THIS checkpoint's geometry."""
+        sp = np.arange(self.tps) if spatial is None else np.asarray(spatial, np.int64)
+        return (np.arange(s0, s1)[:, None] * self.tps + sp[None, :]).reshape(-1)
 
     def config(self):
         """Everything that invalidates a cached score (rule 5)."""
-        return {"model": self.model_id, "dtype": str(self.dtype), "frames": FRAMES,
-                "size": SIZE, "causal_start": CAUSAL_START, "horizon": HORIZON,
+        return {"model": self.model_id, "dtype": str(self.dtype), "frames": self.frames,
+                "size": self.size, "causal_start": CAUSAL_START, "horizon": HORIZON,
                 "target_norm": "layer_norm", "metric": "l1"}
 
     # ---------------------------------------------------------------- encoding
@@ -112,12 +127,12 @@ class SurpriseModel:
                              output_hidden_states=layer is not None)
         toks = out.hidden_states[layer] if layer is not None else out.last_hidden_state
         if not self._checked:
-            if tuple(px.shape) != (1, FRAMES, 3, SIZE, SIZE):
+            if tuple(px.shape) != (1, self.frames, 3, self.size, self.size):
                 raise RuntimeError(f"video did not reach the model as expected: {tuple(px.shape)}")
-            if toks.shape[1] != N_TOKENS:
+            if toks.shape[1] != self.n_tokens:
                 raise RuntimeError(
-                    f"token count {toks.shape[1]} != {N_TOKENS}; the rope position grid is "
-                    f"built from frames_per_clip and would be silently wrong")
+                    f"token count {toks.shape[1]} != {self.n_tokens}; the rope position "
+                    f"grid is built from frames_per_clip and would be silently wrong")
             self._checked = True
         return toks
 

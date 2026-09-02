@@ -60,10 +60,17 @@ LAB = Path(os.environ.get("LAB", "outputs/scene/v1"))
 # derived from LAB so a replicate on a second object gets its own floor rather than
 # silently borrowing the first object's
 FLOOR = Path(str(LAB) + "_floor")
-RESULTS = Path("docs/results/v1_surprise.json")
+RESULTS = Path("docs/results") / (LAB.name + "_surprise.json")
 
 GZ = 0.706
-FPS, SUBSTEPS, NF = 24.0, 60, 64
+FPS, NF = 24.0, 64
+# 420 substeps and pen_frac 1e-4, not 60 and 5e-3. The looser pair let the bowl sink
+# 13-22 mm into a table it is 60 mm tall -- and, fatally, the depth scaled with MASS, so
+# the mass "null control" was never null. Measured after seating was fixed: tilt
+# penetration is 4.57 mm at 0.05 kg and 4.59 mm at 1.6 kg, i.e. actually independent of
+# the swept parameter. Costs 7x the sim time and nothing in render time.
+SUBSTEPS = 420
+PEN_FRAC = 1.0e-4
 TABLE = (0.79, 0.49)
 # The subject is swappable so the whole sweep can be replicated on a SECOND object.
 # One object is enough to answer "does surprise move with theta"; two are needed before
@@ -117,6 +124,32 @@ TILT_X0 = -0.42
 VIOLATIONS = ("teleport", "through", "vanish", "freeze", "rewind")
 N_FLOOR = 5
 
+# ---------------------------------------------------------------- matched-pair design
+# The published intuitive-physics result rests on a within-scene gap of ~0.4% (measured
+# from their own raw_surprises: ViT-L on IntPhys O1-O3 gives +0.29% to +0.61%). It reaches
+# 98% accuracy only because IntPhys ships PERFECTLY MATCHED pairs and the comparison never
+# crosses scenes -- pool their data across scenes and the sign flips to -1.77%. Our render
+# noise floor is 0.29% of value, so an effect that size needs their statistical design, not
+# a 9-point correlation. Hence: many matched pairs, paired accuracy, binomial CIs.
+#
+# The hard part is that OUR theta sweep has no ground truth -- every cd in 400..12800 is
+# legal for some object. So the pairs are laddered by how defensible the answer is:
+#
+#   TIER 1  violations   categorically impossible. Unambiguous. Validates the harness at
+#                        roughly the difficulty the paper reports.
+#   TIER 2  gravity      wrong but internally consistent: every frame is physical for that
+#                        g, nothing teleports, and a bowl falling at lunar g on a kitchen
+#                        table is still unambiguously wrong. This is the BRIDGE between
+#                        their regime and ours, and InfLevel tests the same property.
+#   TIER 3  theta        our actual regime. No ground truth; theta_ref is an assumed
+#                        anchor and the result is reported as such.
+#
+# If surprise passes 1 and fails 2, we have located the boundary precisely, and tier 2 is
+# a real result either way because its ground truth is not in doubt.
+VIOL_SOURCES = 6          # source clips the violations are authored on, spread over probes
+G_EARTH = 9.81
+GRAVITIES = (1.62, 3.72, 9.81, 24.5, 40.0)      # Moon, Mars, Earth, and two impossible
+
 
 # ------------------------------------------------------------------------ sim helpers
 
@@ -139,14 +172,33 @@ def quat_y(deg):
 
 
 def build(cd=3200.0, mu=0.35, mass=MASS, pos=(0., 0., GZ + BOUNCE_Z), vel=(0., 0., 0.),
-          rot=None, gseq=None):
+          rot=None, gseq=None, seat=True, gravity=(0.0, 0.0, -9.81)):
+    """seat=True places the body's LOWEST VERTEX on the table, then lifts by pos[2] - GZ.
+
+    Without this the caller is positioning the body ORIGIN, which for this bowl sits
+    31.8 mm above its lowest vertex -- so a nominal 20 mm clearance actually started the
+    object 11.8 mm INSIDE the table. The solver then ejected it, and how hard it ejected
+    depended on the mass. That is the whole reason the mass null control moved.
+    MeshProbeScene.rest_height() exists for exactly this and was simply not called.
+    (CLAUDE.md already records the same failure from the balance probe: "a bowl is a
+    shell ... a payload seated there starts inside the floor and gets ejected".)
+    """
     from src.sim.mesh_scene import MeshProbeScene
     s = MeshProbeScene([OBJ], [list(pos)], [list(vel)], rot0=None if rot is None else [rot],
                        masses=[float(mass)], ground_z=GZ, dt=1.0 / (FPS * SUBSTEPS),
                        n_steps=NF * SUBSTEPS, k=2500.0, cd=[float(cd)], mu=[float(mu)],
                        mesh_scale=[SCALE], faces=900, ground_mu=0.45, ground_cd=3000.0,
-                       table=TABLE)
-    s.calibrate_stiffness()
+                       table=TABLE, gravity=gravity)
+    s.calibrate_stiffness(pen_frac=PEN_FRAC)
+    if seat:
+        # rotation-aware: rest_height() measures the body frame, but the settle scene tips
+        # the bowl 202 degrees onto its dome, and the lowest point of a rotated shell is
+        # not the lowest point of the unrotated one.
+        L = s.local.numpy().astype(float)
+        R = np.eye(3) if rot is None else quat_to_mat(rot)
+        low = float(((R @ L.T).T)[:, 2].min())
+        lift = float(pos[2]) - GZ
+        s.pos0 = np.array([[float(pos[0]), float(pos[1]), GZ - low + lift]], np.float32)
     if gseq is not None:
         s.gravity_seq = gseq
     return s
@@ -243,7 +295,7 @@ def do_sim(args):
         if "settle" in args.probes:
             print("settle: tipped onto its dome and released, cd swept")
             for cd in CD:
-                r = track(build(cd=cd, pos=(0., 0., GZ + 0.075),
+                r = track(build(cd=cd, pos=(0., 0., GZ + 0.002),
                                 rot=quat_mul(quat_y(180.0), quat_y(22.0))))
                 if r is None:
                     print(f"  cd={cd:8.0f}  DIVERGED"); continue
@@ -254,7 +306,7 @@ def do_sim(args):
         if "tilt" in args.probes:
             print(f"tilt: continuous ramp 0->{TILT1:.0f} deg, mu swept")
             for mu in MU:
-                r = track(build(mu=mu, pos=(TILT_X0, 0.0, GZ + 0.02), gseq=ramp),
+                r = track(build(mu=mu, pos=(TILT_X0, 0.0, GZ + 0.002), gseq=ramp),
                           tilt_seq=tilt_seq)
                 if r is None:
                     print(f"  mu={mu:5.3f}  DIVERGED"); continue
@@ -265,7 +317,7 @@ def do_sim(args):
 
             print("mass null control: same ramp, mass swept (slip is mass-independent)")
             for mk in MASSES:
-                r = track(build(mu=MU_REF, mass=mk, pos=(TILT_X0, 0.0, GZ + 0.02), gseq=ramp),
+                r = track(build(mu=MU_REF, mass=mk, pos=(TILT_X0, 0.0, GZ + 0.002), gseq=ramp),
                           tilt_seq=tilt_seq)
                 if r is None:
                     print(f"  m={mk:5.3f}  DIVERGED"); continue
@@ -274,13 +326,36 @@ def do_sim(args):
                 dx = r[0][-1]["loc"][0] - r[0][0]["loc"][0]
                 print(f"  m={mk:5.3f}  slid {100*dx:6.2f} cm")
 
+        if "gravity" in args.probes:
+            print(f"gravity tier: bounce and tilt at g = {GRAVITIES}")
+            for g in GRAVITIES:
+                r = track(build(cd=CD_REF, gravity=(0.0, 0.0, -g)))
+                if r is not None:
+                    add(f"grav_bounce_g{g:05.2f}", *r, probe="gravity", param="g",
+                        value=float(g), ref=G_EARTH, pair_kind="bounce")
+                rg = ramp_gravity_seq(TILT0, TILT1, NF, SUBSTEPS, settle_frames=6, g=g)
+                r = track(build(mu=MU_REF, pos=(TILT_X0, 0.0, GZ + 0.002), gseq=rg),
+                          tilt_seq=tilt_seq)
+                if r is not None:
+                    add(f"grav_tilt_g{g:05.2f}", *r, tilt=tilt_seq, probe="gravity",
+                        param="g", value=float(g), ref=G_EARTH, pair_kind="tilt")
+                print(f"  g={g:5.2f}")
+
         if "control" in args.probes:
-            print("violation controls, authored on the reference bounce track")
-            ref = track(build(cd=CD_REF))
-            for kind in VIOLATIONS:
-                add(f"viol_{kind}", corrupt(ref[0], kind), ref[1],
-                    probe="violation", param=kind, value=0.0, ref=0.0)
-                print(f"  {kind}")
+            # violations on SEVERAL sources spread across the probes, so the pairwise
+            # accuracy has n=30 rather than n=5. One source clip gave 3/5, which is
+            # indistinguishable from chance.
+            srcs = [r for r in spec if r["probe"] in ("bounce", "settle", "tilt")]
+            idx = np.linspace(0, len(srcs) - 1, VIOL_SOURCES).round().astype(int)
+            print(f"violation tier: {VIOL_SOURCES} sources x {len(VIOLATIONS)} kinds")
+            for i in sorted(set(idx)):
+                sk = srcs[i]["key"]
+                base_seq = scenes[sk]["objects"]["subject"]
+                for kind in VIOLATIONS:
+                    add(f"viol_{kind}__{sk}", corrupt(base_seq, kind), meta[sk],
+                        tilt=scenes[sk]["tilt_deg"], probe="violation", param=kind,
+                        value=0.0, ref=0.0, pair_with=sk)
+                print(f"  on {sk}")
 
     (LAB / "scene_poses.json").write_text(json.dumps(scenes))
     (LAB / "scene.json").write_text(json.dumps({
@@ -363,7 +438,8 @@ def spec_of(lab):
 # bounce track and the floor labs are re-renders of it, so all three have to be framed
 # identically or the comparison measures the crop. The mass null runs the tilt ramp at the
 # reference mu, so it shares the tilt box for the same reason.
-BOX_FROM = {"violation": "bounce", "floor": "bounce", "null": "tilt"}
+BOX_FROM = {"floor": "bounce", "null": "tilt", "gravity": "bounce",
+            "violation": "bounce"}
 
 
 def shared_boxes(cam, meta, spec, W, H):
@@ -396,6 +472,11 @@ def shared_boxes(cam, meta, spec, W, H):
             print(f"  probe {probe:<10} box {per_probe[probe]}  borrowed from {src}")
 
     out = {k: per_probe[r["probe"]] for k, r in spec.items() if r["probe"] in per_probe}
+    # A violation must be framed EXACTLY like the clip it was authored from -- that is the
+    # whole point of a matched pair -- so it takes its source's box, not its probe's.
+    for k, r in spec.items():
+        if r.get("pair_with") and r["pair_with"] in out:
+            out[k] = out[r["pair_with"]]
     out["__floor__"] = per_probe.get("floor")
     return out
 
@@ -490,7 +571,7 @@ MODES = {"sim": do_sim, "clip": do_clip, "score": do_score}
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("mode", choices=list(MODES))
-    ap.add_argument("--probes", default="bounce,settle,tilt,control")
+    ap.add_argument("--probes", default="bounce,settle,tilt,gravity,control")
     ap.add_argument("--floor", action="store_true", default=True)
     a = ap.parse_args()
     a.probes = a.probes.split(",")
