@@ -49,7 +49,7 @@ def report(name, pairs, rows, stat, note=""):
     lo, hi = wilson(ok, n)
     med = sorted(deltas)[n // 2]
     flag = "" if lo > 0.5 else ("  <- includes chance" if hi > 0.5 else "  <- BELOW chance")
-    print(f"  {name:<26} {stat:<5} {ok:>3}/{n:<3} = {100*ok/n:5.1f}%"
+    print(f"  {name:<12} {stat:<5} {ok:>3}/{n:<3} = {100*ok/n:5.1f}%"
           f"  95% CI [{100*lo:4.1f}, {100*hi:4.1f}]   median gap {med:+.2f}%{flag}")
     if note:
         print(f"       {note}")
@@ -90,9 +90,9 @@ def main():
     for name, pairs in tiers.items():
         if not pairs:
             continue
-        print(name)
+        print(f"{name}   ({len(pairs)} pairs)")
         for stat in ("max", "mean"):
-            report(name, pairs, rows, stat)
+            report("", pairs, rows, stat)
         if name in notes:
             print(f"       {notes[name]}")
         print()
@@ -107,7 +107,7 @@ def main():
     if null:
         print("NULL CONTROL (mass; must sit at chance)")
         for stat in ("max", "mean"):
-            report("mass sweep", null, rows, stat)
+            report("mass", null, rows, stat)
 
 
 if __name__ == "__main__":
