@@ -34,11 +34,16 @@ def wilson(k, n, z=1.96):
     return (max(0.0, c - h), min(1.0, c + h))
 
 
-def report(name, pairs, rows, stat, note=""):
+RESULTS = []
+
+
+def report(name, pairs, rows, stat, tier="", note=""):
     """pairs: list of (implausible_key, plausible_key)."""
     ok, deltas = 0, []
     for bad, good in pairs:
         if bad not in rows or good not in rows:
+            continue
+        if stat not in rows[bad] or stat not in rows[good]:
             continue
         d = rows[bad][stat] - rows[good][stat]
         deltas.append(100 * d / rows[good][stat])
@@ -49,7 +54,11 @@ def report(name, pairs, rows, stat, note=""):
     lo, hi = wilson(ok, n)
     med = sorted(deltas)[n // 2]
     flag = "" if lo > 0.5 else ("  <- includes chance" if hi > 0.5 else "  <- BELOW chance")
-    print(f"  {name:<12} {stat:<5} {ok:>3}/{n:<3} = {100*ok/n:5.1f}%"
+    RESULTS.append({"tier": tier or name, "stat": stat, "correct": ok, "n": n,
+                    "accuracy": 100 * ok / n, "ci": [100 * lo, 100 * hi],
+                    "median_gap_pct": med,
+                    "above_chance": bool(lo > 0.5)})
+    print(f"  {name:<12} {stat:<9} {ok:>3}/{n:<3} = {100*ok/n:5.1f}%"
           f"  95% CI [{100*lo:4.1f}, {100*hi:4.1f}]   median gap {med:+.2f}%{flag}")
     if note:
         print(f"       {note}")
@@ -59,7 +68,11 @@ def main():
     src = Path(sys.argv[1]) if len(sys.argv) > 1 else \
         Path("docs/results/v1_protocol_vjepa2-vitl-fpc64-256.json")
     if not src.exists():
-        src = Path("docs/results/v1_protocol.json")
+        # NO silent fallback. An earlier version fell back to a stale results file when
+        # the requested path was missing, and produced plausible-looking numbers from a
+        # contaminated run -- the exact failure mode this project keeps paying for.
+        sys.exit(f"{src} does not exist. Available:\n  " + "\n  ".join(
+            str(x) for x in sorted(Path("docs/results").glob("v1_protocol*.json"))))
     blob = json.loads(src.read_text())
     rows = blob["rows"]
     print(f"{src}   {len(rows)} clips\n")
@@ -91,8 +104,9 @@ def main():
         if not pairs:
             continue
         print(f"{name}   ({len(pairs)} pairs)")
-        for stat in ("max", "mean"):
-            report("", pairs, rows, stat)
+        for stat in ("max", "mean", "peak", "obj_max", "obj_mean"):
+            if any(stat in rows[a] for a, _ in pairs):
+                report("", pairs, rows, stat, tier=name)
         if name in notes:
             print(f"       {notes[name]}")
         print()
@@ -106,8 +120,18 @@ def main():
     null = [(a, b) for a, b in null if b]
     if null:
         print("NULL CONTROL (mass; must sit at chance)")
-        for stat in ("max", "mean"):
-            report("mass", null, rows, stat)
+        for stat in ("max", "mean", "peak", "obj_max", "obj_mean"):
+            if any(stat in rows[a] for a, _ in null):
+                report("mass", null, rows, stat, tier="null control (mass)")
+
+
+    out = Path("docs/results") / (src.stem.replace("v1_protocol", "v1_pairs") + ".json")
+    out.write_text(json.dumps({"source": str(src), "results": RESULTS,
+                               "reference": {"model": "vit-l-rope-vm2m, IntPhys O1-O3",
+                                             "accuracy_pct": [96.7, 100.0],
+                                             "within_scene_gap_pct": [0.29, 0.61],
+                                             "pooled_across_scenes_pct": -1.77}}, indent=1))
+    print(f"\nwrote {out}")
 
 
 if __name__ == "__main__":

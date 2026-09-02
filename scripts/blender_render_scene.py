@@ -218,7 +218,16 @@ def main():
     sc.render.resolution_y = int(CAM["height"] * _RS)
     sc.render.image_settings.file_format = "PNG"
 
-    for key, info in poses.items():
+    # SHARD="k/N" makes this process take only every Nth scene, so several workers can
+    # split one LAB without racing on the same output directory. Needed because a frame is
+    # GPU-light (nvidia-smi pmon attributes only 3-17% sm to each blender process at
+    # 544x448 / 48 samples) and CPU-heavy -- depsgraph sync, BVH refit, OIDN denoise and
+    # PNG write dominate, so throughput scales with processes, not with cards.
+    _shard = os.environ.get("SHARD")
+    _sk, _sn = (int(x) for x in _shard.split("/")) if _shard else (0, 1)
+    for _idx, (key, info) in enumerate(poses.items()):
+      if _idx % _sn != _sk:
+        continue
       acting = info["objects"]
       n_frames = min(len(v) for v in acting.values())
       for vn, camobj in cams.items():

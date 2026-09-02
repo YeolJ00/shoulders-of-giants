@@ -93,7 +93,26 @@ class SurpriseModel:
         self.tps = self.grid * self.grid
         self.depth = self.frames // self.tubelet
         self.n_tokens = self.depth * self.tps
+        self.clip_frames = self.frames          # frames actually fed; see set_clip_frames
         self._checked = False
+
+    def set_clip_frames(self, n):
+        """Feed n frames instead of the checkpoint's pretraining count.
+
+        The reference intuitive-physics eval feeds 16 frames with frame_step 4 -- from
+        15 fps IntPhys footage that is 3.75 fps effective. Our clips are 24 fps and
+        unsubsampled, i.e. 3-6x denser in time and so 3-6x less motion per frame, which is
+        the regime V0 showed the harness cannot read. Token positions are a PREFIX of the
+        pretraining grid (t = n // tps), so a shorter clip addresses rope positions 0..n/2-1
+        and stays valid; only the guard has to know the new length.
+        """
+        if n % self.tubelet:
+            raise ValueError(f"{n} frames is not a multiple of tubelet {self.tubelet}")
+        self.clip_frames = int(n)
+        self.depth = self.clip_frames // self.tubelet
+        self.n_tokens = self.depth * self.tps
+        self._checked = False
+        return self
 
     def slot_tokens(self, s0, s1, spatial=None):
         """Token ids for temporal slots [s0, s1) at THIS checkpoint's geometry."""
@@ -103,7 +122,8 @@ class SurpriseModel:
     def config(self):
         """Everything that invalidates a cached score (rule 5)."""
         return {"model": self.model_id, "dtype": str(self.dtype), "frames": self.frames,
-                "size": self.size, "causal_start": CAUSAL_START, "horizon": HORIZON,
+                "size": self.size, "clip_frames": self.clip_frames,
+                "causal_start": CAUSAL_START, "horizon": HORIZON,
                 "target_norm": "layer_norm", "metric": "l1"}
 
     # ---------------------------------------------------------------- encoding
@@ -127,7 +147,7 @@ class SurpriseModel:
                              output_hidden_states=layer is not None)
         toks = out.hidden_states[layer] if layer is not None else out.last_hidden_state
         if not self._checked:
-            if tuple(px.shape) != (1, self.frames, 3, self.size, self.size):
+            if tuple(px.shape) != (1, self.clip_frames, 3, self.size, self.size):
                 raise RuntimeError(f"video did not reach the model as expected: {tuple(px.shape)}")
             if toks.shape[1] != self.n_tokens:
                 raise RuntimeError(

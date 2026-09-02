@@ -16,6 +16,7 @@ condition is spread-above-floor plus monotonicity; where the minimum lands is RE
 not required (rule 2 -- invariants, not reference values).
 """
 import json
+import sys
 from collections import defaultdict
 from pathlib import Path
 
@@ -24,7 +25,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 
-SRC = Path("docs/results/v1_surprise.json")
+SRC = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("docs/results/v1_surprise.json")
 OUT = Path("docs/results")
 LABEL = {"cd": "contact damping  cd", "mu": "friction  mu", "mass": "mass  (kg)"}
 
@@ -178,7 +179,7 @@ def main():
 
     _alt_statistics(by, floor)
     _plots(stats, viol, f_mean, sigma, legal_max)
-    (OUT / "v1_verdict.json").write_text(json.dumps(
+    (OUT / (SRC.stem.replace("_surprise", "") + "_verdict.json")).write_text(json.dumps(
         {"sigma": sigma, "sigma_seed": s_seed, "sigma_jitter": s_jit, "floor_mean": f_mean,
          "sigma_ratio": sigma_r, "ratio_seed": r_seed, "ratio_jitter": r_jit,
          "ratio_floor_mean": r_mean,
@@ -253,8 +254,8 @@ def _plots(stats, viol, f_mean, sigma, legal_max):
     bx.set_title("gross violations\n(control: these must fire)", fontsize=9)
     fig.suptitle("V1 -- does surprise depend on theta?", fontsize=12)
     fig.tight_layout(rect=(0, 0, 1, 0.93))
-    fig.savefig(OUT / "v1_surprise_vs_theta.png", dpi=150)
-    print(f"wrote {OUT}/v1_surprise_vs_theta.png")
+    fig.savefig(OUT / (SRC.stem.replace("_surprise", "") + "_surprise_vs_theta.png"), dpi=150)
+    print("wrote the sweep figure")
 
 
 if __name__ == "__main__":

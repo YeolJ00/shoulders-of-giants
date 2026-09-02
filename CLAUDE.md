@@ -98,6 +98,28 @@ attacks.
 
 ## Findings that changed the plan
 
+- **The published 98% is IntPhys 1, and IntPhys 1 is coloured shapes on plain
+  backgrounds.** IntPhys **2** — realistic objects, complex backgrounds, moving cameras —
+  reports that "most models perform at chance levels (50%)", against near-perfect human
+  performance (arXiv 2506.09849). Our scenes are a textured object on a wooden table, i.e.
+  squarely the regime where the benchmark's own authors measure the capability as absent.
+  Any expectation set from the 98% figure is set against the wrong benchmark.
+- **The context must be encoded WITH the mask, not gathered from a full-clip encode.**
+  The reference does two forwards — `context = encoder(pieces, masks_enc)` and
+  `h = target_encoder(pieces, full_mask)` — because a context token computed with full
+  self-attention has already seen the region it is being asked to predict. HF's
+  `VJEPA2Model` gathers instead, and its `VJEPA2Encoder` accepts no mask argument, so the
+  HF path *cannot* do this correctly. Measured leak on the 2.1 ViT-g checkpoint:
+  `max |masked - gathered| = 0.043`, against an effect size of ~0.4%. Every V-track number
+  produced through HF before 2026-09-02 is contaminated, including a null control that
+  came out at rho = +1.000 — which the leak plausibly explains, since context tokens that
+  absorb target-region information make the context itself vary with theta.
+- **Two checkpoints, not one.** Checkpoints ship `encoder` AND `target_encoder`; context
+  uses the former, targets the latter. Using one for both is another silent contaminant.
+- **Sweep the context length densely and slide the window.** The IntPhys2 evaluator does
+  both, for the reason its own comment gives: "in case the physics breaking event happens
+  before CONTEXT + 1". We do not know when a clip goes wrong, so committing to one split
+  throws away the localisation.
 - **A published effect size is part of the calibration, not background reading.** The
   intuitive-physics result rests on a within-scene gap of ~0.4%, and reverses sign when
   pooled across scenes. Any experiment aimed at it needs matched pairs and tens of them;
@@ -249,6 +271,14 @@ attacks.
 - If V1 passes for some probes only, use surprise for those and keep sim-side threshold
   reading for the rest. Mixed supervision is fine; unvalidated supervision is not.
 - Every V1 plot goes in `docs/results/` with the noise floor drawn on it.
+- **Score through Meta's own codebase (`models/vjepa2_repo`), never HF transformers.** HF
+  cannot pass masks to the encoder, so it structurally cannot reproduce the protocol. Note
+  the repo ships `VJEPA_BASE_URL = "http://localhost:8300"` as a dev override; the real
+  host is `https://dl.fbaipublicfiles.com/vjepa2`.
+- **Only NON-DISTILLED checkpoints can score surprise.** `vjepa2_1_vitb/vitl_dist_vitG_384`
+  predict into a 1664-d teacher space they do not contain. `vjepa2_1_vitg_384` (1B) and
+  `vjepa2_1_vitG_384` (2B) are the teachers and are self-consistent: verified by loading,
+  encoder 1408 and predictor out 5632 = 4 x 1408 Deep-Self-Supervision levels.
 - **Clip framing is fixed per probe and reported.** A crop box that varies with θ, or a
   clip whose object leaves the frame, is a confound and not a reading.
 - **Carry the motion caveat into every verdict.** A θ that damps harder also moves less, and
