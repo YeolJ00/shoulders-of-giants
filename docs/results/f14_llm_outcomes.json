@@ -1,0 +1,38 @@
+{
+ "baselines": {
+  "chance": 0.28333333333333327,
+  "majority": 0.5
+ },
+ "models": {
+  "claude-opus-5-5": {
+   "n": 48,
+   "acc": 1.0,
+   "acc_incline": 1.0,
+   "acc_shove": 1.0,
+   "logloss": 0.2765647255269225,
+   "p_truth": 0.7622306397306398,
+   "wrong": []
+  },
+  "gemini-3.1-pro-preview": {
+   "n": 48,
+   "acc": 0.9583333333333334,
+   "acc_incline": 0.9666666666666667,
+   "acc_shove": 0.9444444444444444,
+   "logloss": 0.1764470439513329,
+   "p_truth": 0.8731249999999999,
+   "wrong": [
+    "bowl_shove1.0: truth 5-20 cm, said 20-80 cm",
+    "books_incline40: truth slides, said topples"
+   ]
+  },
+  "gpt-6-astra": {
+   "n": 48,
+   "acc": 1.0,
+   "acc_incline": 1.0,
+   "acc_shove": 1.0,
+   "logloss": 0.22486091178066395,
+   "p_truth": 0.8068750000000001,
+   "wrong": []
+  }
+ }
+}
