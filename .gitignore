@@ -19,3 +19,11 @@ assets/soft/
 docs/*.html
 docs/iters/
 docs/videos/
+
+# Physics 101 real-video dataset (4.5 GB, downloaded from phys101.csail.mit.edu)
+data/phys101/
+
+# Model weights (V-JEPA 2.1 ViT-g/G: 45 GB), vendored third-party code (FPT, MYRIAD,
+# V-JEPA repo), vendored Python packages and the OWM eval data. MYRIAD carries one local
+# patch (fp32 flex-attention tile, models/myriad/myriad/model.py) -- recorded in CLAUDE.md.
+models/
