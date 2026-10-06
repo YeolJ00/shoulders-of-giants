@@ -1,0 +1,89 @@
+"""docs/FPT.html -- the motion-prior investigation, including what I got wrong.
+
+Every figure is read from docs/results/ at build time.
+"""
+import json
+from pathlib import Path
+
+G = json.load(open("docs/results/f0_fpt_gate.json"))
+C = json.load(open("docs/results/f0_fpt_components.json"))
+STYLE = Path("docs/V_TRACK.html").read_text().split("<style>")[1].split("</style>")[0]
+
+comp = "".join(
+    f'<tr><td>{c["clip"]}</td><td>{c["true24"]:.0f}</td><td>{c["best_mode"]:.1f}</td>'
+    f'<td>{c["best_wt"]:.3f}</td><td>{c["mix_mean"]:.2f}</td>'
+    f'<td>{c["static_wt"]:.3f}</td></tr>' for c in C)
+med = sorted(c["true24"] / c["best_mode"] for c in C)[len(C) // 2]
+
+H = f"""<title>The Motion Prior</title>
+<style>{STYLE}
+.step{{border-left:3px solid var(--dead);padding:2px 0 2px 18px;margin:20px 0;max-width:40rem}}
+.step b{{color:var(--dead)}}
+.ok{{border-left-color:var(--live)}} .ok b{{color:var(--live)}}
+</style>
+<div class="wrap">
+<header>
+<div class="eyebrow">reify &middot; motion prior &middot; result and three corrections</div>
+<h1>A model that predicts motion, asked about a scene where nothing looks like it moves</h1>
+<p class="lede">Flow Poke Transformer outputs a probability distribution over future motion,
+so our own simulated trajectory can be <em>scored</em> rather than re-measured. That would
+remove the circularity in using a classifier to read a displacement the simulator already
+knows. It does not work here &mdash; and three of my own measurements had to be corrected
+along the way.</p>
+</header>
+
+<h2>What it is</h2>
+<p>Input: one image through DINOv2, plus <em>pokes</em> &mdash; observed flow at chosen
+points &mdash; plus a <code>camera_static</code> flag. No text. Output: a 4-component
+Gaussian mixture over the flow at each query point, so <code>.log_prob(our_flow)</code>
+scores our motion. Trained on point tracks with a horizon of <code>skip = 25</code> source
+frames, about one second.</p>
+
+<h2>Three corrections</h2>
+<div class="step"><b>1. The poke leaked the answer.</b> Scoring the true motion against the
+same motion reversed, the model preferred the physically possible direction
+<b>43/43</b>. But the poke was the object's own first four frames &mdash; already moving
+downhill &mdash; so continuing the line needs no knowledge of gravity. With a neutral poke
+(two static table corners) it preferred the <em>impossible</em> direction <b>1/43</b>, and
+with no poke at all <b>0/43</b>. I had recorded "it knows physics" on the strength of the
+leaky version.</div>
+
+<div class="step"><b>2. I read the mean of a bimodal distribution.</b> Every "predicts
+nothing moves" number came from the mixture mean. For an object in mid-air the mixture puts
+<b>0.995</b> of its weight on a near-zero component, so the mean is 0.7 px &mdash; while a
+genuine falling mode exists, pointing correctly downward, at 44 px. The mean is the one
+statistic that destroys a distribution like this.</div>
+
+<div class="step"><b>3. The horizon was mismatched.</b> I compared its ~1 s prediction
+against 0.67 s of our motion. Corrected to a matched second, the gap gets slightly worse,
+not better.</div>
+
+<h2>The control that settles it: an object in mid-air must fall</h2>
+<p>Frame 0 of the drop clips shows the object airborne at 32 cm. True motion is simulator
+ground truth &mdash; world points from <code>meta.json</code> projected through the render's
+own camera into clip pixels, never measured from pixels.</p>
+<div class="scroll"><table>
+<tr><th>clip</th><th>true @1 s (px)</th><th>best mode</th><th>its weight</th>
+<th>mixture mean</th><th>static weight</th></tr>{comp}</table></div>
+<div class="note"><b>The direction is right and the mass is on "nothing happens".</b> The
+model does contain a falling mode, pointing correctly downward &mdash; but it is
+{med:.1f}&times; too small and carries essentially no weight. 99.5% of the probability says
+the scene stays still.</div>
+
+<h2>What that means</h2>
+<p>This is a defensible prior for a <em>photograph</em>: in real video, a point in a still
+frame mostly does not move much over the next second. Our scene is the unusual one. Nothing
+in a single rendered frame says the ramp is about to matter, or that the bowl is in the air
+rather than resting on something.</p>
+<div class="note"><b>So it is a statement about our renders as much as about the model</b>,
+and that is now a testable question rather than a hunch: does a <em>real photograph</em> of
+an object in mid-air put meaningful weight on the falling mode? If it does, the render gap
+is the problem. That needs one real image, not a footage corpus &mdash; the first cheap
+handle this project has had on a gap it has been unable to measure.</p>
+<p>Fitting &theta; to this as a target does not work meanwhile: across 9 friction sweeps the
+self-consistency fit found <b>0 crossings</b>, with the model under-predicting motion at
+every &mu; tested, so the fit drives friction to its maximum.</p>
+<footer>reify &middot; generated by scripts/fpt_writeup.py &middot; figures read from
+docs/results/f0_fpt_gate.json and f0_fpt_components.json</footer></div>"""
+Path("docs/FPT.html").write_text(H)
+print(f"wrote docs/FPT.html ({len(H)} bytes)")
