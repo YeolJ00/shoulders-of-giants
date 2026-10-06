@@ -1,0 +1,328 @@
+{
+ "model": "facebook/vjepa2-vitg-fpc64-384-ssv2",
+ "views": [
+  "a",
+  "b",
+  "c",
+  "d"
+ ],
+ "rows": [
+  {
+   "key": "ga_mu0.100",
+   "probe": "tilt",
+   "param": "mu",
+   "value": 0.1,
+   "ref": 0.44050796049237234,
+   "slide_cm": 65.43412796227719,
+   "n_views": 4,
+   "agreement": 0.75,
+   "top1_per_view": [
+    "Lifting a surface with [something] on it until it starts sliding down",
+    "Lifting a surface with [something] on it until it starts sliding down",
+    "Turning the camera left while filming [something]",
+    "Lifting a surface with [something] on it until it starts sliding down"
+   ],
+   "avg_top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "avg_margin": 0.4884595666080713,
+   "per_view_margin": {
+    "a": 0.5758057283237576,
+    "b": 0.4723403850803152,
+    "c": 0.25684193277265877,
+    "d": 0.6488502202555537
+   }
+  },
+  {
+   "key": "ga_mu0.123",
+   "probe": "tilt",
+   "param": "mu",
+   "value": 0.12300755055779712,
+   "ref": 0.44050796049237234,
+   "slide_cm": 49.30860463138216,
+   "n_views": 4,
+   "agreement": 0.75,
+   "top1_per_view": [
+    "Lifting a surface with [something] on it until it starts sliding down",
+    "Lifting a surface with [something] on it until it starts sliding down",
+    "Putting [something] that can't roll onto a slanted surface, so it slides down",
+    "Lifting a surface with [something] on it until it starts sliding down"
+   ],
+   "avg_top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "avg_margin": 0.48408939814544283,
+   "per_view_margin": {
+    "a": 0.5772463381290436,
+    "b": 0.39610840915702283,
+    "c": 0.31389659515116364,
+    "d": 0.6491062501445413
+   }
+  },
+  {
+   "key": "ga_mu0.151",
+   "probe": "tilt",
+   "param": "mu",
+   "value": 0.15130857494229014,
+   "ref": 0.44050796049237234,
+   "slide_cm": 34.96229672659181,
+   "n_views": 4,
+   "agreement": 0.5,
+   "top1_per_view": [
+    "Lifting a surface with [something] on it until it starts sliding down",
+    "Tilting [something] with [something] on it slightly so it doesn't fall down",
+    "Putting [something] that can't roll onto a slanted surface, so it slides down",
+    "Lifting a surface with [something] on it until it starts sliding down"
+   ],
+   "avg_top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "avg_margin": 0.3606084014172666,
+   "per_view_margin": {
+    "a": 0.5019441740587354,
+    "b": 0.26269726268947124,
+    "c": 0.2512097505386919,
+    "d": 0.4265824183821678
+   }
+  },
+  {
+   "key": "ga_mu0.186",
+   "probe": "tilt",
+   "param": "mu",
+   "value": 0.18612097182041995,
+   "ref": 0.44050796049237234,
+   "slide_cm": 24.303025829110897,
+   "n_views": 4,
+   "agreement": 0.5,
+   "top1_per_view": [
+    "Lifting a surface with [something] on it until it starts sliding down",
+    "Tilting [something] with [something] on it slightly so it doesn't fall down",
+    "Putting [something] that can't roll onto a slanted surface, so it slides down",
+    "Lifting a surface with [something] on it until it starts sliding down"
+   ],
+   "avg_top1": "Tilting [something] with [something] on it slightly so it doesn't fall down",
+   "avg_margin": 0.1368815046735108,
+   "per_view_margin": {
+    "a": 0.2509436719119549,
+    "b": 0.05341770127415657,
+    "c": 0.13132051564753056,
+    "d": 0.11184412986040115
+   }
+  },
+  {
+   "key": "ga_mu0.229",
+   "probe": "tilt",
+   "param": "mu",
+   "value": 0.22894284851066635,
+   "ref": 0.44050796049237234,
+   "slide_cm": 16.027062134523717,
+   "n_views": 4,
+   "agreement": 0.25,
+   "top1_per_view": [
+    "Lifting a surface with [something] on it until it starts sliding down",
+    "Tilting [something] with [something] on it until it falls off",
+    "Putting [something] that can't roll onto a slanted surface, so it slides down",
+    "Turning the camera left while filming [something]"
+   ],
+   "avg_top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "avg_margin": 0.08913275739178061,
+   "per_view_margin": {
+    "a": 0.2317798063158989,
+    "b": 0.05641278997063637,
+    "c": 0.0677442867308855,
+    "d": 0.0005941465497016907
+   }
+  },
+  {
+   "key": "ga_mu0.282",
+   "probe": "tilt",
+   "param": "mu",
+   "value": 0.28161699013021885,
+   "ref": 0.44050796049237234,
+   "slide_cm": 10.98215365613876,
+   "n_views": 4,
+   "agreement": 0.5,
+   "top1_per_view": [
+    "Lifting a surface with [something] on it until it starts sliding down",
+    "Tilting [something] with [something] on it slightly so it doesn't fall down",
+    "Putting [something] that can't roll onto a slanted surface, so it slides down",
+    "Lifting a surface with [something] on it until it starts sliding down"
+   ],
+   "avg_top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "avg_margin": 0.13324060197919607,
+   "per_view_margin": {
+    "a": 0.35941116884350777,
+    "b": 0.0625998005270958,
+    "c": 0.11094331741333008,
+    "d": 8.121132850646973e-06
+   }
+  },
+  {
+   "key": "ga_mu0.346",
+   "probe": "tilt",
+   "param": "mu",
+   "value": 0.34641016151377546,
+   "ref": 0.44050796049237234,
+   "slide_cm": 6.0772871148378265,
+   "n_views": 4,
+   "agreement": 0.5,
+   "top1_per_view": [
+    "Lifting a surface with [something] on it until it starts sliding down",
+    "Tilting [something] with [something] on it slightly so it doesn't fall down",
+    "Putting [something] that can't roll onto a slanted surface, so it slides down",
+    "Lifting a surface with [something] on it until it starts sliding down"
+   ],
+   "avg_top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "avg_margin": 0.15110213961452246,
+   "per_view_margin": {
+    "a": 0.3307442031800747,
+    "b": 0.04350456967949867,
+    "c": 0.12611685320734978,
+    "d": 0.10404293239116669
+   }
+  },
+  {
+   "key": "ga_mu0.426",
+   "probe": "tilt",
+   "param": "mu",
+   "value": 0.42611065456140407,
+   "ref": 0.44050796049237234,
+   "slide_cm": 4.695603140352006,
+   "n_views": 4,
+   "agreement": 0.75,
+   "top1_per_view": [
+    "Lifting a surface with [something] on it until it starts sliding down",
+    "Tilting [something] with [something] on it slightly so it doesn't fall down",
+    "Lifting a surface with [something] on it until it starts sliding down",
+    "Lifting a surface with [something] on it until it starts sliding down"
+   ],
+   "avg_top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "avg_margin": 0.1583468047901988,
+   "per_view_margin": {
+    "a": 0.22967708855867386,
+    "b": 0.08930664509534836,
+    "c": 0.14347131177783012,
+    "d": 0.17093217372894287
+   }
+  },
+  {
+   "key": "ga_mu0.524",
+   "probe": "tilt",
+   "param": "mu",
+   "value": 0.5241482788417793,
+   "ref": 0.44050796049237234,
+   "slide_cm": 4.1660539693516405,
+   "n_views": 4,
+   "agreement": 0.75,
+   "top1_per_view": [
+    "Lifting a surface with [something] on it until it starts sliding down",
+    "Tilting [something] with [something] on it slightly so it doesn't fall down",
+    "Lifting a surface with [something] on it until it starts sliding down",
+    "Lifting a surface with [something] on it until it starts sliding down"
+   ],
+   "avg_top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "avg_margin": 0.1977343470789492,
+   "per_view_margin": {
+    "a": 0.31696681305766106,
+    "b": 0.054047442972660065,
+    "c": 0.20619945041835308,
+    "d": 0.21372368186712265
+   }
+  },
+  {
+   "key": "ga_mu0.645",
+   "probe": "tilt",
+   "param": "mu",
+   "value": 0.6447419590941251,
+   "ref": 0.44050796049237234,
+   "slide_cm": 5.424289861041837,
+   "n_views": 4,
+   "agreement": 0.5,
+   "top1_per_view": [
+    "Lifting a surface with [something] on it until it starts sliding down",
+    "Tilting [something] with [something] on it slightly so it doesn't fall down",
+    "Tilting [something] with [something] on it slightly so it doesn't fall down",
+    "Lifting a surface with [something] on it until it starts sliding down"
+   ],
+   "avg_top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "avg_margin": 0.11365928826853633,
+   "per_view_margin": {
+    "a": 0.19879555702209473,
+    "b": 0.05848427303135395,
+    "c": 0.09546444937586784,
+    "d": 0.1018928736448288
+   }
+  },
+  {
+   "key": "ga_mu0.793",
+   "probe": "tilt",
+   "param": "mu",
+   "value": 0.7930812913000376,
+   "ref": 0.44050796049237234,
+   "slide_cm": 3.0360229364440547,
+   "n_views": 4,
+   "agreement": 0.5,
+   "top1_per_view": [
+    "Lifting a surface with [something] on it until it starts sliding down",
+    "Tilting [something] with [something] on it slightly so it doesn't fall down",
+    "Putting [something] that can't roll onto a slanted surface, so it slides down",
+    "Lifting a surface with [something] on it until it starts sliding down"
+   ],
+   "avg_top1": "Tilting [something] with [something] on it slightly so it doesn't fall down",
+   "avg_margin": 0.1028612912632525,
+   "per_view_margin": {
+    "a": 0.1602095402777195,
+    "b": 0.0576251782476902,
+    "c": 0.11578680761158466,
+    "d": 0.07782363891601562
+   }
+  },
+  {
+   "key": "ga_mu0.976",
+   "probe": "tilt",
+   "param": "mu",
+   "value": 0.975549870360324,
+   "ref": 0.44050796049237234,
+   "slide_cm": 4.886269595176696,
+   "n_views": 4,
+   "agreement": 0.5,
+   "top1_per_view": [
+    "Lifting a surface with [something] on it until it starts sliding down",
+    "Tilting [something] with [something] on it until it falls off",
+    "Tilting [something] with [something] on it slightly so it doesn't fall down",
+    "Lifting a surface with [something] on it until it starts sliding down"
+   ],
+   "avg_top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "avg_margin": 0.0988716259598732,
+   "per_view_margin": {
+    "a": 0.14396505057811737,
+    "b": 0.058326445519924164,
+    "c": 0.07797794789075851,
+    "d": 0.11521705985069275
+   }
+  },
+  {
+   "key": "ga_mu1.200",
+   "probe": "tilt",
+   "param": "mu",
+   "value": 1.2,
+   "ref": 0.44050796049237234,
+   "slide_cm": 2.328717894634952,
+   "n_views": 4,
+   "agreement": 0.75,
+   "top1_per_view": [
+    "Lifting a surface with [something] on it until it starts sliding down",
+    "Tilting [something] with [something] on it until it falls off",
+    "Lifting a surface with [something] on it until it starts sliding down",
+    "Lifting a surface with [something] on it until it starts sliding down"
+   ],
+   "avg_top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "avg_margin": 0.15999961411580443,
+   "per_view_margin": {
+    "a": 0.26911545544862747,
+    "b": 0.04851943254470825,
+    "c": 0.138303367421031,
+    "d": 0.184060201048851
+   }
+  }
+ ],
+ "agree_frac": 0.38461538461538464,
+ "rho_theta_agreement": 0.2802197802197802,
+ "avg_boundary": null,
+ "mu_star": 0.44050796049237234,
+ "verdict": "FAIL"
+}

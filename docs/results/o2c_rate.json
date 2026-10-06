@@ -1,0 +1,107 @@
+{
+ "model": "facebook/vjepa2-vitg-fpc64-384-ssv2",
+ "rows": [
+  {
+   "key": "mu0.15_r24",
+   "probe": "tilt",
+   "param": "rate",
+   "value": 24.0,
+   "ref": 24.0,
+   "mu": 0.15,
+   "rate": 24,
+   "slide_cm": 373.67597320420714,
+   "margin": 0.8669668195652775
+  },
+  {
+   "key": "mu0.15_r40",
+   "probe": "tilt",
+   "param": "rate",
+   "value": 40.0,
+   "ref": 40.0,
+   "mu": 0.15,
+   "rate": 40,
+   "slide_cm": 167.04448768865007,
+   "margin": 0.8183107248041779
+  },
+  {
+   "key": "mu0.15_r64",
+   "probe": "tilt",
+   "param": "rate",
+   "value": 64.0,
+   "ref": 64.0,
+   "mu": 0.15,
+   "rate": 64,
+   "slide_cm": 40.83751806647528,
+   "margin": 0.6293242620304227
+  },
+  {
+   "key": "mu0.30_r24",
+   "probe": "tilt",
+   "param": "rate",
+   "value": 24.0,
+   "ref": 24.0,
+   "mu": 0.3,
+   "rate": 24,
+   "slide_cm": 133.61185525157066,
+   "margin": 0.8459450695663691
+  },
+  {
+   "key": "mu0.30_r40",
+   "probe": "tilt",
+   "param": "rate",
+   "value": 40.0,
+   "ref": 40.0,
+   "mu": 0.3,
+   "rate": 40,
+   "slide_cm": 62.42776276149928,
+   "margin": 0.761561029125005
+  },
+  {
+   "key": "mu0.30_r64",
+   "probe": "tilt",
+   "param": "rate",
+   "value": 64.0,
+   "ref": 64.0,
+   "mu": 0.3,
+   "rate": 64,
+   "slide_cm": 12.44537761109658,
+   "margin": 0.2282504290342331
+  },
+  {
+   "key": "mu0.60_r24",
+   "probe": "tilt",
+   "param": "rate",
+   "value": 24.0,
+   "ref": 24.0,
+   "mu": 0.6,
+   "rate": 24,
+   "slide_cm": 11.890128435864412,
+   "margin": 0.25453971326351166
+  },
+  {
+   "key": "mu0.60_r40",
+   "probe": "tilt",
+   "param": "rate",
+   "value": 40.0,
+   "ref": 40.0,
+   "mu": 0.6,
+   "rate": 40,
+   "slide_cm": 10.54564285014375,
+   "margin": 0.283004067838192
+  },
+  {
+   "key": "mu0.60_r64",
+   "probe": "tilt",
+   "param": "rate",
+   "value": 64.0,
+   "ref": 64.0,
+   "mu": 0.6,
+   "rate": 64,
+   "slide_cm": 6.223262171803146,
+   "margin": 0.27848041988909245
+  }
+ ],
+ "rho_slide": 0.8333333333333334,
+ "rho_rate": -0.6666666666666666,
+ "rho_mu": -0.7666666666666667
+}

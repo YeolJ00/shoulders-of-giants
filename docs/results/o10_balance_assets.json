@@ -1,0 +1,26 @@
+{
+ "apple": {
+  "n": 36,
+  "sign_ok": 34,
+  "sign_tot": 36,
+  "median_err_pct": 8.90598408190726
+ },
+ "teapot": {
+  "n": 36,
+  "sign_ok": 35,
+  "sign_tot": 36,
+  "median_err_pct": 5.110596541069845
+ },
+ "vase": {
+  "n": 36,
+  "sign_ok": 32,
+  "sign_tot": 36,
+  "median_err_pct": 180.96845478622683
+ },
+ "shark": {
+  "n": 36,
+  "sign_ok": 36,
+  "sign_tot": 36,
+  "median_err_pct": NaN
+ }
+}

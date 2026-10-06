@@ -172,7 +172,8 @@ def quat_y(deg):
 
 
 def build(cd=3200.0, mu=0.35, mass=MASS, pos=(0., 0., GZ + BOUNCE_Z), vel=(0., 0., 0.),
-          rot=None, gseq=None, seat=True, gravity=(0.0, 0.0, -9.81)):
+          rot=None, gseq=None, seat=True, gravity=(0.0, 0.0, -9.81), ang=(0., 0., 0.),
+          com=None):
     """seat=True places the body's LOWEST VERTEX on the table, then lifts by pos[2] - GZ.
 
     Without this the caller is positioning the body ORIGIN, which for this bowl sits
@@ -184,11 +185,13 @@ def build(cd=3200.0, mu=0.35, mass=MASS, pos=(0., 0., GZ + BOUNCE_Z), vel=(0., 0
     shell ... a payload seated there starts inside the floor and gets ejected".)
     """
     from src.sim.mesh_scene import MeshProbeScene
-    s = MeshProbeScene([OBJ], [list(pos)], [list(vel)], rot0=None if rot is None else [rot],
+    s = MeshProbeScene([OBJ], [list(pos)], [list(vel)], ang0=[list(ang)],
+                       rot0=None if rot is None else [rot],
                        masses=[float(mass)], ground_z=GZ, dt=1.0 / (FPS * SUBSTEPS),
                        n_steps=NF * SUBSTEPS, k=2500.0, cd=[float(cd)], mu=[float(mu)],
                        mesh_scale=[SCALE], faces=900, ground_mu=0.45, ground_cd=3000.0,
-                       table=TABLE, gravity=gravity)
+                       table=TABLE, gravity=gravity,
+                       com_offset=None if com is None else [com])
     s.calibrate_stiffness(pen_frac=PEN_FRAC)
     if seat:
         # rotation-aware: rest_height() measures the body frame, but the settle scene tips
@@ -204,7 +207,7 @@ def build(cd=3200.0, mu=0.35, mass=MASS, pos=(0., 0., GZ + BOUNCE_Z), vel=(0., 0
     return s
 
 
-def track(s, tilt_seq=None, n_pts=48):
+def track(s, tilt_seq=None, n_pts=48, stride=None):
     """Per-frame poses plus a handful of world points, for the crop box.
 
     The crop must follow the object through the RENDERED frame, so for a tilt scene the
@@ -212,7 +215,11 @@ def track(s, tilt_seq=None, n_pts=48):
     rotates the table -- about PIVOT, by that frame's own angle.
     """
     s.rollout()
-    P, Q = s.positions(SUBSTEPS), s.rotations(SUBSTEPS)
+    # stride must match the SUBSTEPS the scene was BUILT at. The bounce rig runs
+    # at 60 and the tilt rig at 420; reading a 60-substep rollout at stride 420
+    # returns 9 frames instead of 64 and the rebound came out non-monotone in cd.
+    st = SUBSTEPS if stride is None else int(stride)
+    P, Q = s.positions(st), s.rotations(st)
     if not (np.isfinite(P).all() and np.isfinite(Q).all()):
         return None
     # rule 3: an explicit solver reaches 1e5 m long before it reaches inf
@@ -227,13 +234,35 @@ def track(s, tilt_seq=None, n_pts=48):
     for t in range(len(P)):
         R = quat_to_mat(Q[t, 0])
         loc = P[t, 0] - R @ C
+        flat, Rf = loc.copy(), R.copy()
         w = (R @ V[idx].T).T + P[t, 0]
         if tilt_seq is not None:
             th = np.radians(float(tilt_seq[min(t, len(tilt_seq) - 1)]))
             Ry = np.array([[np.cos(th), 0, np.sin(th)], [0, 1, 0], [-np.sin(th), 0, np.cos(th)]])
             w = PIVOT + (Ry @ (w - PIVOT).T).T
+            # THE POSE MUST BE CARRIED INTO THE TILTED FRAME TOO, not just the crop points.
+            # The simulator tilts GRAVITY and leaves the ground plane flat, so its world
+            # positions are in the FLAT frame; the renderer tilts the TABLE. Sending the
+            # untransformed pose renders an object that ignores the table under it -- it
+            # stayed 2-3 mm above the FLAT plane while drifting 115 mm from the tilted
+            # table surface, so the object visibly floats free of the ramp. Only the crop
+            # points were being rotated, which is why framing looked right and the motion
+            # did not.
+            loc = PIVOT + Ry @ (loc - PIVOT)
+            R = Ry @ R
         seq.append({"loc": [float(v) for v in loc],
-                    "mat": [[float(v) for v in r] for r in R]})
+                    "mat": [[float(v) for v in r] for r in R],
+                    # "flat" is the position in the SIMULATOR's frame, where the plane is
+                    # level and gravity is what tilts. The slide along the ramp must be
+                    # measured there: in the rotated render frame the same slide reads as
+                    # slide*cos(theta) and picks up a spurious z. "loc" is for the renderer,
+                    # "flat" is for the observable.
+                    "flat": [float(v) for v in flat],
+                    # ...and the flat-frame ORIENTATION. "mat" is now rotated for the
+                    # renderer, so a topple test against (0,0,1) using it would just read
+                    # the ramp angle back -- re-breaking the observable the ramp-normal fix
+                    # repaired. Orientation observables use "mat_flat".
+                    "mat_flat": [[float(v) for v in r] for r in Rf]})
         pts.append(w.tolist())
     return seq, pts
 

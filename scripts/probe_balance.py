@@ -56,13 +56,23 @@ PAN_ASSET, PAN_SCALE = ("rigid", "wooden_bowl_01"), 0.75
 # sensitivity: at zero the beam is in neutral equilibrium and slams to a stop on any imbalance,
 # carrying no magnitude information at all. Larger values give a stiffer, less sensitive
 # instrument that settles at a small angle proportional to the load difference.
-PIVOT_RISE = 0.030
+# The pivot rise above the assembly's centre of mass IS the instrument's sensitivity, so
+# it is also the knob that decides which payloads the rig can weigh. A TALL payload raises
+# the combined CoM toward the pivot and the balance loses its restoring torque: the vase
+# (CoM ~0.11 m above the pan floor against a 0.030 m rise) read 21-36% low. Env-settable so
+# the rig can be re-tuned per payload rather than silently mis-weighing it.
+PIVOT_RISE = float(os.environ.get("BAL_PIVOT_RISE", "0.030"))
 ARM = 0.250
 PIVOT_H = 0.20
 COL_R, BASE_R, BASE_T = 0.016, 0.080, 0.016
 
 # The unknown. A real scanned asset, weighed against calibrated references.
-SUBJECT = ("rigid", "food_apple_01", 1.0, 0.182)    # cat, name, scale, TRUE mass (kg)
+# The subject is swappable so the balance can weigh more than one asset. Only assets
+# narrower than the 25 cm pan arm fit; the rig is calibrated for ~0.2 kg payloads.
+SUBJECT = (os.environ.get("BAL_CAT", "rigid"),
+           os.environ.get("BAL_OBJ", "food_apple_01"),
+           float(os.environ.get("BAL_SCALE", "1.0")),
+           float(os.environ.get("BAL_MASS", "0.182")))
 REFS = [0.05, 0.10, 0.15, 0.18, 0.22, 0.30, 0.50]
 
 
@@ -139,16 +149,31 @@ def ref_mesh(m):
     return trimesh.creation.box(extents=(max(a, 0.026),) * 3)
 
 
-def build(m_ref):
+def build(m_ref, m_subject=None, com=None):
+    # m_subject / com are exposed so the whole theta vector can be swept through this rig
+    # (o7_sensitivity). Default is the asset's true mass, so existing callers are unchanged.
     z_beam = GZ + PIVOT_H          # world height of the PIVOT
     names = [beam_with_pans(), stand_mesh(), subject_mesh(), ref_mesh(m_ref)]
-    masses = [0.45, 3.0, SUBJECT[3], m_ref]
+    masses = [0.45, 3.0, SUBJECT[3] if m_subject is None else float(m_subject), m_ref]
     pos = [[0.0, 0.0, z_beam], [0.0, 0.0, GZ],
            [+ARM, 0.0, z_beam], [-ARM, 0.0, z_beam]]
-    s = MeshProbeScene(names, pos, [[0., 0., 0.]] * len(names), masses=masses,
+    # BAL_ROT lays the subject on its side (degrees about +Y). The pan is a shallow bowl,
+    # so a TALL payload topples out of it the moment the beam swings and the balance then
+    # reads whichever stop it slammed into: the vase moved 21 cm out of its pan and the
+    # shark 25 cm, and the shark's beam never flipped at any reference. Shrinking fixes an
+    # over-wide payload (the shark reads +12-14% at scale 0.455) but NOT a tall one, because
+    # scaling preserves aspect -- the vase still travelled 25 cm at a quarter size.
+    _rot = float(os.environ.get("BAL_ROT", "0.0"))
+    _rots = None
+    if abs(_rot) > 1e-9:
+        h = np.radians(_rot) / 2.0
+        _rots = [[0., 0., 0., 1.]] * len(names)
+        _rots[2] = [0.0, float(np.sin(h)), 0.0, float(np.cos(h))]
+    s = MeshProbeScene(names, pos, [[0., 0., 0.]] * len(names), rot0=_rots, masses=masses,
                        ground_z=GZ, dt=1.0 / (FPS * SUBSTEPS), n_steps=NF * SUBSTEPS,
                        k=2500.0, cd=3000.0, mu=0.9, faces=500,
-                       ground_mu=0.45, ground_cd=3000.0)
+                       ground_mu=0.45, ground_cd=3000.0,
+                       com_offset=None if com is None else [None, None, com, None])
     p0 = s.pos0.copy()
     p0[1, 2] = s.rest_height(1)
 
@@ -160,7 +185,14 @@ def build(m_ref):
     p0[0, 2] = z_beam - PIVOT_RISE
     z_floor = p0[0, 2] + (BEAM_T / 2 + pan_inner_z() - c_z)
     for bi in (2, 3):                              # seat each payload in its bowl
-        p0[bi, 2] = z_floor + s.sizes[bi] * 0.5 + 0.002
+        # Seat on the payload's OWN lowest vertex, not half its longest extent.
+        # s.sizes[bi] is max(extents), so an elongated body was lifted by half its LENGTH:
+        # the vase (0.40 m tall) started 0.20 m above the pan floor and the shark (0.167 m
+        # long) 0.084 m, then fell in. The vase's flip point came out 44-52% low and the
+        # shark's beam never flipped at all. Same class as the documented shell bug, in the
+        # opposite direction.
+        Lb = s.local.numpy()[s._bod_np == bi]
+        p0[bi, 2] = z_floor - float(Lb[:, 2].min()) + 0.002
     s.pos0 = p0
 
     s.calibrate_stiffness()

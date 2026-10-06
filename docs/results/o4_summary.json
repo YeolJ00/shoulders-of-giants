@@ -1,0 +1,117 @@
+{
+ "n_clips": 107,
+ "angles": {
+  "bowl": [
+   18.0,
+   21.0,
+   24.0,
+   27.0,
+   30.0,
+   33.0,
+   36.0
+  ],
+  "pot": [
+   21.0,
+   24.0,
+   27.0
+  ]
+ },
+ "n": {
+  "bowl": 74,
+  "pot": 33
+ },
+ "readout": {
+  "bowl": {
+   "two_class": 0.2937728526099125,
+   "all_174": 0.21996180508011354
+  },
+  "pot": {
+   "two_class": 0.10487583112484722,
+   "all_174": 0.057113228589023665
+  }
+ },
+ "transfer": {
+  "bowl_to_pot": {
+   "bias_decades": -0.5290506794425359,
+   "scatter": 0.1499634747653622,
+   "r2": -4.217206420055172,
+   "r2_offset_removed": 0.6119830631917724,
+   "spearman": 0.7336229946524064
+  },
+  "pot_to_bowl": {
+   "bias_decades": -0.5151989935020875,
+   "scatter": 0.3798941082340861,
+   "r2": -0.7563835950937066,
+   "r2_offset_removed": 0.3813770644341671,
+   "spearman": 0.5566382821177341
+  }
+ },
+ "holdout_bowl": {
+  "single_median_pct": 28.742041373271434,
+  "joint_median_pct": 16.262225083481674,
+  "bands": {
+   "free": {
+    "median_pct": 11.58550739145947,
+    "n": 11
+   },
+   "partial": {
+    "median_pct": 17.38193712997276,
+    "n": 4
+   },
+   "stuck": {
+    "median_pct": 61.234452448114055,
+    "n": 4
+   }
+  }
+ },
+ "holdout_pot": {
+  "single_median_pct": 19.92099973588719,
+  "joint_median_pct": 15.307902498335913,
+  "bands": {
+   "free": {
+    "median_pct": 7.808154894111463,
+    "n": 6
+   },
+   "partial": {
+    "median_pct": 36.13991746383049,
+    "n": 2
+   },
+   "stuck": {
+    "median_pct": 144.29618219199267,
+    "n": 3
+   }
+  }
+ },
+ "prior_median_pct": 86.0,
+ "top_classes": [
+  {
+   "label": "Letting [something] roll down a slanted surface",
+   "rho": 0.5946335155469347
+  },
+  {
+   "label": "Rolling [something] on a flat surface",
+   "rho": 0.35555163698348324
+  },
+  {
+   "label": "Putting [something] that can't roll onto a slanted surface, so it slides down",
+   "rho": 0.32524148200395775
+  },
+  {
+   "label": "Pretending to put [something] next to [something]",
+   "rho": -0.8550422226140795
+  },
+  {
+   "label": "Pretending to close [something] without actually closing it",
+   "rho": -0.8472834499108525
+  },
+  {
+   "label": "Pretending to sprinkle air onto [something]",
+   "rho": -0.844951899527812
+  }
+ ],
+ "n_classes_rho_gt_half": 135,
+ "hand_picked_rho": {
+  "slide": 0.29996669213738514,
+  "noslide": -0.7523658378886734
+ }
+}

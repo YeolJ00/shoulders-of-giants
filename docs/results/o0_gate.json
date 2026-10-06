@@ -1,0 +1,4112 @@
+{
+ "model": "facebook/vjepa2-vitg-fpc64-384-ssv2",
+ "config": {
+  "model": "facebook/vjepa2-vitg-fpc64-384-ssv2",
+  "dtype": "torch.float32",
+  "frames": 64,
+  "size": 384,
+  "labels": 174
+ },
+ "deterministic": true,
+ "median_top1": 0.3721632659435272,
+ "median_entropy": 2.4867641065598365,
+ "motion_word_hits": 120,
+ "n": 144,
+ "verdict": "PASS",
+ "top1_counts": [
+  [
+   "Lifting a surface with [something] on it until it starts sliding down",
+   37
+  ],
+  [
+   "Pretending to turn [something] upside down",
+   36
+  ],
+  [
+   "Lifting a surface with [something] on it but not enough for it to slide down",
+   20
+  ],
+  [
+   "Showing [something] to the camera",
+   15
+  ],
+  [
+   "Holding [something]",
+   13
+  ],
+  [
+   "Tipping [something] over",
+   9
+  ],
+  [
+   "Holding [something] over [something]",
+   5
+  ],
+  [
+   "Turning [something] upside down",
+   2
+  ],
+  [
+   "Laying [something] on the table on its side, not upright",
+   1
+  ],
+  [
+   "Pretending to squeeze [something]",
+   1
+  ],
+  [
+   "Spinning [something] so it continues spinning",
+   1
+  ],
+  [
+   "Putting [something] onto [something]",
+   1
+  ],
+  [
+   "Showing a photo of [something] to the camera",
+   1
+  ],
+  [
+   "[Something] falling like a rock",
+   1
+  ],
+  [
+   "Tilting [something] with [something] on it until it falls off",
+   1
+  ]
+ ],
+ "rows": [
+  {
+   "clip": "outputs/scene/v1/clips/bounce_cd00400.0.mp4",
+   "top1_p": 0.3479088842868805,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.7360326139299294,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.3479088842868805
+    ],
+    [
+     "Turning [something] upside down",
+     0.13525761663913727
+    ],
+    [
+     "Tipping [something] over",
+     0.08502431958913803
+    ],
+    [
+     "Laying [something] on the table on its side, not upright",
+     0.058681197464466095
+    ],
+    [
+     "Bending [something] so that it deforms",
+     0.049663420766592026
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/bounce_cd00616.9.mp4",
+   "top1_p": 0.32874318957328796,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.6945181257421247,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.32874318957328796
+    ],
+    [
+     "Tipping [something] over",
+     0.1221172884106636
+    ],
+    [
+     "Turning [something] upside down",
+     0.11713732779026031
+    ],
+    [
+     "Laying [something] on the table on its side, not upright",
+     0.08715152740478516
+    ],
+    [
+     "Bending [something] so that it deforms",
+     0.05487563833594322
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/bounce_cd00951.4.mp4",
+   "top1_p": 0.35736751556396484,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.6231435698692382,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.35736751556396484
+    ],
+    [
+     "Tipping [something] over",
+     0.1317714899778366
+    ],
+    [
+     "Laying [something] on the table on its side, not upright",
+     0.09128410369157791
+    ],
+    [
+     "Turning [something] upside down",
+     0.08643276989459991
+    ],
+    [
+     "Putting [something that cannot actually stand upright] upright on the table, so it falls on its side",
+     0.041888393461704254
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/bounce_cd01467.2.mp4",
+   "top1_p": 0.35935577750205994,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.6596142468765303,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.35935577750205994
+    ],
+    [
+     "Turning [something] upside down",
+     0.11510175466537476
+    ],
+    [
+     "Tipping [something] over",
+     0.08911575376987457
+    ],
+    [
+     "Laying [something] on the table on its side, not upright",
+     0.08755753189325333
+    ],
+    [
+     "Bending [something] so that it deforms",
+     0.06563906371593475
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/bounce_cd02262.7.mp4",
+   "top1_p": 0.3761090040206909,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.4764591711528228,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.3761090040206909
+    ],
+    [
+     "Turning [something] upside down",
+     0.13475573062896729
+    ],
+    [
+     "Tipping [something] over",
+     0.11157544702291489
+    ],
+    [
+     "Laying [something] on the table on its side, not upright",
+     0.08488423377275467
+    ],
+    [
+     "Bending [something] so that it deforms",
+     0.056250717490911484
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/bounce_cd03489.6.mp4",
+   "top1_p": 0.412453293800354,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.38008076379174,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.412453293800354
+    ],
+    [
+     "Tipping [something] over",
+     0.16266673803329468
+    ],
+    [
+     "Turning [something] upside down",
+     0.08430475741624832
+    ],
+    [
+     "Bending [something] so that it deforms",
+     0.05919075384736061
+    ],
+    [
+     "Laying [something] on the table on its side, not upright",
+     0.05842851102352142
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/bounce_cd05381.7.mp4",
+   "top1_p": 0.376027911901474,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.481204647443786,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.376027911901474
+    ],
+    [
+     "Tipping [something] over",
+     0.1383582055568695
+    ],
+    [
+     "Turning [something] upside down",
+     0.08937806636095047
+    ],
+    [
+     "Laying [something] on the table on its side, not upright",
+     0.08694422990083694
+    ],
+    [
+     "Bending [something] so that it deforms",
+     0.06915935128927231
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/bounce_cd08299.8.mp4",
+   "top1_p": 0.31008365750312805,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.6530765753591004,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.31008365750312805
+    ],
+    [
+     "Tipping [something] over",
+     0.1830265074968338
+    ],
+    [
+     "Turning [something] upside down",
+     0.0963551476597786
+    ],
+    [
+     "Laying [something] on the table on its side, not upright",
+     0.08778667449951172
+    ],
+    [
+     "Bending [something] so that it deforms",
+     0.04036629572510719
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/bounce_cd12800.0.mp4",
+   "top1_p": 0.3545111417770386,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.490340150242322,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.3545111417770386
+    ],
+    [
+     "Tipping [something] over",
+     0.18565845489501953
+    ],
+    [
+     "Laying [something] on the table on its side, not upright",
+     0.1174626275897026
+    ],
+    [
+     "Turning [something] upside down",
+     0.06040867045521736
+    ],
+    [
+     "Bending [something] so that it deforms",
+     0.02851298823952675
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/grav_bounce_g01.62.mp4",
+   "top1_p": 0.2177807092666626,
+   "top1": "Tipping [something] over",
+   "entropy": 3.10967137139866,
+   "top5": [
+    [
+     "Tipping [something] over",
+     0.2177807092666626
+    ],
+    [
+     "Laying [something] on the table on its side, not upright",
+     0.16647596657276154
+    ],
+    [
+     "Bending [something] so that it deforms",
+     0.08513572812080383
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.06767448782920837
+    ],
+    [
+     "Rolling [something] on a flat surface",
+     0.05742016062140465
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/grav_bounce_g03.72.mp4",
+   "top1_p": 0.15153823792934418,
+   "top1": "Laying [something] on the table on its side, not upright",
+   "entropy": 3.183115156379304,
+   "top5": [
+    [
+     "Laying [something] on the table on its side, not upright",
+     0.15153823792934418
+    ],
+    [
+     "Tipping [something] over",
+     0.12971007823944092
+    ],
+    [
+     "Bending [something] so that it deforms",
+     0.11262869834899902
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.09109432250261307
+    ],
+    [
+     "Showing [something] to the camera",
+     0.07441563159227371
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/grav_bounce_g09.81.mp4",
+   "top1_p": 0.36366239190101624,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.571128175433053,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.36366239190101624
+    ],
+    [
+     "Turning [something] upside down",
+     0.12696866691112518
+    ],
+    [
+     "Tipping [something] over",
+     0.11574462056159973
+    ],
+    [
+     "Laying [something] on the table on its side, not upright",
+     0.07618682086467743
+    ],
+    [
+     "Bending [something] so that it deforms",
+     0.05944208428263664
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/grav_bounce_g24.50.mp4",
+   "top1_p": 0.2927941381931305,
+   "top1": "Turning [something] upside down",
+   "entropy": 2.6281365646896115,
+   "top5": [
+    [
+     "Turning [something] upside down",
+     0.2927941381931305
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.2688893675804138
+    ],
+    [
+     "Laying [something] on the table on its side, not upright",
+     0.07013345509767532
+    ],
+    [
+     "Tipping [something] over",
+     0.05289779230952263
+    ],
+    [
+     "Putting [something that cannot actually stand upright] upright on the table, so it falls on its side",
+     0.039735786616802216
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/grav_bounce_g40.00.mp4",
+   "top1_p": 0.18872524797916412,
+   "top1": "Turning [something] upside down",
+   "entropy": 3.1880343184901516,
+   "top5": [
+    [
+     "Turning [something] upside down",
+     0.18872524797916412
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.13090404868125916
+    ],
+    [
+     "Throwing [something]",
+     0.1133364886045456
+    ],
+    [
+     "Putting [something that cannot actually stand upright] upright on the table, so it falls on its side",
+     0.06792405247688293
+    ],
+    [
+     "Laying [something] on the table on its side, not upright",
+     0.05476086214184761
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/grav_tilt_g01.62.mp4",
+   "top1_p": 0.6826350688934326,
+   "top1": "Lifting a surface with [something] on it but not enough for it to slide down",
+   "entropy": 1.4218432924332856,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.6826350688934326
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it stays where it is",
+     0.11287211626768112
+    ],
+    [
+     "Putting [something] onto a slanted surface but it doesn't glide down",
+     0.051135022193193436
+    ],
+    [
+     "Putting [something] on a flat surface without letting it roll",
+     0.03136517480015755
+    ],
+    [
+     "Pouring [something] out of [something]",
+     0.022354688495397568
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/grav_tilt_g03.72.mp4",
+   "top1_p": 0.7462702393531799,
+   "top1": "Lifting a surface with [something] on it but not enough for it to slide down",
+   "entropy": 1.2229666534284807,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.7462702393531799
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it stays where it is",
+     0.08087918907403946
+    ],
+    [
+     "Putting [something] onto a slanted surface but it doesn't glide down",
+     0.03566301614046097
+    ],
+    [
+     "Putting [something] on a flat surface without letting it roll",
+     0.03304402157664299
+    ],
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.017964575439691544
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/grav_tilt_g09.81.mp4",
+   "top1_p": 0.6275798082351685,
+   "top1": "Lifting a surface with [something] on it but not enough for it to slide down",
+   "entropy": 1.6958186612122936,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.6275798082351685
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it stays where it is",
+     0.09083618968725204
+    ],
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.06123138591647148
+    ],
+    [
+     "Pouring [something] out of [something]",
+     0.032221365720033646
+    ],
+    [
+     "Putting [something] onto a slanted surface but it doesn't glide down",
+     0.030918855220079422
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/grav_tilt_g24.50.mp4",
+   "top1_p": 0.8021725416183472,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 1.0591726561874069,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.8021725416183472
+    ],
+    [
+     "Letting [something] roll down a slanted surface",
+     0.05240800604224205
+    ],
+    [
+     "Pouring [something] out of [something]",
+     0.0319625660777092
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.0222022607922554
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.01208147406578064
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/grav_tilt_g40.00.mp4",
+   "top1_p": 0.857266902923584,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 0.773461382245616,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.857266902923584
+    ],
+    [
+     "Letting [something] roll down a slanted surface",
+     0.04991836100816727
+    ],
+    [
+     "Tilting [something] with [something] on it until it falls off",
+     0.01987035945057869
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.015180411748588085
+    ],
+    [
+     "Pouring [something] out of [something]",
+     0.006925842724740505
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/null_m0.050.mp4",
+   "top1_p": 0.28280824422836304,
+   "top1": "Lifting a surface with [something] on it but not enough for it to slide down",
+   "entropy": 2.5985507199286255,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.28280824422836304
+    ],
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.2616807520389557
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.08838537335395813
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.0476050078868866
+    ],
+    [
+     "Pouring [something] out of [something]",
+     0.03767411783337593
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/null_m0.119.mp4",
+   "top1_p": 0.40502455830574036,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 2.146214935803669,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.40502455830574036
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.25795212388038635
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.08812661468982697
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.02868344821035862
+    ],
+    [
+     "Lifting [something] with [something] on it",
+     0.028050536289811134
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/null_m0.283.mp4",
+   "top1_p": 0.35156622529029846,
+   "top1": "Lifting a surface with [something] on it but not enough for it to slide down",
+   "entropy": 2.285502204335902,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.35156622529029846
+    ],
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.28087490797042847
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.06770250201225281
+    ],
+    [
+     "Lifting [something] with [something] on it",
+     0.04691433534026146
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.04483700543642044
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/null_m0.673.mp4",
+   "top1_p": 0.3578692674636841,
+   "top1": "Lifting a surface with [something] on it but not enough for it to slide down",
+   "entropy": 2.440695320240448,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.3578692674636841
+    ],
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.23255527019500732
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.06800173223018646
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.05377284809947014
+    ],
+    [
+     "Lifting [something] with [something] on it",
+     0.03523969277739525
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/null_m1.600.mp4",
+   "top1_p": 0.33146458864212036,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 2.251817425717427,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.33146458864212036
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.30650538206100464
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.08747832477092743
+    ],
+    [
+     "Lifting [something] with [something] on it",
+     0.042098116129636765
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.03117917850613594
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/settle_cd00400.0.mp4",
+   "top1_p": 0.39507371187210083,
+   "top1": "Holding [something]",
+   "entropy": 2.4222340608994184,
+   "top5": [
+    [
+     "Holding [something]",
+     0.39507371187210083
+    ],
+    [
+     "Holding [something] over [something]",
+     0.14849454164505005
+    ],
+    [
+     "Showing [something] to the camera",
+     0.0799737423658371
+    ],
+    [
+     "Pretending to squeeze [something]",
+     0.07941039651632309
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.03363201394677162
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/settle_cd00616.9.mp4",
+   "top1_p": 0.33094969391822815,
+   "top1": "Holding [something]",
+   "entropy": 2.609383958697303,
+   "top5": [
+    [
+     "Holding [something]",
+     0.33094969391822815
+    ],
+    [
+     "Holding [something] over [something]",
+     0.1632148176431656
+    ],
+    [
+     "Showing [something] to the camera",
+     0.07795645296573639
+    ],
+    [
+     "Pretending to squeeze [something]",
+     0.07132122665643692
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.04630453884601593
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/settle_cd00951.4.mp4",
+   "top1_p": 0.27203330397605896,
+   "top1": "Holding [something]",
+   "entropy": 2.5025597192066154,
+   "top5": [
+    [
+     "Holding [something]",
+     0.27203330397605896
+    ],
+    [
+     "Holding [something] over [something]",
+     0.24838092923164368
+    ],
+    [
+     "Pretending to squeeze [something]",
+     0.11281140148639679
+    ],
+    [
+     "Showing [something] to the camera",
+     0.05890066176652908
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.03747234866023064
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/settle_cd01467.2.mp4",
+   "top1_p": 0.2890326678752899,
+   "top1": "Holding [something]",
+   "entropy": 2.5841809375592764,
+   "top5": [
+    [
+     "Holding [something]",
+     0.2890326678752899
+    ],
+    [
+     "Holding [something] over [something]",
+     0.1899116039276123
+    ],
+    [
+     "Pretending to squeeze [something]",
+     0.1119193285703659
+    ],
+    [
+     "Showing [something] to the camera",
+     0.0775306448340416
+    ],
+    [
+     "Moving [part] of [something]",
+     0.03714954853057861
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/settle_cd02262.7.mp4",
+   "top1_p": 0.3407868444919586,
+   "top1": "Holding [something]",
+   "entropy": 2.4524835844707025,
+   "top5": [
+    [
+     "Holding [something]",
+     0.3407868444919586
+    ],
+    [
+     "Holding [something] over [something]",
+     0.23456428945064545
+    ],
+    [
+     "Showing [something] to the camera",
+     0.0538027361035347
+    ],
+    [
+     "Pretending to squeeze [something]",
+     0.05156734213232994
+    ],
+    [
+     "Holding [something] in front of [something]",
+     0.03577430173754692
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/settle_cd03489.6.mp4",
+   "top1_p": 0.38362953066825867,
+   "top1": "Holding [something]",
+   "entropy": 2.235765336828944,
+   "top5": [
+    [
+     "Holding [something]",
+     0.38362953066825867
+    ],
+    [
+     "Holding [something] over [something]",
+     0.23517027497291565
+    ],
+    [
+     "Pretending to squeeze [something]",
+     0.07107943296432495
+    ],
+    [
+     "Showing [something] to the camera",
+     0.06286539137363434
+    ],
+    [
+     "Holding [something] in front of [something]",
+     0.0277167409658432
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/settle_cd05381.7.mp4",
+   "top1_p": 0.28246939182281494,
+   "top1": "Holding [something]",
+   "entropy": 2.4116231593136983,
+   "top5": [
+    [
+     "Holding [something]",
+     0.28246939182281494
+    ],
+    [
+     "Holding [something] over [something]",
+     0.24927468597888947
+    ],
+    [
+     "Pretending to squeeze [something]",
+     0.11827606707811356
+    ],
+    [
+     "Showing [something] to the camera",
+     0.05500393360853195
+    ],
+    [
+     "Bending [something] so that it deforms",
+     0.03312411531805992
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/settle_cd08299.8.mp4",
+   "top1_p": 0.3481777012348175,
+   "top1": "Holding [something]",
+   "entropy": 2.341451243141384,
+   "top5": [
+    [
+     "Holding [something]",
+     0.3481777012348175
+    ],
+    [
+     "Holding [something] over [something]",
+     0.24876318871974945
+    ],
+    [
+     "Pretending to squeeze [something]",
+     0.0822715237736702
+    ],
+    [
+     "Showing [something] to the camera",
+     0.047098539769649506
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.024056680500507355
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/settle_cd12800.0.mp4",
+   "top1_p": 0.38163578510284424,
+   "top1": "Holding [something]",
+   "entropy": 2.386928331557632,
+   "top5": [
+    [
+     "Holding [something]",
+     0.38163578510284424
+    ],
+    [
+     "Holding [something] over [something]",
+     0.20841187238693237
+    ],
+    [
+     "Showing [something] to the camera",
+     0.06297474354505539
+    ],
+    [
+     "Pretending to squeeze [something]",
+     0.05134572088718414
+    ],
+    [
+     "Holding [something] in front of [something]",
+     0.02946658805012703
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/tilt_mu0.100.mp4",
+   "top1_p": 0.7474004626274109,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 1.3302828053069713,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.7474004626274109
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.03956569358706474
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.03490391746163368
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.03269500285387039
+    ],
+    [
+     "Letting [something] roll down a slanted surface",
+     0.02587777003645897
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/tilt_mu0.117.mp4",
+   "top1_p": 0.7485232949256897,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 1.2856687845088288,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.7485232949256897
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.05863049998879433
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.039039481431245804
+    ],
+    [
+     "Lifting [something] with [something] on it",
+     0.02304808236658573
+    ],
+    [
+     "Letting [something] roll down a slanted surface",
+     0.022397812455892563
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/tilt_mu0.137.mp4",
+   "top1_p": 0.6062354445457458,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 1.7058446397098717,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.6062354445457458
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.13427287340164185
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.04605598747730255
+    ],
+    [
+     "Lifting [something] with [something] on it",
+     0.04149499535560608
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.03769924119114876
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/tilt_mu0.160.mp4",
+   "top1_p": 0.7166637182235718,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 1.4538380925097059,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.7166637182235718
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.05664128437638283
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.05447310954332352
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.03349556028842926
+    ],
+    [
+     "Pouring [something] out of [something]",
+     0.014928051270544529
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/tilt_mu0.187.mp4",
+   "top1_p": 0.4309341013431549,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 2.09889986800953,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.4309341013431549
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.2745087444782257
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.04475634545087814
+    ],
+    [
+     "Lifting [something] with [something] on it",
+     0.03476898372173309
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.026047680526971817
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/tilt_mu0.219.mp4",
+   "top1_p": 0.3403220772743225,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 2.3385682102574528,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.3403220772743225
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.2921537756919861
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.06892209500074387
+    ],
+    [
+     "Pouring [something] out of [something]",
+     0.033277809619903564
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.033135682344436646
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/tilt_mu0.256.mp4",
+   "top1_p": 0.3294565677642822,
+   "top1": "Lifting a surface with [something] on it but not enough for it to slide down",
+   "entropy": 2.4686900217451457,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.3294565677642822
+    ],
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.2582184672355652
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.06556451320648193
+    ],
+    [
+     "Lifting [something] with [something] on it",
+     0.05042877793312073
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.04762702062726021
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/tilt_mu0.299.mp4",
+   "top1_p": 0.326692670583725,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 2.5361149489953343,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.326692670583725
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.252002477645874
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.05878693610429764
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.05485406145453453
+    ],
+    [
+     "Lifting [something] with [something] on it",
+     0.03954446315765381
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/tilt_mu0.350.mp4",
+   "top1_p": 0.30158862471580505,
+   "top1": "Lifting a surface with [something] on it but not enough for it to slide down",
+   "entropy": 2.5735577062104538,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.30158862471580505
+    ],
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.260103702545166
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.06798932701349258
+    ],
+    [
+     "Lifting [something] with [something] on it",
+     0.05446617677807808
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.04466792941093445
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_freeze__bounce_cd00400.0.mp4",
+   "top1_p": 0.2983779013156891,
+   "top1": "Tipping [something] over",
+   "entropy": 2.7845458633381113,
+   "top5": [
+    [
+     "Tipping [something] over",
+     0.2983779013156891
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.15909671783447266
+    ],
+    [
+     "Turning [something] upside down",
+     0.13367001712322235
+    ],
+    [
+     "Laying [something] on the table on its side, not upright",
+     0.06648669391870499
+    ],
+    [
+     "Putting [something] onto [something]",
+     0.0277850478887558
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_freeze__bounce_cd03489.6.mp4",
+   "top1_p": 0.4382611811161041,
+   "top1": "Tipping [something] over",
+   "entropy": 2.3505677131648426,
+   "top5": [
+    [
+     "Tipping [something] over",
+     0.4382611811161041
+    ],
+    [
+     "Laying [something] on the table on its side, not upright",
+     0.12277308851480484
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.11579106748104095
+    ],
+    [
+     "Turning [something] upside down",
+     0.04594280198216438
+    ],
+    [
+     "Bending [something] so that it deforms",
+     0.04504162073135376
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_freeze__settle_cd00616.9.mp4",
+   "top1_p": 0.19695700705051422,
+   "top1": "Holding [something] over [something]",
+   "entropy": 3.0793970300029363,
+   "top5": [
+    [
+     "Holding [something] over [something]",
+     0.19695700705051422
+    ],
+    [
+     "Holding [something]",
+     0.16672848165035248
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.09570088982582092
+    ],
+    [
+     "Moving [part] of [something]",
+     0.0858769565820694
+    ],
+    [
+     "Laying [something] on the table on its side, not upright",
+     0.03302434831857681
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_freeze__settle_cd08299.8.mp4",
+   "top1_p": 0.22169239819049835,
+   "top1": "Holding [something] over [something]",
+   "entropy": 3.0414681191726274,
+   "top5": [
+    [
+     "Holding [something] over [something]",
+     0.22169239819049835
+    ],
+    [
+     "Holding [something]",
+     0.1847156435251236
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.09069222211837769
+    ],
+    [
+     "Showing [something] to the camera",
+     0.04604678228497505
+    ],
+    [
+     "Moving [part] of [something]",
+     0.04402906820178032
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_freeze__tilt_mu0.160.mp4",
+   "top1_p": 0.37284645438194275,
+   "top1": "Lifting a surface with [something] on it but not enough for it to slide down",
+   "entropy": 2.576470274355694,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.37284645438194275
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it stays where it is",
+     0.11167725920677185
+    ],
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.09816325455904007
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.07519418001174927
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.04510766640305519
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_freeze__tilt_mu0.350.mp4",
+   "top1_p": 0.4317660331726074,
+   "top1": "Lifting a surface with [something] on it but not enough for it to slide down",
+   "entropy": 2.4388590288345986,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.4317660331726074
+    ],
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.115447998046875
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.06597857177257538
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it stays where it is",
+     0.06266864389181137
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.04868108406662941
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_rewind__bounce_cd00400.0.mp4",
+   "top1_p": 0.5730997920036316,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.3585412253371345,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.5730997920036316
+    ],
+    [
+     "Moving [part] of [something]",
+     0.036129407584667206
+    ],
+    [
+     "Pretending to put [something] on a surface",
+     0.030979424715042114
+    ],
+    [
+     "Tipping [something] over",
+     0.02945050597190857
+    ],
+    [
+     "Showing [something] to the camera",
+     0.023126404732465744
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_rewind__bounce_cd03489.6.mp4",
+   "top1_p": 0.6746433973312378,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 1.86166517363314,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.6746433973312378
+    ],
+    [
+     "Moving [part] of [something]",
+     0.04470527917146683
+    ],
+    [
+     "Tipping [something] over",
+     0.032327327877283096
+    ],
+    [
+     "Putting [something] onto [something]",
+     0.01573987491428852
+    ],
+    [
+     "Showing [something] to the camera",
+     0.01568938046693802
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_rewind__settle_cd00616.9.mp4",
+   "top1_p": 0.19387294352054596,
+   "top1": "Holding [something]",
+   "entropy": 2.9349438036407616,
+   "top5": [
+    [
+     "Holding [something]",
+     0.19387294352054596
+    ],
+    [
+     "Holding [something] over [something]",
+     0.172587588429451
+    ],
+    [
+     "Pretending to squeeze [something]",
+     0.10582828521728516
+    ],
+    [
+     "Moving [part] of [something]",
+     0.06718481332063675
+    ],
+    [
+     "Trying to bend [something unbendable] so nothing happens",
+     0.06158972159028053
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_rewind__settle_cd08299.8.mp4",
+   "top1_p": 0.1928952932357788,
+   "top1": "Pretending to squeeze [something]",
+   "entropy": 2.820633699733202,
+   "top5": [
+    [
+     "Pretending to squeeze [something]",
+     0.1928952932357788
+    ],
+    [
+     "Holding [something]",
+     0.1741781383752823
+    ],
+    [
+     "Holding [something] over [something]",
+     0.15973885357379913
+    ],
+    [
+     "Showing [something] to the camera",
+     0.08671881258487701
+    ],
+    [
+     "Holding [something] in front of [something]",
+     0.04746287316083908
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_rewind__tilt_mu0.160.mp4",
+   "top1_p": 0.6244580149650574,
+   "top1": "Lifting a surface with [something] on it but not enough for it to slide down",
+   "entropy": 1.4599373130321571,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.6244580149650574
+    ],
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.15842314064502716
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.09021764993667603
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it stays where it is",
+     0.017350465059280396
+    ],
+    [
+     "Showing a photo of [something] to the camera",
+     0.016585495322942734
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_rewind__tilt_mu0.350.mp4",
+   "top1_p": 0.5354733467102051,
+   "top1": "Lifting a surface with [something] on it but not enough for it to slide down",
+   "entropy": 1.6871751081599657,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.5354733467102051
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.17708748579025269
+    ],
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.1327354609966278
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it stays where it is",
+     0.02430308423936367
+    ],
+    [
+     "Pouring [something] out of [something]",
+     0.018073037266731262
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_teleport__bounce_cd00400.0.mp4",
+   "top1_p": 0.23011791706085205,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.9916001150264533,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.23011791706085205
+    ],
+    [
+     "Tipping [something] over",
+     0.13385479152202606
+    ],
+    [
+     "Putting [something that cannot actually stand upright] upright on the table, so it falls on its side",
+     0.12147022038698196
+    ],
+    [
+     "Laying [something] on the table on its side, not upright",
+     0.08215348422527313
+    ],
+    [
+     "Turning [something] upside down",
+     0.07937724888324738
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_teleport__bounce_cd03489.6.mp4",
+   "top1_p": 0.32998812198638916,
+   "top1": "Tipping [something] over",
+   "entropy": 2.4937291480328216,
+   "top5": [
+    [
+     "Tipping [something] over",
+     0.32998812198638916
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.20330365002155304
+    ],
+    [
+     "Laying [something] on the table on its side, not upright",
+     0.11481186747550964
+    ],
+    [
+     "Putting [something that cannot actually stand upright] upright on the table, so it falls on its side",
+     0.07399797439575195
+    ],
+    [
+     "Turning [something] upside down",
+     0.039972417056560516
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_teleport__settle_cd00616.9.mp4",
+   "top1_p": 0.17916682362556458,
+   "top1": "Holding [something]",
+   "entropy": 3.430340289927094,
+   "top5": [
+    [
+     "Holding [something]",
+     0.17916682362556458
+    ],
+    [
+     "Holding [something] over [something]",
+     0.10368559509515762
+    ],
+    [
+     "Pretending to put [something] on a surface",
+     0.06126660853624344
+    ],
+    [
+     "Pretending to squeeze [something]",
+     0.057621486485004425
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.055198606103658676
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_teleport__settle_cd08299.8.mp4",
+   "top1_p": 0.2017577886581421,
+   "top1": "Holding [something] over [something]",
+   "entropy": 3.0946061018069364,
+   "top5": [
+    [
+     "Holding [something] over [something]",
+     0.2017577886581421
+    ],
+    [
+     "Holding [something]",
+     0.1497575342655182
+    ],
+    [
+     "Pretending to put [something] on a surface",
+     0.14722001552581787
+    ],
+    [
+     "Holding [something] in front of [something]",
+     0.04796147719025612
+    ],
+    [
+     "Pretending to squeeze [something]",
+     0.03795543313026428
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_teleport__tilt_mu0.160.mp4",
+   "top1_p": 0.5822697877883911,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 1.8921307212106273,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.5822697877883911
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.12453228235244751
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.05112822726368904
+    ],
+    [
+     "Lifting [something] with [something] on it",
+     0.03873924911022186
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.02393721230328083
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_teleport__tilt_mu0.350.mp4",
+   "top1_p": 0.22532068192958832,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 3.0218805919353535,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.22532068192958832
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.18028825521469116
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.08377417176961899
+    ],
+    [
+     "Showing a photo of [something] to the camera",
+     0.07389762997627258
+    ],
+    [
+     "Lifting [something] with [something] on it",
+     0.04943572357296944
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_through__bounce_cd00400.0.mp4",
+   "top1_p": 0.1773100346326828,
+   "top1": "Tipping [something] over",
+   "entropy": 3.285733195956162,
+   "top5": [
+    [
+     "Tipping [something] over",
+     0.1773100346326828
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.14406360685825348
+    ],
+    [
+     "Turning [something] upside down",
+     0.14066579937934875
+    ],
+    [
+     "Putting [something that cannot actually stand upright] upright on the table, so it falls on its side",
+     0.06338780373334885
+    ],
+    [
+     "Laying [something] on the table on its side, not upright",
+     0.04901551082730293
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_through__bounce_cd03489.6.mp4",
+   "top1_p": 0.39958083629608154,
+   "top1": "Tipping [something] over",
+   "entropy": 2.52643419449522,
+   "top5": [
+    [
+     "Tipping [something] over",
+     0.39958083629608154
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.1540086418390274
+    ],
+    [
+     "Laying [something] on the table on its side, not upright",
+     0.05970356613397598
+    ],
+    [
+     "Tipping [something] with [something in it] over, so [something in it] falls out",
+     0.05236118659377098
+    ],
+    [
+     "Putting [something that cannot actually stand upright] upright on the table, so it falls on its side",
+     0.0523528978228569
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_through__settle_cd00616.9.mp4",
+   "top1_p": 0.11948410421609879,
+   "top1": "Holding [something] over [something]",
+   "entropy": 3.5850954367903274,
+   "top5": [
+    [
+     "Holding [something] over [something]",
+     0.11948410421609879
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.09621600806713104
+    ],
+    [
+     "Moving [part] of [something]",
+     0.0902375802397728
+    ],
+    [
+     "Pretending to put [something] on a surface",
+     0.08444881439208984
+    ],
+    [
+     "Pretending to squeeze [something]",
+     0.050904519855976105
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_through__settle_cd08299.8.mp4",
+   "top1_p": 0.3364834189414978,
+   "top1": "Holding [something] over [something]",
+   "entropy": 2.869778008206575,
+   "top5": [
+    [
+     "Holding [something] over [something]",
+     0.3364834189414978
+    ],
+    [
+     "Pretending to put [something] on a surface",
+     0.10978937149047852
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.07486221194267273
+    ],
+    [
+     "Pretending to squeeze [something]",
+     0.056064121425151825
+    ],
+    [
+     "Holding [something]",
+     0.05186742916703224
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_through__tilt_mu0.160.mp4",
+   "top1_p": 0.45566099882125854,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 2.1254798743382275,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.45566099882125854
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.23498393595218658
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.048794977366924286
+    ],
+    [
+     "Lifting [something] with [something] on it",
+     0.025836702436208725
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.024108072742819786
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_through__tilt_mu0.350.mp4",
+   "top1_p": 0.4280838668346405,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 2.1182489711893946,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.4280838668346405
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.26517224311828613
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.052546653896570206
+    ],
+    [
+     "Lifting [something] with [something] on it",
+     0.03491045534610748
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.03207746148109436
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_vanish__bounce_cd00400.0.mp4",
+   "top1_p": 0.2022775113582611,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 3.0458713287346475,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.2022775113582611
+    ],
+    [
+     "Tipping [something] over",
+     0.16901998221874237
+    ],
+    [
+     "Turning [something] upside down",
+     0.09762401878833771
+    ],
+    [
+     "Putting [something that cannot actually stand upright] upright on the table, so it falls on its side",
+     0.08985401690006256
+    ],
+    [
+     "Laying [something] on the table on its side, not upright",
+     0.06723525375127792
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_vanish__bounce_cd03489.6.mp4",
+   "top1_p": 0.30796003341674805,
+   "top1": "Tipping [something] over",
+   "entropy": 2.4808013453936253,
+   "top5": [
+    [
+     "Tipping [something] over",
+     0.30796003341674805
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.23921839892864227
+    ],
+    [
+     "Putting [something that cannot actually stand upright] upright on the table, so it falls on its side",
+     0.08100785315036774
+    ],
+    [
+     "Laying [something] on the table on its side, not upright",
+     0.07712224125862122
+    ],
+    [
+     "Turning [something] upside down",
+     0.055095549672842026
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_vanish__settle_cd00616.9.mp4",
+   "top1_p": 0.34124094247817993,
+   "top1": "Holding [something]",
+   "entropy": 2.6846825135093475,
+   "top5": [
+    [
+     "Holding [something]",
+     0.34124094247817993
+    ],
+    [
+     "Holding [something] over [something]",
+     0.1370762139558792
+    ],
+    [
+     "Showing [something] to the camera",
+     0.0969458520412445
+    ],
+    [
+     "Pretending to squeeze [something]",
+     0.05437067523598671
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.0407581590116024
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_vanish__settle_cd08299.8.mp4",
+   "top1_p": 0.33752673864364624,
+   "top1": "Holding [something]",
+   "entropy": 2.4530866433390677,
+   "top5": [
+    [
+     "Holding [something]",
+     0.33752673864364624
+    ],
+    [
+     "Holding [something] over [something]",
+     0.22661133110523224
+    ],
+    [
+     "Pretending to squeeze [something]",
+     0.06968865543603897
+    ],
+    [
+     "Showing [something] to the camera",
+     0.05413256585597992
+    ],
+    [
+     "Pretending to put [something] on a surface",
+     0.048288725316524506
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_vanish__tilt_mu0.160.mp4",
+   "top1_p": 0.6366613507270813,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 1.7321919456881951,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.6366613507270813
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.07221899926662445
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.06270888447761536
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.05386307090520859
+    ],
+    [
+     "Letting [something] roll down a slanted surface",
+     0.023055443540215492
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1/clips/viol_vanish__tilt_mu0.350.mp4",
+   "top1_p": 0.2824689745903015,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 2.5627337719927175,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.2824689745903015
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.2799193561077118
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.08627334237098694
+    ],
+    [
+     "Lifting [something] with [something] on it",
+     0.045662086457014084
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.041692353785037994
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/bounce_cd00400.0.mp4",
+   "top1_p": 0.4379293620586395,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.689679588652738,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.4379293620586395
+    ],
+    [
+     "Tipping [something] over",
+     0.11902167648077011
+    ],
+    [
+     "Pretending to pour [something] out of [something], but [something] is empty",
+     0.05045001208782196
+    ],
+    [
+     "Turning [something] upside down",
+     0.02921435981988907
+    ],
+    [
+     "Spilling [something] onto [something]",
+     0.02500487118959427
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/bounce_cd00616.9.mp4",
+   "top1_p": 0.44315510988235474,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.710812581332716,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.44315510988235474
+    ],
+    [
+     "Tipping [something] over",
+     0.08800085633993149
+    ],
+    [
+     "Lifting [something] up completely, then letting it drop down",
+     0.04062648490071297
+    ],
+    [
+     "Pretending to pour [something] out of [something], but [something] is empty",
+     0.03995048254728317
+    ],
+    [
+     "Turning [something] upside down",
+     0.03906779736280441
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/bounce_cd00951.4.mp4",
+   "top1_p": 0.5697063207626343,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.1503748612358438,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.5697063207626343
+    ],
+    [
+     "Tipping [something] over",
+     0.11067267507314682
+    ],
+    [
+     "Pretending to pour [something] out of [something], but [something] is empty",
+     0.033299755305051804
+    ],
+    [
+     "Turning [something] upside down",
+     0.027539873495697975
+    ],
+    [
+     "Lifting [something] up completely, then letting it drop down",
+     0.017945168539881706
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/bounce_cd01467.2.mp4",
+   "top1_p": 0.3840041756629944,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.686432749296198,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.3840041756629944
+    ],
+    [
+     "Tipping [something] over",
+     0.17563121020793915
+    ],
+    [
+     "Pretending to pour [something] out of [something], but [something] is empty",
+     0.06118455529212952
+    ],
+    [
+     "Rolling [something] on a flat surface",
+     0.03133520111441612
+    ],
+    [
+     "Spilling [something] onto [something]",
+     0.02408827468752861
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/bounce_cd02262.7.mp4",
+   "top1_p": 0.615159273147583,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 1.9468441435494936,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.615159273147583
+    ],
+    [
+     "Tipping [something] over",
+     0.09937047213315964
+    ],
+    [
+     "Pretending to pour [something] out of [something], but [something] is empty",
+     0.039257727563381195
+    ],
+    [
+     "Rolling [something] on a flat surface",
+     0.01802646368741989
+    ],
+    [
+     "Spinning [something] so it continues spinning",
+     0.016940677538514137
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/bounce_cd03489.6.mp4",
+   "top1_p": 0.5572839379310608,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.29083813552713,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.5572839379310608
+    ],
+    [
+     "Tipping [something] over",
+     0.07885091751813889
+    ],
+    [
+     "Turning [something] upside down",
+     0.03957241028547287
+    ],
+    [
+     "Pretending to pour [something] out of [something], but [something] is empty",
+     0.036731891334056854
+    ],
+    [
+     "Rolling [something] on a flat surface",
+     0.01702125370502472
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/bounce_cd05381.7.mp4",
+   "top1_p": 0.40760961174964905,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.463355054936697,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.40760961174964905
+    ],
+    [
+     "Tipping [something] over",
+     0.22788557410240173
+    ],
+    [
+     "Spilling [something] onto [something]",
+     0.03481362760066986
+    ],
+    [
+     "Pretending to pour [something] out of [something], but [something] is empty",
+     0.032211270183324814
+    ],
+    [
+     "Turning [something] upside down",
+     0.021003294736146927
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/bounce_cd08299.8.mp4",
+   "top1_p": 0.5601537823677063,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.1059024095704593,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.5601537823677063
+    ],
+    [
+     "Tipping [something] over",
+     0.1352604776620865
+    ],
+    [
+     "Pretending to pour [something] out of [something], but [something] is empty",
+     0.03560837730765343
+    ],
+    [
+     "Turning [something] upside down",
+     0.02274559810757637
+    ],
+    [
+     "Pretending to put [something] on a surface",
+     0.020450139418244362
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/bounce_cd12800.0.mp4",
+   "top1_p": 0.4850849509239197,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.2874247388865223,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.4850849509239197
+    ],
+    [
+     "Tipping [something] over",
+     0.1892247498035431
+    ],
+    [
+     "Pretending to pour [something] out of [something], but [something] is empty",
+     0.026471419259905815
+    ],
+    [
+     "Pretending to put [something] on a surface",
+     0.02609952725470066
+    ],
+    [
+     "Spilling [something] onto [something]",
+     0.019267739728093147
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/grav_bounce_g01.62.mp4",
+   "top1_p": 0.1489957571029663,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 3.5620327824938434,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.1489957571029663
+    ],
+    [
+     "Pretending to put [something] on a surface",
+     0.12788935005664825
+    ],
+    [
+     "Showing [something] to the camera",
+     0.0717715173959732
+    ],
+    [
+     "Rolling [something] on a flat surface",
+     0.059746962040662766
+    ],
+    [
+     "Tipping [something] over",
+     0.05658029019832611
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/grav_bounce_g03.72.mp4",
+   "top1_p": 0.4801270663738251,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.5972834547894474,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.4801270663738251
+    ],
+    [
+     "Tipping [something] over",
+     0.09078904986381531
+    ],
+    [
+     "Pretending to pour [something] out of [something], but [something] is empty",
+     0.041237372905015945
+    ],
+    [
+     "Pretending to put [something] on a surface",
+     0.037274252623319626
+    ],
+    [
+     "Rolling [something] on a flat surface",
+     0.033598076552152634
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/grav_bounce_g09.81.mp4",
+   "top1_p": 0.6294112205505371,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 1.9717384979648527,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.6294112205505371
+    ],
+    [
+     "Tipping [something] over",
+     0.06423679739236832
+    ],
+    [
+     "Pretending to pour [something] out of [something], but [something] is empty",
+     0.04518934339284897
+    ],
+    [
+     "Turning [something] upside down",
+     0.018787745386362076
+    ],
+    [
+     "Spinning [something] so it continues spinning",
+     0.018094372004270554
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/grav_bounce_g24.50.mp4",
+   "top1_p": 0.386995792388916,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.6888949206651063,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.386995792388916
+    ],
+    [
+     "Tipping [something] over",
+     0.17459310591220856
+    ],
+    [
+     "Lifting [something] up completely, then letting it drop down",
+     0.04238590598106384
+    ],
+    [
+     "Hitting [something] with [something]",
+     0.02940169908106327
+    ],
+    [
+     "[Something] falling like a rock",
+     0.024934010580182076
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/grav_bounce_g40.00.mp4",
+   "top1_p": 0.4513574540615082,
+   "top1": "Spinning [something] so it continues spinning",
+   "entropy": 2.6700227401011163,
+   "top5": [
+    [
+     "Spinning [something] so it continues spinning",
+     0.4513574540615082
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.047985684126615524
+    ],
+    [
+     "Pushing [something] so it spins",
+     0.04128013923764229
+    ],
+    [
+     "[Something] falling like a rock",
+     0.037429552525281906
+    ],
+    [
+     "Rolling [something] on a flat surface",
+     0.03586466982960701
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/grav_tilt_g01.62.mp4",
+   "top1_p": 0.22446942329406738,
+   "top1": "Lifting a surface with [something] on it but not enough for it to slide down",
+   "entropy": 2.6494611157334167,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.22446942329406738
+    ],
+    [
+     "Tilting [something] with [something] on it slightly so it doesn't fall down",
+     0.1605270355939865
+    ],
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.11045537143945694
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it stays where it is",
+     0.07165051251649857
+    ],
+    [
+     "Turning the camera left while filming [something]",
+     0.07079637795686722
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/grav_tilt_g03.72.mp4",
+   "top1_p": 0.18451599776744843,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 2.6925542056118807,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.18451599776744843
+    ],
+    [
+     "Tilting [something] with [something] on it slightly so it doesn't fall down",
+     0.16094601154327393
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.13338014483451843
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.10081818699836731
+    ],
+    [
+     "Turning the camera left while filming [something]",
+     0.07400692999362946
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/grav_tilt_g09.81.mp4",
+   "top1_p": 0.23033148050308228,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 2.555849953495477,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.23033148050308228
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.1694846898317337
+    ],
+    [
+     "Tilting [something] with [something] on it slightly so it doesn't fall down",
+     0.1330782026052475
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.11208526045084
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it stays where it is",
+     0.04500517621636391
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/grav_tilt_g24.50.mp4",
+   "top1_p": 0.5620902180671692,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 1.8956845801070579,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.5620902180671692
+    ],
+    [
+     "Tilting [something] with [something] on it slightly so it doesn't fall down",
+     0.06667450070381165
+    ],
+    [
+     "Turning the camera left while filming [something]",
+     0.062425851821899414
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.05477994680404663
+    ],
+    [
+     "Letting [something] roll down a slanted surface",
+     0.046779487282037735
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/grav_tilt_g40.00.mp4",
+   "top1_p": 0.7629352807998657,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 1.1595001978958976,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.7629352807998657
+    ],
+    [
+     "Letting [something] roll down a slanted surface",
+     0.07136799395084381
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.032628655433654785
+    ],
+    [
+     "Turning the camera left while filming [something]",
+     0.02830798737704754
+    ],
+    [
+     "Tilting [something] with [something] on it slightly so it doesn't fall down",
+     0.015011829324066639
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/null_m0.050.mp4",
+   "top1_p": 0.2257661521434784,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 2.5414107110139543,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.2257661521434784
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.19927214086055756
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.11968374997377396
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it stays where it is",
+     0.07982950657606125
+    ],
+    [
+     "Tilting [something] with [something] on it slightly so it doesn't fall down",
+     0.05557142198085785
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/null_m0.119.mp4",
+   "top1_p": 0.19916638731956482,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 2.7346123057037417,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.19916638731956482
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.13862578570842743
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.11849555373191833
+    ],
+    [
+     "Showing a photo of [something] to the camera",
+     0.0830904170870781
+    ],
+    [
+     "Tilting [something] with [something] on it slightly so it doesn't fall down",
+     0.06617400795221329
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/null_m0.283.mp4",
+   "top1_p": 0.24199634790420532,
+   "top1": "Lifting a surface with [something] on it but not enough for it to slide down",
+   "entropy": 2.596639934646098,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.24199634790420532
+    ],
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.16990689933300018
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.09103351831436157
+    ],
+    [
+     "Showing a photo of [something] to the camera",
+     0.0712132602930069
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it stays where it is",
+     0.07051534950733185
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/null_m0.673.mp4",
+   "top1_p": 0.20320655405521393,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 2.786519653700777,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.20320655405521393
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.11631472408771515
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.11134116351604462
+    ],
+    [
+     "Tilting [something] with [something] on it slightly so it doesn't fall down",
+     0.09464701265096664
+    ],
+    [
+     "Turning the camera left while filming [something]",
+     0.062303245067596436
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/null_m1.600.mp4",
+   "top1_p": 0.3014228641986847,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 2.4889301706433566,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.3014228641986847
+    ],
+    [
+     "Tilting [something] with [something] on it slightly so it doesn't fall down",
+     0.1405620574951172
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.1366044282913208
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.08164817839860916
+    ],
+    [
+     "Showing a photo of [something] to the camera",
+     0.05516255274415016
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/settle_cd00400.0.mp4",
+   "top1_p": 0.5496365427970886,
+   "top1": "Showing [something] to the camera",
+   "entropy": 2.3781582851139125,
+   "top5": [
+    [
+     "Showing [something] to the camera",
+     0.5496365427970886
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.052267853170633316
+    ],
+    [
+     "Showing [something] on top of [something]",
+     0.04299379140138626
+    ],
+    [
+     "Spinning [something] so it continues spinning",
+     0.03766712173819542
+    ],
+    [
+     "Holding [something] in front of [something]",
+     0.02655070833861828
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/settle_cd00616.9.mp4",
+   "top1_p": 0.6619482636451721,
+   "top1": "Showing [something] to the camera",
+   "entropy": 1.896735282016131,
+   "top5": [
+    [
+     "Showing [something] to the camera",
+     0.6619482636451721
+    ],
+    [
+     "Showing [something] on top of [something]",
+     0.03304720297455788
+    ],
+    [
+     "Holding [something] in front of [something]",
+     0.03197157382965088
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.02450462058186531
+    ],
+    [
+     "Showing that [something] is inside [something]",
+     0.02271946705877781
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/settle_cd00951.4.mp4",
+   "top1_p": 0.5684587955474854,
+   "top1": "Showing [something] to the camera",
+   "entropy": 2.184188443805999,
+   "top5": [
+    [
+     "Showing [something] to the camera",
+     0.5684587955474854
+    ],
+    [
+     "Showing [something] on top of [something]",
+     0.048063527792692184
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.043348729610443115
+    ],
+    [
+     "Showing that [something] is inside [something]",
+     0.042348820716142654
+    ],
+    [
+     "Spinning [something] so it continues spinning",
+     0.03459686413407326
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/settle_cd01467.2.mp4",
+   "top1_p": 0.7558770179748535,
+   "top1": "Showing [something] to the camera",
+   "entropy": 1.4026167056277472,
+   "top5": [
+    [
+     "Showing [something] to the camera",
+     0.7558770179748535
+    ],
+    [
+     "Showing [something] on top of [something]",
+     0.03594771772623062
+    ],
+    [
+     "Spinning [something] so it continues spinning",
+     0.03234401345252991
+    ],
+    [
+     "Showing that [something] is inside [something]",
+     0.02009671740233898
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.01772915944457054
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/settle_cd02262.7.mp4",
+   "top1_p": 0.6926953792572021,
+   "top1": "Showing [something] to the camera",
+   "entropy": 1.7000398200991076,
+   "top5": [
+    [
+     "Showing [something] to the camera",
+     0.6926953792572021
+    ],
+    [
+     "Spinning [something] so it continues spinning",
+     0.03715895488858223
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.03615860641002655
+    ],
+    [
+     "Holding [something] in front of [something]",
+     0.030525153502821922
+    ],
+    [
+     "Showing [something] on top of [something]",
+     0.026034317910671234
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/settle_cd03489.6.mp4",
+   "top1_p": 0.6665906310081482,
+   "top1": "Showing [something] to the camera",
+   "entropy": 1.8265114246542604,
+   "top5": [
+    [
+     "Showing [something] to the camera",
+     0.6665906310081482
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.050424933433532715
+    ],
+    [
+     "Spinning [something] so it continues spinning",
+     0.03347140550613403
+    ],
+    [
+     "Holding [something] in front of [something]",
+     0.02868150733411312
+    ],
+    [
+     "Showing [something] on top of [something]",
+     0.027572713792324066
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/settle_cd05381.7.mp4",
+   "top1_p": 0.7206911444664001,
+   "top1": "Showing [something] to the camera",
+   "entropy": 1.5083515466799295,
+   "top5": [
+    [
+     "Showing [something] to the camera",
+     0.7206911444664001
+    ],
+    [
+     "Spinning [something] so it continues spinning",
+     0.05690215155482292
+    ],
+    [
+     "Holding [something] in front of [something]",
+     0.031457215547561646
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.02748832292854786
+    ],
+    [
+     "Showing [something] on top of [something]",
+     0.024096058681607246
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/settle_cd08299.8.mp4",
+   "top1_p": 0.7990593910217285,
+   "top1": "Showing [something] to the camera",
+   "entropy": 1.1873572403354107,
+   "top5": [
+    [
+     "Showing [something] to the camera",
+     0.7990593910217285
+    ],
+    [
+     "Showing [something] on top of [something]",
+     0.03121514804661274
+    ],
+    [
+     "Holding [something] in front of [something]",
+     0.028917061164975166
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.017185451462864876
+    ],
+    [
+     "Showing that [something] is inside [something]",
+     0.012672833167016506
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/settle_cd12800.0.mp4",
+   "top1_p": 0.7420716285705566,
+   "top1": "Showing [something] to the camera",
+   "entropy": 1.4589548470993257,
+   "top5": [
+    [
+     "Showing [something] to the camera",
+     0.7420716285705566
+    ],
+    [
+     "Showing [something] on top of [something]",
+     0.048164721578359604
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.02426256611943245
+    ],
+    [
+     "Holding [something] in front of [something]",
+     0.024204149842262268
+    ],
+    [
+     "Showing that [something] is inside [something]",
+     0.021457036957144737
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/tilt_mu0.100.mp4",
+   "top1_p": 0.49852854013442993,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 2.074851422233909,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.49852854013442993
+    ],
+    [
+     "Turning the camera left while filming [something]",
+     0.09653187543153763
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.06684894114732742
+    ],
+    [
+     "Letting [something] roll down a slanted surface",
+     0.048022735863924026
+    ],
+    [
+     "Showing [something] on top of [something]",
+     0.047121137380599976
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/tilt_mu0.117.mp4",
+   "top1_p": 0.5037484765052795,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 2.050595066673739,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.5037484765052795
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.09466079622507095
+    ],
+    [
+     "Turning the camera left while filming [something]",
+     0.07613454759120941
+    ],
+    [
+     "Letting [something] roll down a slanted surface",
+     0.06662639230489731
+    ],
+    [
+     "Tilting [something] with [something] on it slightly so it doesn't fall down",
+     0.03690280392765999
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/tilt_mu0.137.mp4",
+   "top1_p": 0.4683179259300232,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 2.192560121682609,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.4683179259300232
+    ],
+    [
+     "Tilting [something] with [something] on it slightly so it doesn't fall down",
+     0.08099965006113052
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.07494287192821503
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.05353086069226265
+    ],
+    [
+     "Turning the camera left while filming [something]",
+     0.044380079954862595
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/tilt_mu0.160.mp4",
+   "top1_p": 0.25933346152305603,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 2.636916316102722,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.25933346152305603
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.11507447063922882
+    ],
+    [
+     "Turning the camera left while filming [something]",
+     0.08799780160188675
+    ],
+    [
+     "Tilting [something] with [something] on it slightly so it doesn't fall down",
+     0.08791769295930862
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.07123731076717377
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/tilt_mu0.187.mp4",
+   "top1_p": 0.2017899453639984,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 2.6931188329926017,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.2017899453639984
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.17080900073051453
+    ],
+    [
+     "Tilting [something] with [something] on it slightly so it doesn't fall down",
+     0.10786420851945877
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.10282991081476212
+    ],
+    [
+     "Turning the camera left while filming [something]",
+     0.056102901697158813
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/tilt_mu0.219.mp4",
+   "top1_p": 0.1809759885072708,
+   "top1": "Lifting a surface with [something] on it but not enough for it to slide down",
+   "entropy": 2.7491280741926962,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.1809759885072708
+    ],
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.16444142162799835
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.10910060256719589
+    ],
+    [
+     "Tilting [something] with [something] on it slightly so it doesn't fall down",
+     0.09732960164546967
+    ],
+    [
+     "Turning the camera left while filming [something]",
+     0.07070069760084152
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/tilt_mu0.256.mp4",
+   "top1_p": 0.1900022178888321,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 2.669421273192187,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.1900022178888321
+    ],
+    [
+     "Tilting [something] with [something] on it slightly so it doesn't fall down",
+     0.17241765558719635
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.1406724750995636
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.07591038197278976
+    ],
+    [
+     "Lifting [something] with [something] on it",
+     0.07032298296689987
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/tilt_mu0.299.mp4",
+   "top1_p": 0.19986356794834137,
+   "top1": "Lifting a surface with [something] on it but not enough for it to slide down",
+   "entropy": 2.7772791349704207,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.19986356794834137
+    ],
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.14216159284114838
+    ],
+    [
+     "Tilting [something] with [something] on it slightly so it doesn't fall down",
+     0.09893973916769028
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.07981150597333908
+    ],
+    [
+     "Turning the camera left while filming [something]",
+     0.06828420609235764
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/tilt_mu0.350.mp4",
+   "top1_p": 0.31486907601356506,
+   "top1": "Lifting a surface with [something] on it but not enough for it to slide down",
+   "entropy": 2.4845980424763168,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.31486907601356506
+    ],
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.15184840559959412
+    ],
+    [
+     "Tilting [something] with [something] on it slightly so it doesn't fall down",
+     0.10754523426294327
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it stays where it is",
+     0.06159644573926926
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.050912078469991684
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_freeze__bounce_cd00400.0.mp4",
+   "top1_p": 0.5569161772727966,
+   "top1": "Tipping [something] over",
+   "entropy": 2.0525980551665954,
+   "top5": [
+    [
+     "Tipping [something] over",
+     0.5569161772727966
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.13439355790615082
+    ],
+    [
+     "Spilling [something] onto [something]",
+     0.04380570352077484
+    ],
+    [
+     "Laying [something] on the table on its side, not upright",
+     0.029083039611577988
+    ],
+    [
+     "Pretending to pour [something] out of [something], but [something] is empty",
+     0.02680473029613495
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_freeze__bounce_cd03489.6.mp4",
+   "top1_p": 0.45127904415130615,
+   "top1": "Tipping [something] over",
+   "entropy": 2.4173461733363792,
+   "top5": [
+    [
+     "Tipping [something] over",
+     0.45127904415130615
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.17252610623836517
+    ],
+    [
+     "Spilling [something] onto [something]",
+     0.04896913096308708
+    ],
+    [
+     "Pretending to pour [something] out of [something], but [something] is empty",
+     0.0340103805065155
+    ],
+    [
+     "Laying [something] on the table on its side, not upright",
+     0.022538917139172554
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_freeze__settle_cd00616.9.mp4",
+   "top1_p": 0.11111016571521759,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 3.71505386942082,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.11111016571521759
+    ],
+    [
+     "Holding [something] over [something]",
+     0.07880716770887375
+    ],
+    [
+     "Moving [part] of [something]",
+     0.07676342874765396
+    ],
+    [
+     "Showing [something] on top of [something]",
+     0.059926122426986694
+    ],
+    [
+     "Holding [something] in front of [something]",
+     0.0590217225253582
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_freeze__settle_cd08299.8.mp4",
+   "top1_p": 0.08747436106204987,
+   "top1": "Putting [something] onto [something]",
+   "entropy": 3.731079067088213,
+   "top5": [
+    [
+     "Putting [something] onto [something]",
+     0.08747436106204987
+    ],
+    [
+     "Holding [something] over [something]",
+     0.08493698388338089
+    ],
+    [
+     "Holding [something] in front of [something]",
+     0.08350387215614319
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.07208403944969177
+    ],
+    [
+     "Showing [something] on top of [something]",
+     0.0656641274690628
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_freeze__tilt_mu0.160.mp4",
+   "top1_p": 0.5173364877700806,
+   "top1": "Lifting a surface with [something] on it but not enough for it to slide down",
+   "entropy": 2.0418686923198033,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.5173364877700806
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it stays where it is",
+     0.08508890122175217
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.07530224323272705
+    ],
+    [
+     "Tilting [something] with [something] on it slightly so it doesn't fall down",
+     0.05329502373933792
+    ],
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.04280301555991173
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_freeze__tilt_mu0.350.mp4",
+   "top1_p": 0.523046612739563,
+   "top1": "Lifting a surface with [something] on it but not enough for it to slide down",
+   "entropy": 2.039912175801562,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.523046612739563
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it stays where it is",
+     0.08096767961978912
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.06928174942731857
+    ],
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.04498958960175514
+    ],
+    [
+     "Tilting [something] with [something] on it slightly so it doesn't fall down",
+     0.043615929782390594
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_rewind__bounce_cd00400.0.mp4",
+   "top1_p": 0.15805630385875702,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 3.6743036842937213,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.15805630385875702
+    ],
+    [
+     "Spinning [something] so it continues spinning",
+     0.11019033938646317
+    ],
+    [
+     "Rolling [something] on a flat surface",
+     0.0564725324511528
+    ],
+    [
+     "Pretending to put [something] on a surface",
+     0.045160263776779175
+    ],
+    [
+     "Pretending to scoop [something] up with [something]",
+     0.034308552742004395
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_rewind__bounce_cd03489.6.mp4",
+   "top1_p": 0.2809728682041168,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 3.21162984758932,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.2809728682041168
+    ],
+    [
+     "Pretending to put [something] on a surface",
+     0.10355591028928757
+    ],
+    [
+     "Tipping [something] over",
+     0.059644583612680435
+    ],
+    [
+     "Rolling [something] on a flat surface",
+     0.04330205172300339
+    ],
+    [
+     "Showing [something] to the camera",
+     0.04172152653336525
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_rewind__settle_cd00616.9.mp4",
+   "top1_p": 0.6229815483093262,
+   "top1": "Showing [something] to the camera",
+   "entropy": 2.142791570785829,
+   "top5": [
+    [
+     "Showing [something] to the camera",
+     0.6229815483093262
+    ],
+    [
+     "Spinning [something] so it continues spinning",
+     0.039547353982925415
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.026752425357699394
+    ],
+    [
+     "Showing [something] on top of [something]",
+     0.026339789852499962
+    ],
+    [
+     "Holding [something] in front of [something]",
+     0.023610621690750122
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_rewind__settle_cd08299.8.mp4",
+   "top1_p": 0.6802424788475037,
+   "top1": "Showing [something] to the camera",
+   "entropy": 1.8325560810889232,
+   "top5": [
+    [
+     "Showing [something] to the camera",
+     0.6802424788475037
+    ],
+    [
+     "Spinning [something] so it continues spinning",
+     0.03827532008290291
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.02559734135866165
+    ],
+    [
+     "Showing that [something] is empty",
+     0.018552538007497787
+    ],
+    [
+     "Holding [something] in front of [something]",
+     0.016245661303400993
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_rewind__tilt_mu0.160.mp4",
+   "top1_p": 0.15922056138515472,
+   "top1": "Showing a photo of [something] to the camera",
+   "entropy": 2.818749698326072,
+   "top5": [
+    [
+     "Showing a photo of [something] to the camera",
+     0.15922056138515472
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.14867061376571655
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.12210145592689514
+    ],
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.10533194988965988
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it stays where it is",
+     0.08267559856176376
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_rewind__tilt_mu0.350.mp4",
+   "top1_p": 0.27519580721855164,
+   "top1": "Lifting a surface with [something] on it but not enough for it to slide down",
+   "entropy": 2.523445771016769,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.27519580721855164
+    ],
+    [
+     "Showing a photo of [something] to the camera",
+     0.1658398061990738
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it stays where it is",
+     0.12055607885122299
+    ],
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.07249794155359268
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.0715615302324295
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_teleport__bounce_cd00400.0.mp4",
+   "top1_p": 0.5989505648612976,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.0982240623283523,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.5989505648612976
+    ],
+    [
+     "Turning [something] upside down",
+     0.06235136091709137
+    ],
+    [
+     "Tipping [something] over",
+     0.05606134608387947
+    ],
+    [
+     "Pretending to pour [something] out of [something], but [something] is empty",
+     0.032071635127067566
+    ],
+    [
+     "Pretending to scoop [something] up with [something]",
+     0.014130168594419956
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_teleport__bounce_cd03489.6.mp4",
+   "top1_p": 0.6996518969535828,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 1.6574980654831541,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.6996518969535828
+    ],
+    [
+     "Turning [something] upside down",
+     0.05587385967373848
+    ],
+    [
+     "Tipping [something] over",
+     0.04959670826792717
+    ],
+    [
+     "Pretending to pour [something] out of [something], but [something] is empty",
+     0.023990482091903687
+    ],
+    [
+     "Putting [something] onto [something]",
+     0.008367741480469704
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_teleport__settle_cd00616.9.mp4",
+   "top1_p": 0.5578811168670654,
+   "top1": "Showing [something] to the camera",
+   "entropy": 2.4754382759927998,
+   "top5": [
+    [
+     "Showing [something] to the camera",
+     0.5578811168670654
+    ],
+    [
+     "Showing [something] on top of [something]",
+     0.03890957683324814
+    ],
+    [
+     "Spinning [something] so it continues spinning",
+     0.038319773972034454
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.032074835151433945
+    ],
+    [
+     "Holding [something]",
+     0.018656296655535698
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_teleport__settle_cd08299.8.mp4",
+   "top1_p": 0.4134363532066345,
+   "top1": "Showing [something] to the camera",
+   "entropy": 3.0215679123002257,
+   "top5": [
+    [
+     "Showing [something] to the camera",
+     0.4134363532066345
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.05421397089958191
+    ],
+    [
+     "Spinning [something] so it continues spinning",
+     0.05178791284561157
+    ],
+    [
+     "Showing [something] on top of [something]",
+     0.05096040666103363
+    ],
+    [
+     "Tilting [something] with [something] on it slightly so it doesn't fall down",
+     0.029218832030892372
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_teleport__tilt_mu0.160.mp4",
+   "top1_p": 0.3244325518608093,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 2.4968536034216964,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.3244325518608093
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.1190224438905716
+    ],
+    [
+     "Tilting [something] with [something] on it slightly so it doesn't fall down",
+     0.09130728989839554
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.07550869137048721
+    ],
+    [
+     "Turning the camera left while filming [something]",
+     0.07405666261911392
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_teleport__tilt_mu0.350.mp4",
+   "top1_p": 0.18496660888195038,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 2.7156319170712955,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.18496660888195038
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.14926305413246155
+    ],
+    [
+     "Tilting [something] with [something] on it slightly so it doesn't fall down",
+     0.13241547346115112
+    ],
+    [
+     "Showing a photo of [something] to the camera",
+     0.0725652351975441
+    ],
+    [
+     "Turning the camera left while filming [something]",
+     0.07029903680086136
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_through__bounce_cd00400.0.mp4",
+   "top1_p": 0.40585681796073914,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.5401413448108023,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.40585681796073914
+    ],
+    [
+     "Tipping [something] over",
+     0.20156985521316528
+    ],
+    [
+     "Pretending to pour [something] out of [something], but [something] is empty",
+     0.03764698654413223
+    ],
+    [
+     "Lifting [something] up completely, then letting it drop down",
+     0.03481311723589897
+    ],
+    [
+     "Spilling [something] onto [something]",
+     0.028729235753417015
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_through__bounce_cd03489.6.mp4",
+   "top1_p": 0.3300710618495941,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.9638756654938074,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.3300710618495941
+    ],
+    [
+     "Tipping [something] over",
+     0.16379877924919128
+    ],
+    [
+     "Pretending to pour [something] out of [something], but [something] is empty",
+     0.04269033670425415
+    ],
+    [
+     "Turning [something] upside down",
+     0.03640474006533623
+    ],
+    [
+     "Spilling [something] onto [something]",
+     0.029745396226644516
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_through__settle_cd00616.9.mp4",
+   "top1_p": 0.10465120524168015,
+   "top1": "[Something] falling like a rock",
+   "entropy": 3.8718345443917643,
+   "top5": [
+    [
+     "[Something] falling like a rock",
+     0.10465120524168015
+    ],
+    [
+     "Showing [something] to the camera",
+     0.07698072493076324
+    ],
+    [
+     "Tipping [something] over",
+     0.07493630051612854
+    ],
+    [
+     "Tilting [something] with [something] on it until it falls off",
+     0.06536512076854706
+    ],
+    [
+     "Lifting up one end of [something], then letting it drop down",
+     0.056613385677337646
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_through__settle_cd08299.8.mp4",
+   "top1_p": 0.1026642769575119,
+   "top1": "Tilting [something] with [something] on it until it falls off",
+   "entropy": 3.790283367008482,
+   "top5": [
+    [
+     "Tilting [something] with [something] on it until it falls off",
+     0.1026642769575119
+    ],
+    [
+     "Tipping [something] over",
+     0.1012156680226326
+    ],
+    [
+     "Lifting up one end of [something], then letting it drop down",
+     0.07535072416067123
+    ],
+    [
+     "[Something] falling like a rock",
+     0.0734834223985672
+    ],
+    [
+     "Showing [something] to the camera",
+     0.0611867792904377
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_through__tilt_mu0.160.mp4",
+   "top1_p": 0.738853931427002,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 1.261449998595615,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.738853931427002
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.08421741425991058
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.045906856656074524
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.0197786595672369
+    ],
+    [
+     "Letting [something] roll down a slanted surface",
+     0.014653722755610943
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_through__tilt_mu0.350.mp4",
+   "top1_p": 0.7199718952178955,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 1.3537994924430516,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.7199718952178955
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.06495963782072067
+    ],
+    [
+     "Turning the camera downwards while filming [something]",
+     0.04686257988214493
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.03702859953045845
+    ],
+    [
+     "Letting [something] roll down a slanted surface",
+     0.027294116094708443
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_vanish__bounce_cd00400.0.mp4",
+   "top1_p": 0.3714800775051117,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.75534712455297,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.3714800775051117
+    ],
+    [
+     "Tipping [something] over",
+     0.17468374967575073
+    ],
+    [
+     "Pretending to pour [something] out of [something], but [something] is empty",
+     0.056634899228811264
+    ],
+    [
+     "Lifting [something] up completely, then letting it drop down",
+     0.03096430003643036
+    ],
+    [
+     "Turning [something] upside down",
+     0.02786252088844776
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_vanish__bounce_cd03489.6.mp4",
+   "top1_p": 0.46986064314842224,
+   "top1": "Pretending to turn [something] upside down",
+   "entropy": 2.4930541354622764,
+   "top5": [
+    [
+     "Pretending to turn [something] upside down",
+     0.46986064314842224
+    ],
+    [
+     "Tipping [something] over",
+     0.1482624113559723
+    ],
+    [
+     "Turning [something] upside down",
+     0.036359261721372604
+    ],
+    [
+     "Pretending to pour [something] out of [something], but [something] is empty",
+     0.03398072347044945
+    ],
+    [
+     "Spilling [something] onto [something]",
+     0.023760588839650154
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_vanish__settle_cd00616.9.mp4",
+   "top1_p": 0.36513978242874146,
+   "top1": "Showing [something] to the camera",
+   "entropy": 3.178351058476739,
+   "top5": [
+    [
+     "Showing [something] to the camera",
+     0.36513978242874146
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.06277454644441605
+    ],
+    [
+     "Spinning [something] so it continues spinning",
+     0.047064658254384995
+    ],
+    [
+     "Showing [something] on top of [something]",
+     0.03959788754582405
+    ],
+    [
+     "Tilting [something] with [something] on it slightly so it doesn't fall down",
+     0.028968755155801773
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_vanish__settle_cd08299.8.mp4",
+   "top1_p": 0.3524892032146454,
+   "top1": "Showing [something] to the camera",
+   "entropy": 3.166606026978571,
+   "top5": [
+    [
+     "Showing [something] to the camera",
+     0.3524892032146454
+    ],
+    [
+     "Pretending to turn [something] upside down",
+     0.08642478287220001
+    ],
+    [
+     "Spinning [something] so it continues spinning",
+     0.06000956892967224
+    ],
+    [
+     "Showing [something] on top of [something]",
+     0.04780247062444687
+    ],
+    [
+     "Holding [something] in front of [something]",
+     0.03057272359728813
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_vanish__tilt_mu0.160.mp4",
+   "top1_p": 0.5384262204170227,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 1.9883289337103682,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.5384262204170227
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.07396557927131653
+    ],
+    [
+     "Tilting [something] with [something] on it slightly so it doesn't fall down",
+     0.058879826217889786
+    ],
+    [
+     "Lifting [something] with [something] on it",
+     0.046664346009492874
+    ],
+    [
+     "Letting [something] roll down a slanted surface",
+     0.04601101204752922
+    ]
+   ]
+  },
+  {
+   "clip": "outputs/scene/v1b/clips/viol_vanish__tilt_mu0.350.mp4",
+   "top1_p": 0.528350293636322,
+   "top1": "Lifting a surface with [something] on it until it starts sliding down",
+   "entropy": 1.9612104428050148,
+   "top5": [
+    [
+     "Lifting a surface with [something] on it until it starts sliding down",
+     0.528350293636322
+    ],
+    [
+     "Lifting a surface with [something] on it but not enough for it to slide down",
+     0.11580521613359451
+    ],
+    [
+     "Tilting [something] with [something] on it slightly so it doesn't fall down",
+     0.08387205749750137
+    ],
+    [
+     "Lifting [something] with [something] on it",
+     0.05353563278913498
+    ],
+    [
+     "Putting [something] that can't roll onto a slanted surface, so it slides down",
+     0.032022371888160706
+    ]
+   ]
+  }
+ ]
+}

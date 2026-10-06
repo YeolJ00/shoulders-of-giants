@@ -51,12 +51,19 @@ def quat_y(deg):
     return [0.0, float(np.sin(h)), 0.0, float(np.cos(h))]
 
 
-def build(cd, n_frames, pos, vel=(0.0, 0.0, 0.0), ang=(0.0, 0.0, 0.0), rot=None):
+def build(cd, n_frames, pos, vel=(0.0, 0.0, 0.0), ang=(0.0, 0.0, 0.0), rot=None,
+          mass=MASS, mu=0.35, com=None):
+    # mass / mu / com are exposed so the whole theta vector can be swept through THIS
+    # probe's own validated solver set. They default to what the probe was validated at,
+    # so every existing caller is unchanged. The set matters: this probe calibrates
+    # stiffness at the default pen_frac = 0.005, and at the tilt rig's 1e-4 the contact is
+    # 50x stiffer and cd stops mattering at all (rebound range 1.03x over a 64x cd sweep).
     s = MeshProbeScene([OBJ], [list(pos)], [list(vel)], ang0=[list(ang)],
-                       rot0=None if rot is None else [rot], masses=[MASS],
+                       rot0=None if rot is None else [rot], masses=[float(mass)],
                        ground_z=GZ, dt=1.0 / (FPS * SUBSTEPS), n_steps=n_frames * SUBSTEPS,
-                       k=2500.0, cd=[cd], mu=[0.35], mesh_scale=[SCALE], faces=900,
-                       ground_mu=0.45, ground_cd=3000.0, table=TABLE)
+                       k=2500.0, cd=[cd], mu=[float(mu)], mesh_scale=[SCALE], faces=900,
+                       ground_mu=0.45, ground_cd=3000.0, table=TABLE,
+                       com_offset=None if com is None else [com])
     s.calibrate_stiffness()
     return s
 
