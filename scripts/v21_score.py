@@ -25,7 +25,14 @@ from pathlib import Path
 import numpy as np
 
 VJ = "/home/nas5/jooyeolyun/repos/simulation-assestization/models/vjepa2_repo"
-CKPT = "/home/nas5/jooyeolyun/repos/simulation-assestization/models/vjepa2_1_vitg_384.pt"
+import os as _os
+# ViT-g (1B, 1408 wide) by default; ViT-G (2B, 1664 wide) is the TEACHER the distilled
+# ViT-B was trained against -- its width is exactly the pred_teacher_embed_dim: 1664 that
+# made the distilled checkpoint unusable.
+_ARCH = _os.environ.get("V21_ARCH", "giant")          # "giant" | "gigantic"
+ARCH = f"vjepa2_1_vit_{_ARCH}_384"
+CKPT = ("/home/nas5/jooyeolyun/repos/simulation-assestization/models/"
+        + ("vjepa2_1_vitG_384.pt" if _ARCH == "gigantic" else "vjepa2_1_vitg_384.pt"))
 sys.path.insert(0, VJ)
 
 SIZE, PATCH, TUBELET, FRAMES, LEVELS = 384, 16, 2, 64, 4
@@ -86,11 +93,11 @@ def main():
     # which is what HF's VJEPA2Model does. That leaks: a context token computed with full
     # attention has already seen the region it is being asked to predict. Measured on this
     # checkpoint, max |masked - gathered| = 0.043 on features whose signal is ~0.4%.
-    enc_c, pred = _make_vjepa2_1_model(model_name="vjepa2_1_vit_giant_384", img_size=SIZE,
+    enc_c, pred = _make_vjepa2_1_model(model_name=ARCH, img_size=SIZE,
                                        predictor_num_mask_tokens=8,
                                        n_output_distillation=LEVELS,
                                        return_all_tokens=True, pretrained=False)
-    enc_t, _ = _make_vjepa2_1_model(model_name="vjepa2_1_vit_giant_384", img_size=SIZE,
+    enc_t, _ = _make_vjepa2_1_model(model_name=ARCH, img_size=SIZE,
                                     predictor_num_mask_tokens=8,
                                     n_output_distillation=LEVELS,
                                     return_all_tokens=True, pretrained=False)
@@ -167,7 +174,7 @@ def main():
                          obj_patches=r["median_patches"])
         print(f"  {key:<34} max {L.max():.5f}  obj_max {O.max():.5f}", flush=True)
     dst = Path("docs/results") / f"v21fix_{src.stem.replace('v21_input_', '')}.json"
-    dst.write_text(json.dumps({"model": "vjepa2_1_vit_giant_384", "rows": rows}, indent=1))
+    dst.write_text(json.dumps({"model": ARCH, "rows": rows}, indent=1))
     print(f"wrote {dst}")
 
 

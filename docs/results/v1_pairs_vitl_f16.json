@@ -1,0 +1,225 @@
+{
+ "source": "docs/results/v1_protocol_vitl_f16.json",
+ "results": [
+  {
+   "tier": "1 violations (impossible)",
+   "stat": "max",
+   "correct": 15,
+   "n": 30,
+   "accuracy": 50.0,
+   "ci": [
+    33.15385122717377,
+    66.84614877282624
+   ],
+   "median_gap_pct": 0.1306757043332103,
+   "above_chance": false
+  },
+  {
+   "tier": "1 violations (impossible)",
+   "stat": "mean",
+   "correct": 10,
+   "n": 30,
+   "accuracy": 33.333333333333336,
+   "ci": [
+    19.230295526846195,
+    51.22027418616973
+   ],
+   "median_gap_pct": -0.21566570867693313,
+   "above_chance": false
+  },
+  {
+   "tier": "1 violations (impossible)",
+   "stat": "obj_max",
+   "correct": 17,
+   "n": 30,
+   "accuracy": 56.666666666666664,
+   "ci": [
+    39.197009545408726,
+    72.62276256938489
+   ],
+   "median_gap_pct": 0.1990586770172104,
+   "above_chance": false
+  },
+  {
+   "tier": "1 violations (impossible)",
+   "stat": "obj_mean",
+   "correct": 14,
+   "n": 30,
+   "accuracy": 46.666666666666664,
+   "ci": [
+    30.232127224128234,
+    63.857986718474955
+   ],
+   "median_gap_pct": -0.14568904473576696,
+   "above_chance": false
+  },
+  {
+   "tier": "2 gravity (wrong, legal)",
+   "stat": "max",
+   "correct": 2,
+   "n": 8,
+   "accuracy": 25.0,
+   "ci": [
+    7.147768885802764,
+    59.073012089741084
+   ],
+   "median_gap_pct": -1.8486517994992102,
+   "above_chance": false
+  },
+  {
+   "tier": "2 gravity (wrong, legal)",
+   "stat": "mean",
+   "correct": 2,
+   "n": 8,
+   "accuracy": 25.0,
+   "ci": [
+    7.147768885802764,
+    59.073012089741084
+   ],
+   "median_gap_pct": -1.6088437027004199,
+   "above_chance": false
+  },
+  {
+   "tier": "2 gravity (wrong, legal)",
+   "stat": "obj_max",
+   "correct": 0,
+   "n": 8,
+   "accuracy": 0.0,
+   "ci": [
+    0.0,
+    32.441561951087685
+   ],
+   "median_gap_pct": -2.1538920661634124,
+   "above_chance": false
+  },
+  {
+   "tier": "2 gravity (wrong, legal)",
+   "stat": "obj_mean",
+   "correct": 1,
+   "n": 8,
+   "accuracy": 12.5,
+   "ci": [
+    2.241690886329617,
+    47.08948057698615
+   ],
+   "median_gap_pct": -1.8667409272877915,
+   "above_chance": false
+  },
+  {
+   "tier": "3 theta (no ground truth)",
+   "stat": "max",
+   "correct": 5,
+   "n": 24,
+   "accuracy": 20.833333333333332,
+   "ci": [
+    9.24468910478809,
+    40.470844485235475
+   ],
+   "median_gap_pct": -0.8006828473081639,
+   "above_chance": false
+  },
+  {
+   "tier": "3 theta (no ground truth)",
+   "stat": "mean",
+   "correct": 4,
+   "n": 24,
+   "accuracy": 16.666666666666668,
+   "ci": [
+    6.678568000728924,
+    35.85347038786943
+   ],
+   "median_gap_pct": -0.5302501480695095,
+   "above_chance": false
+  },
+  {
+   "tier": "3 theta (no ground truth)",
+   "stat": "obj_max",
+   "correct": 1,
+   "n": 24,
+   "accuracy": 4.166666666666667,
+   "ci": [
+    0.7393265354805125,
+    20.242226248842233
+   ],
+   "median_gap_pct": -1.26959220308252,
+   "above_chance": false
+  },
+  {
+   "tier": "3 theta (no ground truth)",
+   "stat": "obj_mean",
+   "correct": 2,
+   "n": 24,
+   "accuracy": 8.333333333333334,
+   "ci": [
+    2.31583278429735,
+    25.849215201450598
+   ],
+   "median_gap_pct": -0.6627790371789801,
+   "above_chance": false
+  },
+  {
+   "tier": "null control (mass)",
+   "stat": "max",
+   "correct": 2,
+   "n": 4,
+   "accuracy": 50.0,
+   "ci": [
+    15.003570882017147,
+    84.99642911798286
+   ],
+   "median_gap_pct": 0.1613276040426788,
+   "above_chance": false
+  },
+  {
+   "tier": "null control (mass)",
+   "stat": "mean",
+   "correct": 3,
+   "n": 4,
+   "accuracy": 75.0,
+   "ci": [
+    30.06360524426366,
+    95.44139373553637
+   ],
+   "median_gap_pct": 0.14200311230916673,
+   "above_chance": false
+  },
+  {
+   "tier": "null control (mass)",
+   "stat": "obj_max",
+   "correct": 3,
+   "n": 4,
+   "accuracy": 75.0,
+   "ci": [
+    30.06360524426366,
+    95.44139373553637
+   ],
+   "median_gap_pct": 0.4145883165859444,
+   "above_chance": false
+  },
+  {
+   "tier": "null control (mass)",
+   "stat": "obj_mean",
+   "correct": 3,
+   "n": 4,
+   "accuracy": 75.0,
+   "ci": [
+    30.06360524426366,
+    95.44139373553637
+   ],
+   "median_gap_pct": 0.3598611197590054,
+   "above_chance": false
+  }
+ ],
+ "reference": {
+  "model": "vit-l-rope-vm2m, IntPhys O1-O3",
+  "accuracy_pct": [
+   96.7,
+   100.0
+  ],
+  "within_scene_gap_pct": [
+   0.29,
+   0.61
+  ],
+  "pooled_across_scenes_pct": -1.77
+ }
+}

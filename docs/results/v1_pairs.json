@@ -1,0 +1,69 @@
+{
+ "source": "docs/results/v1_protocol.json",
+ "results": [
+  {
+   "tier": "3 theta (no ground truth)",
+   "stat": "max",
+   "correct": 6,
+   "n": 24,
+   "accuracy": 25.0,
+   "ci": [
+    11.999203479342329,
+    44.89982531210644
+   ],
+   "median_gap_pct": -0.6541092954389259,
+   "above_chance": false
+  },
+  {
+   "tier": "3 theta (no ground truth)",
+   "stat": "mean",
+   "correct": 15,
+   "n": 24,
+   "accuracy": 62.5,
+   "ci": [
+    42.70961903790707,
+    78.84086656636855
+   ],
+   "median_gap_pct": 0.258156714932699,
+   "above_chance": false
+  },
+  {
+   "tier": "null control (mass)",
+   "stat": "max",
+   "correct": 1,
+   "n": 4,
+   "accuracy": 25.0,
+   "ci": [
+    4.558606264463622,
+    69.93639475573634
+   ],
+   "median_gap_pct": -0.6412854721862095,
+   "above_chance": false
+  },
+  {
+   "tier": "null control (mass)",
+   "stat": "mean",
+   "correct": 1,
+   "n": 4,
+   "accuracy": 25.0,
+   "ci": [
+    4.558606264463622,
+    69.93639475573634
+   ],
+   "median_gap_pct": -0.014826097013822495,
+   "above_chance": false
+  }
+ ],
+ "reference": {
+  "model": "vit-l-rope-vm2m, IntPhys O1-O3",
+  "accuracy_pct": [
+   96.7,
+   100.0
+  ],
+  "within_scene_gap_pct": [
+   0.29,
+   0.61
+  ],
+  "pooled_across_scenes_pct": -1.77
+ }
+}
