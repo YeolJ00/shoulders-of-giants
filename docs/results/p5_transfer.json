@@ -1,0 +1,335 @@
+{
+ "rule_test": {
+  "cardboard": {
+   "n": 92,
+   "mu_board": 0.23007605453479027,
+   "mu_table": 0.19863524379345865,
+   "ratio": 0.8254856048291207
+  },
+  "dough": {
+   "n": 14,
+   "mu_board": 0.1609491298644249,
+   "mu_table": 0.15708496574151984,
+   "ratio": 1.0481800455622956
+  },
+  "h_wood": {
+   "n": 3,
+   "mu_board": 0.21379673886029757,
+   "mu_table": 0.3715169324568658,
+   "ratio": 1.8934951149748154
+  },
+  "m_pole": {
+   "n": 15,
+   "mu_board": 0.20061358165401005,
+   "mu_table": 0.1507743387594385,
+   "ratio": 0.7543566757307786
+  },
+  "p_block": {
+   "n": 54,
+   "mu_board": 0.24679613478934737,
+   "mu_table": 0.22983220899079665,
+   "ratio": 0.96195661290029
+  },
+  "p_doll": {
+   "n": 18,
+   "mu_board": 0.17067794691973637,
+   "mu_table": 0.21609062699129988,
+   "ratio": 1.3614963551701076
+  },
+  "p_ring": {
+   "n": 19,
+   "mu_board": 0.32975708992487696,
+   "mu_table": 0.10351813205037666,
+   "ratio": 0.3133694887816083
+  },
+  "p_toy": {
+   "n": 12,
+   "mu_board": 0.2522714389828674,
+   "mu_table": 0.23873015342655796,
+   "ratio": 0.925736774484381
+  },
+  "porcelain": {
+   "n": 12,
+   "mu_board": 0.16609995071465106,
+   "mu_table": 0.17520169850392284,
+   "ratio": 1.0064956613438891
+  },
+  "w_block": {
+   "n": 43,
+   "mu_board": 0.22991316567701708,
+   "mu_table": 0.19886419860594845,
+   "ratio": 0.8776001775907951
+  },
+  "w_pole": {
+   "n": 19,
+   "mu_board": 0.2139682912584456,
+   "mu_table": 0.17562361880081725,
+   "ratio": 0.8483901145492934
+  }
+ },
+ "assets": {
+  "cardboard_box_01": {
+   "material": "cardboard",
+   "grade": "exact",
+   "note": "",
+   "V_enclosed_cm3": 57916.412511477036,
+   "extent_cm": [
+    38.7,
+    51.6,
+    34.2
+   ],
+   "mu_pair": 0.229269437347843,
+   "mu_body": 0.11680994422621445,
+   "area_cm2": 8883.870741433033,
+   "build": "areal (measured)",
+   "areal_g_cm2": 0.10564409237417902,
+   "areal_cv": 0.03481250803668695,
+   "mass_g": 938.5284612482176
+  },
+  "Threshold_Porcelain_Teapot_White": {
+   "material": "porcelain",
+   "grade": "exact",
+   "note": "hollow, mass assumed",
+   "V_enclosed_cm3": 2256.7899234939414,
+   "extent_cm": [
+    18.7,
+    18.4,
+    13.6
+   ],
+   "mu_pair": 0.16609995071465106,
+   "mu_body": 0.061309319172021134,
+   "area_cm2": 977.0792459949473,
+   "build": "shell (ASSUMED wall 3.0-5.0 mm, rho 2.3-2.4 g/cm3; mesh area may double-count open containers' inner+outer surfaces)",
+   "mass_g_range": [
+    674.1846797365135,
+    1172.4950951939368
+   ]
+  },
+  "ceramic_vase_01": {
+   "material": "porcelain",
+   "grade": "close",
+   "note": "ceramic ~ porcelain; hollow, mass assumed",
+   "V_enclosed_cm3": 2121.51312572583,
+   "extent_cm": [
+    20.4,
+    20.4,
+    40.0
+   ],
+   "mu_pair": 0.16609995071465106,
+   "mu_body": 0.061309319172021134,
+   "area_cm2": 3465.1244931484566,
+   "build": "shell (ASSUMED wall 3.0-6.0 mm, rho 2.0-2.4 g/cm3; mesh area may double-count open containers' inner+outer surfaces)",
+   "mass_g_range": [
+    2079.074695889074,
+    4989.779270133778
+   ]
+  },
+  "wooden_bowl_01": {
+   "material": "w_block",
+   "grade": "close",
+   "note": "turned solid-wood walls (wall volume, open bowl)",
+   "V_enclosed_cm3": 2600.413600094851,
+   "extent_cm": [
+    31.3,
+    30.9,
+    9.4
+   ],
+   "mu_pair": 0.22991316567701708,
+   "mu_body": 0.11746680833695002,
+   "area_cm2": 1907.2223159955404,
+   "build": "solid (measured density)",
+   "rho_eff": 0.68390560875513,
+   "mass_g": 1778.4374461879884,
+   "mass_g_range": [
+    1564.0168754193671,
+    1893.1799012811757
+   ]
+  },
+  "Weisshai_Great_White_Shark": {
+   "material": "p_toy",
+   "grade": "close",
+   "note": "plastic toy",
+   "V_enclosed_cm3": 157.10630266706204,
+   "extent_cm": [
+    14.4,
+    16.7,
+    7.5
+   ],
+   "mu_pair": 0.25182731934017394,
+   "mu_body": 0.1409266639245732,
+   "area_cm2": 227.60209382989373,
+   "build": "solid (measured density)",
+   "rho_eff": 0.6181818181818182,
+   "mass_g": 97.12025983054745,
+   "mass_g_range": [
+    52.967267756323785,
+    130.17379363842284
+   ]
+  },
+  "Schleich_Lion_Action_Figure": {
+   "material": "p_toy",
+   "grade": "close",
+   "note": "plastic toy",
+   "V_enclosed_cm3": 78.4807211430474,
+   "extent_cm": [
+    11.5,
+    4.2,
+    7.0
+   ],
+   "mu_pair": 0.25182731934017394,
+   "mu_body": 0.1409266639245732,
+   "area_cm2": 136.46313902877753,
+   "build": "solid (measured density)",
+   "rho_eff": 0.6181818181818182,
+   "mass_g": 48.5153548884293,
+   "mass_g_range": [
+    26.45921455679884,
+    65.0268832328107
+   ]
+  },
+  "Great_Dinos_Triceratops_Toy": {
+   "material": "p_toy",
+   "grade": "close",
+   "note": "plastic toy",
+   "V_enclosed_cm3": 108.2265421385987,
+   "extent_cm": [
+    6.9,
+    4.6,
+    7.9
+   ],
+   "mu_pair": 0.25182731934017394,
+   "mu_body": 0.1409266639245732,
+   "area_cm2": 140.73197936228397,
+   "build": "solid (measured density)",
+   "rho_eff": 0.6181818181818182,
+   "mass_g": 66.90368059477011,
+   "mass_g_range": [
+    36.487805635299,
+    89.67342062912464
+   ]
+  },
+  "Pony_C_Clamp_1440": {
+   "material": "m_pole",
+   "grade": "close",
+   "note": "solid metal",
+   "V_enclosed_cm3": 148.59974324482698,
+   "extent_cm": [
+    20.2,
+    17.3,
+    2.7
+   ],
+   "mu_pair": 0.20105426602630116,
+   "mu_body": 0.08982848419416596,
+   "area_cm2": 343.0655254327208,
+   "build": "solid (measured density)",
+   "rho_eff": 7.7625,
+   "mass_g": 1153.5055069379694,
+   "mass_g_range": [
+    910.7726198876492,
+    1572.8263020305412
+   ]
+  },
+  "Poppin_File_Sorter_Blue": {
+   "material": "p_block",
+   "grade": "friction-only",
+   "note": "thin plastic shell; p_block is solid",
+   "V_enclosed_cm3": 972.5943121937859,
+   "extent_cm": [
+    25.0,
+    17.4,
+    15.4
+   ],
+   "mu_pair": 0.24645561057514564,
+   "mu_body": 0.13497859551992852,
+   "area_cm2": 1360.6617132137671,
+   "build": "shell (ASSUMED wall 1.5-2.5 mm, rho 0.9-1.2 g/cm3; mesh area may double-count open containers' inner+outer surfaces)",
+   "mass_g_range": [
+    183.68933128385856,
+    408.19851396413014
+   ]
+  },
+  "brass_pot_01": {
+   "material": "m_pole",
+   "grade": "friction-only",
+   "note": "no hollow-metal class for density",
+   "V_enclosed_cm3": 15256.084514338329,
+   "extent_cm": [
+    30.2,
+    30.2,
+    29.1
+   ],
+   "mu_pair": 0.20105426602630116,
+   "mu_body": 0.08982848419416596,
+   "area_cm2": 6171.610801034333,
+   "build": "shell (ASSUMED wall 0.8-1.5 mm, rho 8.4-8.7 g/cm3; mesh area may double-count open containers' inner+outer surfaces)",
+   "mass_g_range": [
+    4147.3224582950725,
+    8053.952095349804
+   ]
+  },
+  "book_encyclopedia_set_01": {
+   "material": null,
+   "grade": "not covered",
+   "note": "no paper/book class",
+   "V_enclosed_cm3": 19283.573737407904,
+   "extent_cm": [
+    55.1,
+    16.3,
+    23.7
+   ],
+   "area_cm2": 35347.55671997238,
+   "mass_g_range": [
+    11570.144242444741,
+    17355.216363667114
+   ],
+   "mass_src": "published density of bound books/paper; reference, not measured here",
+   "friction": "not measured"
+  },
+  "baseball_01": {
+   "material": null,
+   "grade": "not covered",
+   "note": "no leather/ball class; rolls anyway",
+   "V_enclosed_cm3": 235.42195297590277,
+   "extent_cm": [
+    7.4,
+    7.5,
+    7.5
+   ],
+   "area_cm2": 179.09458553146732,
+   "mass_g_range": [
+    142,
+    149
+   ],
+   "mass_src": "rulebook specification (5-5.25 oz)",
+   "cor": [
+    0.514,
+    0.578
+   ],
+   "cor_src": "rulebook specification 0.546 +- 0.032, against ash wood at 58 mph -- far faster than a table drop",
+   "cd_bounce_rig": [
+    1836.798405979751,
+    2340.9796121087525
+   ],
+   "friction": "not measured"
+  },
+  "food_apple_01": {
+   "material": null,
+   "grade": "not covered",
+   "note": "no organic class",
+   "V_enclosed_cm3": 443.48337456263334,
+   "extent_cm": [
+    9.8,
+    9.6,
+    8.5
+   ],
+   "area_cm2": 283.5169778002938,
+   "mass_g_range": [
+    332.612530921975,
+    376.96086837823833
+   ],
+   "mass_src": "published bulk density (apples float); reference, not measured here",
+   "friction": "not measured"
+  }
+ },
+ "anchor": "our table ~ Physics 101 ramp board; body mu = mu_pair^2 / 0.45"
+}
