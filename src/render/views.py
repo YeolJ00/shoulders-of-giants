@@ -18,4 +18,10 @@ VIEWS = {
           "width": 544, "height": 448},
     "c": {"eye": [0.50, -0.62, 1.62], "target": [-0.05, 0.00, 0.74], "fov_deg": 48,
           "width": 544, "height": 448},
+    # "d" is the opposing azimuth, added for the O-track. A real physical outcome is
+    # view-invariant, so disagreement between views is a free render-gap diagnostic: it
+    # means the classifier is reacting to the rendering rather than to the motion. Three
+    # near-coplanar views on the -y side could not have shown that; "d" breaks the plane.
+    "d": {"eye": [-0.68, 0.78, 1.10], "target": [-0.02, 0.02, 0.80], "fov_deg": 46,
+          "width": 544, "height": 448},
 }
