@@ -53,16 +53,37 @@ def ground_contact_mesh(world: wp.array(dtype=wp.vec3), body: wp.array(dtype=int
                         k: wp.array(dtype=float), cd: wp.array(dtype=float),
                         mu: wp.array(dtype=float), ground_mu: float, ground_cd: float,
                         weight: wp.array(dtype=float), half_w: float, half_d: float,
+                        gn: wp.vec3, gt: wp.vec3, gp: wp.vec3,
                         force: wp.array(dtype=wp.vec3), torque: wp.array(dtype=wp.vec3)):
-    """Exact plane contact: every mesh vertex tested directly against the table."""
+    """Exact plane contact: every mesh vertex tested directly against the table.
+
+    The plane is ARBITRARILY ORIENTED, given by a unit normal `gn`, an in-plane tangent
+    `gt` (which fixes the bounds rectangle's axes) and a point on it `gp`. Passing
+    gn = (0,0,1), gt = (1,0,0), gp = (0,0,ground_z) reproduces the original horizontal
+    plane exactly, which is what every existing caller gets.
+
+    WHY THIS EXISTS. The plane used to be a horizontal z-test, so an incline could only be
+    made by ROTATING GRAVITY and leaving the ground flat. That is exactly equivalent for a
+    static incline, but it splits the world in two: the simulator's frame is level and the
+    renderer's is tilted, and every quantity then has to be transformed by hand. Four
+    wrong-frame bugs came out of that split -- a stack probe subtracting in world
+    coordinates, a crop box, a ramp normal, and object poses handed to the renderer
+    untransformed so the object floated free of the ramp. A real tilted plane keeps one
+    frame for both. It also removes the rotating-frame approximation a RAMPING gravity
+    makes (centrifugal terms of 0.05-0.3% of g at the rates used here).
+    """
     i = wp.tid()
     b = body[i]
-    # A BOUNDED table. The ground was an infinite plane, so nothing could ever fall off an
-    # edge -- which makes "does it leave the table" unrepresentable, and that is exactly the
-    # threshold form the bounce probe needs. Negative bounds keep the old infinite plane.
-    if half_w > 0.0 and (wp.abs(world[i][0]) > half_w or wp.abs(world[i][1]) > half_d):
-        return
-    pen = ground_z - world[i][2]
+    d = world[i] - gp
+    # A BOUNDED table, tested in the PLANE's own axes so the rectangle tilts with it.
+    # The ground was an infinite plane, so nothing could ever fall off an edge -- which
+    # makes "does it leave the table" unrepresentable, and that is exactly the threshold
+    # form the bounce probe needs. Negative bounds keep the old infinite plane.
+    if half_w > 0.0:
+        gb = wp.cross(gn, gt)
+        if wp.abs(wp.dot(d, gt)) > half_w or wp.abs(wp.dot(d, gb)) > half_d:
+            return
+    pen = -wp.dot(gn, d)
     if pen > 0.0:
         r = world[i] - pos[b]
         vc = vlin[b] + wp.cross(vang[b], r)
@@ -76,10 +97,11 @@ def ground_contact_mesh(world: wp.array(dtype=wp.vec3), body: wp.array(dtype=int
         # Without it a densely-tesselated region would push harder than a sparse one
         # purely because it has more vertices -- the same defect as counting spheres.
         w = weight[i]
-        fn = wp.max(k[b] * w * pen - HC * cde * w * pen * vc[2], 0.0)
-        vt = wp.vec3(vc[0], vc[1], 0.0)
+        vnorm = wp.dot(vc, gn)
+        fn = wp.max(k[b] * w * pen - HC * cde * w * pen * vnorm, 0.0)
+        vt = vc - vnorm * gn                 # slide velocity, projected into the plane
         ft = -mue * fn * vt / (wp.length(vt) + V_EPS)
-        f = wp.vec3(ft[0], ft[1], fn)
+        f = ft + fn * gn
         wp.atomic_add(force, b, f)
         wp.atomic_add(torque, b, wp.cross(r, f))
 

@@ -13,14 +13,83 @@ from .mesh_contact import (apply_links, apply_revolute, ground_contact_mesh,
                            pair_contact_mesh, vertex_weights, world_verts)
 
 
+def mass_points(tm, model, n_solid=60):
+    """(points, weights summing to 1) describing where a body's mass is.
+
+    shell / vertex: the mesh vertices with their area weights (vertex_weights) -- the
+    distribution the contact forces act on. solid: centres of interior voxels, found by
+    sampling the surface densely and flood-filling the exterior (numpy only; works for open
+    scans, whose cavities then count as outside)."""
+    V = np.asarray(tm.vertices, np.float64)
+    if model in ("shell", "vertex"):
+        w = vertex_weights(tm).astype(np.float64)
+        return V, w / w.sum()
+    if model != "solid":
+        raise ValueError(f"mass_model must be shell / solid / vertex, got {model!r}")
+    from collections import deque
+    pitch = float(np.ptp(V, 0).max()) / n_solid
+    import trimesh
+    pts = np.asarray(trimesh.sample.sample_surface(tm, 300000, seed=0)[0])  # seeded: deterministic
+    # Grid offset by an IRRATIONAL fraction of a voxel. A flat face lying exactly on a voxel
+    # boundary rounds into two partial layers whose gaps the 6-connected fill leaks through
+    # -- a solid cube then came out with its SHELL inertia. Thickening the wall to close the
+    # gaps grew the body outward instead (+10% inertia, +3% centre of mass on a hemisphere).
+    lo = V.min(0) - pitch * (1.0 + 0.3819660)
+    ijk = np.floor((pts - lo) / pitch).astype(int)
+    S = np.zeros(ijk.max(0) + 3, bool); S[tuple(ijk.T)] = True
+    out = np.zeros_like(S); out[0, 0, 0] = True; dq = deque([(0, 0, 0)])
+    while dq:
+        x, y, z = dq.popleft()
+        for dx, dy, dz in ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1)):
+            a, b, c = x + dx, y + dy, z + dz
+            if 0 <= a < S.shape[0] and 0 <= b < S.shape[1] and 0 <= c < S.shape[2] \
+                    and not out[a, b, c] and not S[a, b, c]:
+                out[a, b, c] = True; dq.append((a, b, c))
+    solid = ~out
+    # boundary (wall) voxels straddle the true surface -- about half inside on average;
+    # weighting them 0.5 removes the outward bias of counting them whole
+    idx = np.argwhere(solid)
+    w = np.where(S[tuple(idx.T)], 0.5, 1.0)
+    P = lo + (idx + 0.5) * pitch
+    return P, w / w.sum()
+
+
 class MeshProbeScene:
     def __init__(self, names, pos0, vel0, ang0=None, rot0=None, densities=None, masses=None,
                  ground_z=0.706, dt=1.0 / 1440.0, n_steps=1400, k=2500.0, cd=3000.0,
                  mu=0.5, gravity=(0.0, 0.0, -9.81), mesh_scale=None, faces=1200,
-                 ground_mu=None, ground_cd=None, query_dist=0.05, table=None):
+                 ground_mu=None, ground_cd=None, query_dist=0.05, table=None,
+                 com_offset=None, tilt_deg=0.0, pivot=None, mass_model="auto"):
         self.N = len(names)
+        # MASS MODEL -- where a body's mass is, per body (str or list). It sets the centre of
+        # mass AND the inertia from one point cloud, so the two can no longer disagree:
+        #   "shell"   area-weighted surface (thin-walled hollow objects)
+        #   "solid"   voxel-filled interior (solid objects)
+        #   "vertex"  LEGACY: centre of mass = plain vertex mean, inertia = area-weighted
+        #             cloud about it. Inconsistent with itself -- vertex density follows
+        #             modelling detail, not mass -- and off by up to 2.2x in base leverage b/h
+        #             (scripts/f14_llm_outcomes.py). Kept only to reproduce pre-2026-10-05 runs.
+        #   "auto"    per asset from src/data/assets.MASS_MODEL (the DEFAULT); procedural
+        #             trimeshes passed directly get "shell"
+        from ..data.assets import mass_model_for
+        mm = [mass_model] * self.N if isinstance(mass_model, str) else list(mass_model)
+        self.mass_model = [mass_model_for(n) if m == "auto" else m for m, n in zip(mm, names)]
+        self._mass_pts, self._mass_w = [], []
         self.dt, self.n_steps = float(dt), int(n_steps)
         self.ground_z = float(ground_z)
+        # A REAL TILTED PLANE, rather than a level plane with gravity rotated. tilt_deg
+        # rotates the ground about +Y through `pivot` (default: the table centre at
+        # ground_z), so +x runs downhill -- matching how blender_render_scene rotates the
+        # table. gravity stays (0,0,-9.81), the simulator and the renderer share one frame,
+        # and nothing downstream has to transform poses by hand.
+        self.tilt_deg = float(tilt_deg)
+        th = np.radians(self.tilt_deg)
+        self.pivot = (np.asarray(pivot, np.float64) if pivot is not None
+                      else np.array([0.0, 0.0, self.ground_z]))
+        # Ry(th) applied to +z and +x. +x tilts downward, so the surface falls toward +x.
+        self._gn = np.array([np.sin(th), 0.0, np.cos(th)])
+        self._gt = np.array([np.cos(th), 0.0, -np.sin(th)])
+        self._gp = self.pivot.copy()
         self.gravity = wp.vec3(*gravity)
         self.gravity_seq = None
         self._gmu = float(ground_mu) if ground_mu is not None else -1.0
@@ -29,6 +98,13 @@ class MeshProbeScene:
         # (half_width, half_depth) of the table, or None for an unbounded plane
         self.half_w, self.half_d = (float(table[0]), float(table[1])) if table else (-1.0, -1.0)
 
+        # com_offset[bi] moves a body's CENTRE OF MASS off its geometric centre, in metres
+        # in the asset's own axes. It is applied by re-centring the local vertex cloud: the
+        # body frame origin IS the centre of mass everywhere downstream -- gravity acts
+        # there, inertia is taken about it, and contacts are expressed in it -- so shifting
+        # the origin is the whole change and the solver needs none. Renders must undo it,
+        # which is the COM-offset convention balance_render_prep.py already follows.
+        self.com_shift = [np.zeros(3) for _ in range(self.N)]
         loc, bod, wts, self.meshes, self.coms, self.sizes, vols = [], [], [], [], [], [], []
         mesh_ids = []
         for bi, name in enumerate(names):
@@ -43,11 +119,17 @@ class MeshProbeScene:
                 s = float(mesh_scale[bi] if hasattr(mesh_scale, "__len__") else mesh_scale)
                 tm.apply_scale(s)
             V = np.asarray(tm.vertices, np.float64)
-            C = V.mean(0)
+            mpts, mw = mass_points(tm, self.mass_model[bi])
+            C = V.mean(0) if self.mass_model[bi] == "vertex" else (mpts * mw[:, None]).sum(0)
+            if com_offset is not None and com_offset[bi] is not None:
+                d = np.asarray(com_offset[bi], np.float64).reshape(3)
+                self.com_shift[bi] = d
+                C = C + d
             # Body frame is COM-centred, matching how poses are exported. Unlike the sphere
             # cover this is the ONLY offset -- the collision surface and the visible surface
             # are now the same object, so nothing floats.
             Vc = (V - C).astype(np.float32)
+            self._mass_pts.append(mpts - C); self._mass_w.append(mw)
             self.coms.append(C)
             self.sizes.append(float(max(tm.extents)))
             vols.append(float(abs(tm.volume)) if tm.is_watertight else float(np.prod(tm.extents)) * 0.5)
@@ -113,8 +195,7 @@ class MeshProbeScene:
         # forces act on, so torque and inertia stay consistent even for open meshes.
         Gs, Gis = [], []
         for b in range(self.N):
-            P = self._loc_np[self._bod_np == b]
-            w = self._w_np[self._bod_np == b]; w = w / w.sum()
+            P, w = self._mass_pts[b], self._mass_w[b]
             r2 = (P ** 2 * w[:, None]).sum(0)
             G = np.diag([r2[1] + r2[2], r2[0] + r2[2], r2[0] + r2[1]])
             off = np.zeros((3, 3))
@@ -181,6 +262,73 @@ class MeshProbeScene:
             wp.array(np.array([x[5] for x in L], np.float32), dtype=float))
         return len(L) - 1
 
+    def plane_quat(self):
+        """Body orientation that puts the body's +z along the plane normal, as (x,y,z,w)."""
+        h = np.radians(self.tilt_deg) / 2.0
+        return [0.0, float(np.sin(h)), 0.0, float(np.cos(h))]
+
+    def seat_on_plane(self, bi=0, along=0.0, across=0.0, clearance=0.0, rotate=True):
+        """Place body `bi` on the tilted plane, `along` metres downhill of the pivot.
+
+        Two things have to happen together and neither is obvious, which is why they live
+        here rather than in each script:
+
+        ROTATE THE BODY TO THE PLANE. With gravity rotated and the ground level, a body
+        with identity orientation was automatically flat on the ramp. On a REAL tilted
+        plane the same body starts tipped by the tilt angle, so it rests on the edge of its
+        base instead of its face: only a sliver of weighted contact area engages, the
+        effective stiffness collapses, and a 0.4 kg bowl sank 14.5 mm and was ejected,
+        sliding 4 m at a friction 2.2x above its slip threshold. Rotating it by the same
+        Ry(tilt) fixes that.
+
+        SEAT ALONG THE NORMAL, not along z. The lowest point of the body must be measured
+        against the plane. Because the body carries the plane's own rotation, the lowest
+        vertex along the normal is simply min(local z) -- but only once `rotate` has been
+        applied, so the two steps are not separable.
+
+        CLEARANCE IS 0, NOT 2 mm. The old default dropped the body 2 mm onto the plane at
+        release; on a 20 deg slope that impact gave it a ~6 cm/s head start along the
+        ramp, an 11% overshoot at 1 s that read as a friction error until the acceleration
+        was checked (exact to 1%). Found by fitting Newton to real Physics 101 footage
+        (scripts/p4_sim_loop.py). Under calibrate_stiffness the body sinks only
+        pen_frac * size (~20 um) under its own weight, so starting in contact is benign.
+        Results computed before 2026-10-05 (o13, o14, f4/f6, f7, p4) carry the 2 mm drop.
+        """
+        q = self.plane_quat()
+        if rotate:
+            R = np.asarray(self.rot0, np.float32).copy()
+            R[bi] = np.asarray(q, np.float32)
+            self.rot0 = R
+        L = self.local.numpy().astype(float)
+        L = L[self._bod_np == bi]
+        low = float(L[:, 2].min())
+        P = np.asarray(self.pos0, np.float32).copy()
+        P[bi] = (self._gp + self._gt * float(along)
+                 + np.cross(self._gn, self._gt) * float(across)
+                 + self._gn * (-low + float(clearance)))
+        self.pos0 = P
+        return self
+
+    def set_restitution_alpha(self, alpha):
+        """Contact damping from a Hunt-Crossley alpha (s/m) instead of a raw cd.
+
+        The contact force is fn = k w pen - HC cd w pen vn (Hunt-Crossley), whose
+        restitution is ~ 1 - alpha * v_impact with alpha = 2 HC cd / (3 k). So restitution
+        is set by cd / k, not by cd: on the tilt rig (pen_frac 1e-4, k 50x stiffer) every
+        cd up to 30000 gave e = 0.77-1.00, and on any rig one cd gave bodies of different
+        mass different restitution (k is set proportional to mass). Specifying alpha and
+        deriving cd = 1.5 alpha k / HC per body makes restitution independent of stiffness,
+        mass and rig (scripts/p8_alpha.py). Re-applied by calibrate_stiffness, so the order
+        of the two calls does not matter. Turns off the ground_cd geometric-mean mix, which
+        would otherwise reintroduce a fixed, unscaled cd.
+        """
+        self._alpha = float(alpha)
+        self._gcd = -1.0
+        k = self.k.numpy().astype(np.float64)
+        from .mesh_contact import HC
+        self.cd.assign((1.5 * self._alpha * k / HC).astype(np.float32))
+        return self
+
     def calibrate_stiffness(self, pen_frac=0.005):
         """k_i so each body sinks pen_frac of its own size under its own weight.
 
@@ -190,6 +338,8 @@ class MeshProbeScene:
         """
         m = self.mass.numpy(); sz = np.asarray(self.sizes)
         self.k.assign((m * 9.81 / (pen_frac * sz)).astype(np.float32))
+        if getattr(self, "_alpha", None) is not None:      # keep cd tied to the new k
+            self.set_restitution_alpha(self._alpha)
 
     def rollout(self):
         self.pos[0].assign(self.pos0)
@@ -206,7 +356,10 @@ class MeshProbeScene:
             wp.launch(ground_contact_mesh, self.nV,
                       inputs=[self.world, self.body, self.pos[t], self.vlin[t], self.vang[t],
                               self.ground_z, self.k, self.cd, self.mu, self._gmu, self._gcd,
-                              self.weight, self.half_w, self.half_d],
+                              self.weight, self.half_w, self.half_d,
+                              wp.vec3(*[float(v) for v in self._gn]),
+                              wp.vec3(*[float(v) for v in self._gt]),
+                              wp.vec3(*[float(v) for v in self._gp])],
                       outputs=[self.force, self.torque])
             if self.N > 1:
                 wp.launch(pair_contact_mesh, self.nV * self.N,

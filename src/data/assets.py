@@ -95,3 +95,26 @@ def add_rigid_asset(builder, m: trimesh.Trimesh, pos, rot=None, density: float =
     cfg = newton.ModelBuilder.ShapeConfig(density=density)
     builder.add_shape_mesh(body, mesh=mesh, cfg=cfg)
     return body
+
+
+# HOW EACH ASSET IS BUILT -- decides where its mass is (MeshProbeScene mass_model="auto").
+#   shell : thin-walled hollow object, mass on the surface
+#   solid : mass fills the enclosed volume (for an OPEN scan such as a bowl, the enclosed
+#           volume is the wall itself, which is right for a turned-wood bowl)
+# Physics 101 cardboard cubes confirm the shell case directly: mass/area is constant across
+# nine sizes (0.106 g/cm2, CV 0.03) while mass/volume varies 35% (scripts/p5_transfer.py).
+MASS_MODEL = {
+    "cardboard_box_01": "shell", "brass_pot_01": "shell", "ceramic_vase_01": "shell",
+    "Threshold_Porcelain_Teapot_White": "shell", "Poppin_File_Sorter_Blue": "shell",
+    "wooden_bowl_01": "solid", "book_encyclopedia_set_01": "solid", "baseball_01": "solid",
+    "food_apple_01": "solid", "Pony_C_Clamp_1440": "solid",
+    "Weisshai_Great_White_Shark": "solid", "Schleich_Lion_Action_Figure": "solid",
+    "Great_Dinos_Triceratops_Toy": "solid",
+}
+
+
+def mass_model_for(name) -> str:
+    """'shell' / 'solid' for a known asset name ('rigid/x' or 'x'); 'shell' otherwise."""
+    if not isinstance(name, str):
+        return "shell"
+    return MASS_MODEL.get(name.rpartition("/")[2], "shell")
