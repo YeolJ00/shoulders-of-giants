@@ -154,6 +154,7 @@ table.res th.n{white-space:normal}
   <ul class="toc" aria-label="Contents">
     <li><a href="#rigid">Rigid objects</a></li>
     <li><a href="#cloth">Cloth</a></li>
+    <li><a href="#practice">Practising running alone</a></li>
     <li><a href="#running">Running now</a></li>
   </ul>
 </header>
@@ -1581,19 +1582,82 @@ table.res th.n{white-space:normal}
   </div>
 </section>
 
+<section id="practice">
+  <div class="col">
+    <div class="eyebrow">Both tracks · running alone · 2026-11-25</div>
+    <h2>Practising longer on its own output does not help</h2>
+    <p>Both networks learn to run alone only through a short drill in training: for the first few frames of each
+    training window they are fed their own predictions instead of the teacher's, up to 4 frames for cloth and 6 for
+    rigid objects. We made that drill longer, in short fine-tunes of the current best networks, each beside a control
+    fine-tune of the same length that keeps the drill as it was.</p>
+    <p><b>Cloth.</b> The more frames practised alone, the more rollouts blow up: 25, 31 and 44 of 336 unseen
+    episodes at 4, 8 and 16 frames. We predicted fewer. The one-frame fit stays level (+0.006), and positions
+    after 2 s are slightly closer (3 mm), but the mean stretch doubles (42% against 22%).</p>
+    <p><b>Rigid objects.</b> Practising 16 frames costs 0.02&ndash;0.03 on one frame and leaves replays where they
+    were. Practising 30 frames (one second) costs 0.05 and brings the objects that moved a few millimetres closer
+    by the end (4 and 10 mm on the two unseen sets, both intervals through zero). That is the same exchange as
+    training a third as long, not a new lever.</p>
+  </div>
+  <figure class="scroll">
+    <svg viewBox="0 0 820 196" role="img" aria-label="Cloth rollouts that blow up (end above twice the cloth's area), of 336 unseen episodes, after short fine-tunes that differ only in how many frames the network practised alone in training: 4 frames, as trained, 25; 8 frames, 31; 16 frames, 44.">
+      <g font-family="IBM Plex Sans, system-ui, sans-serif" font-size="12.5" fill="currentColor">
+        <text x="0" y="16" font-size="12" font-family="IBM Plex Mono, monospace" letter-spacing="1.2" opacity=".65">CLOTH: UNSEEN ROLLOUTS THAT BLOW UP, OF 336, BY FRAMES PRACTISED ALONE IN TRAINING</text>
+        <text x="290" y="52" text-anchor="end">4 frames (as trained)</text>
+        <text x="290" y="88" text-anchor="end">8 frames</text>
+        <text x="290" y="124" text-anchor="end">16 frames (half a second)</text>
+      </g>
+      <g>
+        <rect x="300" y="38" width="225" height="20" fill="var(--net)"/>
+        <rect x="300" y="74" width="279" height="20" fill="var(--net)" opacity=".75"/>
+        <rect x="300" y="110" width="396" height="20" fill="var(--net)" opacity=".55"/>
+        <line x1="300" y1="142" x2="741" y2="142" stroke="currentColor" stroke-width="1" opacity=".5"/>
+      </g>
+      <g font-family="IBM Plex Sans, system-ui, sans-serif" font-size="12" fill="currentColor" font-variant-numeric="tabular-nums">
+        <text x="531" y="52">25</text>
+        <text x="585" y="88">31</text>
+        <text x="702" y="124">44</text>
+        <g text-anchor="middle" opacity=".7">
+          <text x="300" y="160">0</text><text x="390" y="160">10</text><text x="480" y="160">20</text><text x="570" y="160">30</text><text x="660" y="160">40</text>
+        </g>
+        <text x="520" y="184" text-anchor="middle" opacity=".7">rollouts ending above twice the cloth's area (fewer is better)</text>
+      </g>
+      <g stroke="currentColor" opacity=".5"><line x1="300" y1="142" x2="300" y2="147"/><line x1="390" y1="142" x2="390" y2="147"/><line x1="480" y1="142" x2="480" y2="147"/><line x1="570" y1="142" x2="570" y2="147"/><line x1="660" y1="142" x2="660" y2="147"/></g>
+    </svg>
+    <figcaption>Short fine-tunes (3,000 steps) of the third stretch, every input given, scored at their last step; at
+    their step 2,000 the counts are 23, 31 and 38.</figcaption>
+  </figure>
+  <div class="col">
+    <p><b>Watched.</b> In both videos below the cloth first bunches up as it lands or folds, and the bunched part then
+    grows into a spiky ball within about a second, as in the third stretch's own blow-ups. One reading: in this drill
+    the target is still the teacher's next frame, which a cloth that has drifted can reach only by pulling
+    unevenly, so the network learns corrections that stretch. The loss on the network's own 2&ndash;3 s runs, now
+    running, has the same target and may show the same; a loss on the cloth's shape alone would not.</p>
+  </div>
+  <div class="vidgrid">
+  <figure class="vid">
+    <div class="frame"><video data-auto src="media/cloth_pf16_fold.mp4" poster="media/cloth_pf16_fold.jpg" controls loop muted playsinline preload="metadata"></video></div>
+    <figcaption>An unseen fold. Top: the control, which keeps the cloth whole (51 mm off at the end, 0.97 of its area). Bottom: after practising 16 frames alone, the folded part near the gripper crumples at about 2 s and grows into a spiky ball, 14 times its area by 3.5 s.</figcaption>
+  </figure>
+  <figure class="vid">
+    <div class="frame"><video data-auto src="media/cloth_pf16_drop.mp4" poster="media/cloth_pf16_drop.jpg" controls loop muted playsinline preload="metadata"></video></div>
+    <figcaption>An unseen lift and drop onto a box. Both networks land the towel against the box (91 and 126 mm off at the end); the 16-frame network's towel crumples and swells to 18 times its area in the last second.</figcaption>
+  </figure>
+  </div>
+  <p class="note">The two episodes were picked from those where the 16-frame network blew up and the control did not. A third such episode, a shake, does not blow up in its video (1.6 times its area against 13.6 when scored): these rollouts sit near an instability, and small differences decide whether they cross it.</p>
+</section>
+
 <section id="running">
   <div class="col">
-    <div class="eyebrow">Running now · as of 2026-11-25 08:10 UTC</div>
+    <div class="eyebrow">Running now · as of 2026-11-25 14:30 UTC</div>
     <h2>Runs in progress, each with its prediction on file</h2>
     <p>Rigid runs train with every input given from 2026-11-24, cloth runs from 2026-11-25; hidden material and
     hidden forces come back once a forward simulator fits.</p>
   </div>
   <div class="tablewrap"><table class="res">
-    <thead><tr><th>run</th><th>prediction written before it started</th><th>due (UTC)</th></tr></thead>
+    <thead><tr><th>run</th><th>prediction written before it started</th><th>so far / due (UTC)</th></tr></thead>
     <tbody>
     <tr><td>Cloth: the third stretch of training again, with every input given, from the same start</td><td>one frame within 0.015 of the usual recipe's third stretch; within 3 mm at 1 s; at most half the stretch</td><td>25 Nov, ~19:00</td></tr>
-    <tr><td>Cloth: short trials from the third stretch (3,000 steps each) that make the network run alone for 4 frames (as trained), 8 frames, or 16 frames (half a second) during training</td><td>4 frames: within 0.01 of the third stretch on one frame. 8 frames: within +0.02 of that, with at most two thirds of its blow-ups. 16 frames: 0.01–0.04 behind on one frame, at most half the blow-ups, within 4 mm at 2 s</td><td>25 Nov, ~12:00 to ~14:30</td></tr>
-    <tr><td>Rigid: the same from the nine-times network (6,000 steps each): 6 frames (as trained), 16, or 30 frames (one second)</td><td>6 frames: within 0.02 of 0.37. 16 and 30 frames: within +0.03 of that on one frame, and replays of objects that moved ending at least 5 mm closer than the 6-frame trial's (30 frames more so)</td><td>25 Nov, ~10:00 to ~14:30</td></tr>
+    <tr><td>Cloth: short fine-tunes from the third stretch (400 steps each) with a loss on the network's own 2 s or 3.3 s runs against the teacher's, beside a control without it. Started because longer practice did not help (above)</td><td>control within 0.01 of the third stretch on one frame. With the loss: one frame within +0.02 of the control, level at 1 s, 3&ndash;10 mm closer at 3.8 s, at most two thirds (2 s) or half (3.3 s) of the control's blow-ups</td><td>2 s arm ~19:45, 3.3 s arm ~23:00</td></tr>
         </tbody></table></div>
   <p class="foot">Numbers come from the experiment log in <code>docs/DIRECTION.md</code>, where each one has its date,
   test set and script. Part of <a href="https://claude.ai/artifact/5WR9dMDTujSfrNAyhjCEQJ">[SoG] Shoulder of Giants</a>; how the episodes are made: <a href="https://claude.ai/artifact/Bqgkb28DtrCtLMpWj1hLtt">[SoG] Making the Training Data</a>.</p>

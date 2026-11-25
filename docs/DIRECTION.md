@@ -2274,6 +2274,39 @@ teacher and the model can be measured on (`lsim.real.cloth`, `scripts/l1_real_cl
     scored at steps 2,000 and 2,999 with `--roll_given`; rigid from `rigid_pilot1024p_attn_direct_108k.pt`, `--plain`
     as trained, 6,000 steps, lr 2e-4 -- `rigid_pf_ctl` (K 8 pf 6), `rigid_pf16` (K 16 pf 16), `rigid_pf30` (K 30
     pf 30), scored at 4,000 and 6,000 on shards 8 and 1.
+    **First arms (12:30 UTC; scratch `pf_report.sh`, `blowups.py`).** Cloth control (pf 4): one frame 0.485 at step
+    2,999 against cont2's 0.486 (-0.001 [-0.004, +0.002]; held), rollouts 13.1 / 51.3 / 81.6 mm at 1 s / 2 s / 3.8 s,
+    blow-ups (area > 2x at the end, of 336) 25 / 23 at steps 2,999 / 2,000 (cont2 scored hidden: 21). **Cloth pf 8:
+    one frame +0.005 [+0.003, +0.008] / +0.006 [+0.002, +0.011] at 2,999 / 2,000 (held: within +0.02), rollouts level
+    (3.8 s -2.6 [-6.2, +0.7] / +1.0 [-3.7, +6.6] mm), blow-ups 31 / 31 against 25 / 23 -- more, not two thirds
+    (failed); strain mean 24% / 27% against 22% / 21%.** Rigid control (pf 6): 0.372 held-out against 0.368 (held),
+    replays level. **Rigid pf 16: one frame +0.027 [+0.021, +0.033] on shard 8 (better in 1 of 32), +0.018 [+0.010,
+    +0.026] on shard 1 (held, just: within +0.03); moved bodies' replays level -- end +0.1 [-8.2, +6.6] mm (shard 8),
+    +9.7 [-1.8, +29.6] (shard 1; at step 4,000 -1.3 [-4.1, +1.6]) -- not 5 mm closer (failed).** So far: practising
+    up to 8 (cloth) or 16 (rigid) frames alone buys neither stability nor less creep.
+    **RESULT (14:12 UTC, all six arms): practising longer alone does not help either track, and for cloth it makes the
+    blow-up tail worse in proportion to the horizon.** Cloth at step 2,999 (2,000): blow-ups 25 / 31 / 44 (23 / 31 /
+    38) at pf 4 / 8 / 16; strain mean 22% / 24% / 42%; pf 16 against the control: one frame +0.006 [+0.003, +0.009]
+    (prediction +0.01 to +0.04: held, cheaper), positions slightly closer at 2 s (-3.1 [-6.1, -0.8] mm) and 3.8 s
+    (-5.2 [-12.0, +0.6]), strain +20 [+10, +30] points, mean area +0.72 [+0.28, +1.17] (prediction "at most half the
+    blow-ups": FAILED, 1.8x). Rigid pf 30 against the control: one frame +0.056 [+0.039, +0.076] on shard 8 (+0.052 on
+    shard 1; prediction within +0.03: failed), moved bodies' replay end +4.1 [-0.6, +8.4] mm closer (shard 1 +9.9
+    [-2.6, +30.8]; closer in 65-67% of bodies; at step 4,000 +3.0 / +2.2), never-moved bodies 3.5 against 3.9 mm at the
+    end -- a few mm at the end bought with 0.05 of one-frame fit, the same exchange as 36k against 108k steps (pf 30's
+    0.419 lies between them), not a new lever (READ: the one-frame cost is above 0.02). **The trial's READ, "no change",
+    points at the long-rollout loss, already running (below).** A hypothesis for cloth's growing tail, written before
+    the long-rollout trial reports: the pushforward's targets are the teacher's frames, and a drifted own state cannot
+    reach the teacher's next frame without pulling vertices unevenly -- a correction that stretches -- so the more
+    of a window is the network's own, the more it learns corrective stretch. If so, the long-rollout loss (whose
+    target is also the teacher's trajectory) raises strain too, and a loss on shape alone (the edge loss on its own
+    rollouts) would not. Renders of three episodes where pf 16 blows up and the control does not:
+    `outputs/lsim/render_pf.sh` (fold shard 4 ep 8, lift-drop shard 11 ep 16, shake shard 3 ep 28).
+    **Next, launched 13:09 UTC on the READ's second branch (`outputs/lsim/roll_trial.sh`, prediction in its header):
+    the long-rollout loss already in the trainer (`--roll`, v6e / q64L's recipe: lr 3e-5, distance to the teacher's
+    trajectory of rollouts from true history), never tried on the own-frame networks.** From cont2, `--given` with
+    `--roll_given 1`, 400 steps: `cloth_roll_ctl` (no rollout loss, GPU 1, then `cloth_roll100`, R 100, on GPU 1),
+    `cloth_roll60` (R 60, GPU 4); smoke test ~40 s a step at R 60, 10 GB. Predicted: one frame within +0.02 of the
+    control, 3.8 s closer by 3-10 mm, blow-ups at most two thirds (R 60) / half (R 100) of the control's.
     Also started: its PGND evaluation before real
     data (tag `q64_ownup_cont`) and renders of the four fixed held-out episodes (`outputs/lsim/render_cont.sh`, tag
     `localcont`).
