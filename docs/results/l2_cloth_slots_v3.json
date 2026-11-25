@@ -1,0 +1,55 @@
+{
+ "n": 256,
+ "ckpt": "outputs/lsim/cloth_v3/last.pt",
+ "moving_fraction": 0.4296875,
+ "slots": {
+  "density": {
+   "model_abs_err": 0.8191309496760368,
+   "prior_abs_err": 0.9723046720027924,
+   "model_moving": 0.7935383170843124,
+   "prior_moving": 0.8614906370639801,
+   "model_still": 0.8814512938261032,
+   "corr": 0.31091706389575874,
+   "factor_model": 1.6347315304960899,
+   "factor_prior": 1.792090519486365,
+   "within_1sd": 0.58984375,
+   "within_2sd": 0.9765625
+  },
+  "stretch": {
+   "model_abs_err": 0.4665357321500778,
+   "prior_abs_err": 0.8147892653942108,
+   "model_moving": 0.4457577355206013,
+   "prior_moving": 0.8923206627368927,
+   "model_still": 0.48383891582489014,
+   "corr": 0.7312023287956734,
+   "factor_model": 1.7503974926950978,
+   "factor_prior": 2.6584603975854457,
+   "within_1sd": 0.66796875,
+   "within_2sd": 0.97265625
+  },
+  "bend": {
+   "model_abs_err": 0.8566402932628989,
+   "prior_abs_err": 0.9347124695777893,
+   "model_moving": 0.8281460925936699,
+   "prior_moving": 0.8388429880142212,
+   "model_still": 0.8959943596273661,
+   "corr": 0.3057043184726834,
+   "factor_model": 1.2930349094038658,
+   "factor_prior": 1.3236773732340927,
+   "within_1sd": 0.68359375,
+   "within_2sd": 1.0
+  },
+  "mu": {
+   "model_abs_err": 0.8805875470861793,
+   "prior_abs_err": 0.8784793317317963,
+   "model_moving": 0.8832842875272036,
+   "prior_moving": 0.8890573382377625,
+   "model_still": 0.8805875470861793,
+   "corr": 0.023894434375354184,
+   "factor_model": 1.8522688118211692,
+   "factor_prior": 1.8495373407639715,
+   "within_1sd": 0.58203125,
+   "within_2sd": 1.0
+  }
+ }
+}

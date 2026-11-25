@@ -1,0 +1,541 @@
+{
+ "single_lift_cloth": {
+  "notes": "red brocade, ~45 x 50 cm; one hand pinches near the centre and lifts it into a hanging bundle",
+  "frames": 173,
+  "grid": [
+   48,
+   41,
+   0.010021850744383089
+  ],
+  "grasp": [
+   {
+    "grasp": "pinch",
+    "vertex": 1144,
+    "from_frame": 11,
+    "vertices": 9,
+    "lift_frame": 31,
+    "hand_horizontal_m": 0.0947503626922598,
+    "held": true
+   }
+  ],
+  "qc": {
+   "residual": {
+    "median_mm": 10.304451304448886,
+    "p90_mm": 218.63034307807243
+   },
+   "residual_train": {
+    "median_mm": 5.444173902602972,
+    "p90_mm": 42.92950542246121
+   },
+   "residual_test": {
+    "median_mm": 193.47197778713053,
+    "p90_mm": 311.4403437336918
+   },
+   "residual_median_mm_every_10th": [
+    3.6560699166819104,
+    2.7057975515489736,
+    3.129299009709399,
+    3.7582621342830596,
+    3.9861606668622667,
+    5.331025147317371,
+    4.99392571543409,
+    6.379143305928098,
+    11.495866791668336,
+    26.123685113106962,
+    34.40873362397112,
+    40.56664101120003,
+    61.87444184251138,
+    101.64514810380935,
+    151.8386722109397,
+    193.42936901485317,
+    231.74383307986272,
+    263.27837997025364
+   ],
+   "annotated": {
+    "median_mm": 15.327378687675866,
+    "p90_mm": 194.884058397621
+   },
+   "annotated_test": {
+    "median_mm": NaN,
+    "p90_mm": NaN
+   },
+   "drift_train_mm": 9.399207549444302,
+   "drift_test_mm": 29.71540902446756,
+   "strain_median": 0.00022538943165073544,
+   "strain_p90": 0.0009409412017288067,
+   "strain_p99": 0.0032241937065549202,
+   "rest_height_spread_mm": 26.177795949061263,
+   "tracked_points": 7793,
+   "visible_share": 0.7345209892921445
+  }
+ },
+ "single_lift_cloth_1": {
+  "notes": "green cloth, 33 cm square; one hand pinches near the centre and lifts it clear of the table",
+  "frames": 110,
+  "grid": [
+   32,
+   32,
+   0.010104579048974455
+  ],
+  "grasp": [
+   {
+    "grasp": "pinch",
+    "vertex": 676,
+    "from_frame": 21,
+    "vertices": 9,
+    "lift_frame": 36,
+    "hand_horizontal_m": 0.051943766881759536,
+    "held": true
+   }
+  ],
+  "qc": {
+   "residual": {
+    "median_mm": 6.63443645738454,
+    "p90_mm": 45.548398826600064
+   },
+   "residual_train": {
+    "median_mm": 4.385270251356743,
+    "p90_mm": 23.38305262677755
+   },
+   "residual_test": {
+    "median_mm": 25.981169291093956,
+    "p90_mm": 86.35062826765973
+   },
+   "residual_median_mm_every_10th": [
+    2.2333455423675064,
+    2.382230080473809,
+    2.823411952074373,
+    3.5788116521551956,
+    5.027958469142753,
+    8.92910615557525,
+    10.052921255256388,
+    15.10985283680142,
+    21.250717498878398,
+    25.358403633993483,
+    26.955949509794365
+   ],
+   "annotated": {
+    "median_mm": 6.387422162370912,
+    "p90_mm": 34.14048291932737
+   },
+   "annotated_test": {
+    "median_mm": NaN,
+    "p90_mm": NaN
+   },
+   "drift_train_mm": 9.004308674551883,
+   "drift_test_mm": 25.658148088485664,
+   "strain_median": 0.00017146618040631,
+   "strain_p90": 0.0006874544498488577,
+   "strain_p99": 0.002170836510181073,
+   "rest_height_spread_mm": 10.525117451493498,
+   "tracked_points": 5490,
+   "visible_share": 0.8536606619187264
+  }
+ },
+ "single_lift_cloth_3": {
+  "notes": "grey woven cloth; one hand pinches near the centre and lifts",
+  "frames": 156,
+  "grid": [
+   56,
+   42,
+   0.010005405103256263
+  ],
+  "grasp": [
+   {
+    "grasp": "pinch",
+    "vertex": 1054,
+    "from_frame": 29,
+    "vertices": 9,
+    "lift_frame": 50,
+    "hand_horizontal_m": 0.04762146591323874,
+    "held": true
+   }
+  ],
+  "qc": {
+   "residual": {
+    "median_mm": 6.259974180458048,
+    "p90_mm": 35.08629579743561
+   },
+   "residual_train": {
+    "median_mm": 4.2462281792158025,
+    "p90_mm": 22.47649443093392
+   },
+   "residual_test": {
+    "median_mm": 20.268917315284984,
+    "p90_mm": 74.73100631144364
+   },
+   "residual_median_mm_every_10th": [
+    2.2403602437034347,
+    2.1214431683891166,
+    2.0790697615647633,
+    2.6374875870445607,
+    3.773433825536786,
+    4.484470158515511,
+    5.568271827566895,
+    8.5744743749573,
+    9.978400891813482,
+    11.572904294817889,
+    14.08539577886406,
+    15.284603046895208,
+    16.23884872576183,
+    18.78698489038435,
+    23.161890643170732,
+    26.11297629756775
+   ],
+   "annotated": {
+    "median_mm": 6.103675669399171,
+    "p90_mm": 20.7756801200911
+   },
+   "annotated_test": {
+    "median_mm": NaN,
+    "p90_mm": NaN
+   },
+   "drift_train_mm": 8.000632032760432,
+   "drift_test_mm": 16.57531491762228,
+   "strain_median": 0.00020216310655463143,
+   "strain_p90": 0.0010304722402080914,
+   "strain_p99": 0.003771816998062985,
+   "rest_height_spread_mm": 8.075479774884926,
+   "tracked_points": 8582,
+   "visible_share": 0.862106506560732
+  }
+ },
+ "single_lift_cloth_4": {
+  "notes": "light blue cloth; one hand pinches near the centre and lifts",
+  "frames": 172,
+  "grid": [
+   49,
+   36,
+   0.009991632550171093
+  ],
+  "grasp": [
+   {
+    "grasp": "pinch",
+    "vertex": 775,
+    "from_frame": 16,
+    "vertices": 9,
+    "lift_frame": 40,
+    "hand_horizontal_m": 0.041623413405293505,
+    "held": true
+   }
+  ],
+  "qc": {
+   "residual": {
+    "median_mm": 7.962342835634342,
+    "p90_mm": 41.348926844808254
+   },
+   "residual_train": {
+    "median_mm": 5.865271224281744,
+    "p90_mm": 29.123416903939102
+   },
+   "residual_test": {
+    "median_mm": 22.84062979589577,
+    "p90_mm": 88.22129132214754
+   },
+   "residual_median_mm_every_10th": [
+    2.168487227266312,
+    2.311369319826614,
+    2.604095452560929,
+    3.1877543069602163,
+    4.394519257809877,
+    5.876361838986389,
+    8.283400497041903,
+    10.095124129025441,
+    12.5375030111733,
+    14.439622496369143,
+    16.225127664763722,
+    19.172689370018183,
+    20.18832139493341,
+    21.98241202639104,
+    23.77447300221729,
+    24.19791859493839,
+    23.748219163892966,
+    23.4712305427686
+   ],
+   "annotated": {
+    "median_mm": 11.12341141802006,
+    "p90_mm": 35.77290718943618
+   },
+   "annotated_test": {
+    "median_mm": NaN,
+    "p90_mm": NaN
+   },
+   "drift_train_mm": 10.241588646894229,
+   "drift_test_mm": 24.884861545453436,
+   "strain_median": 0.0001804121166229522,
+   "strain_p90": 0.0009104899041249339,
+   "strain_p99": 0.0028794383394020366,
+   "rest_height_spread_mm": 8.853969847201908,
+   "tracked_points": 8185,
+   "visible_share": 0.7623137986789597
+  }
+ },
+ "double_lift_cloth_1": {
+  "notes": "green cloth; two hands take the two far corners and raise that edge, the cloth hangs like a curtain",
+  "frames": 116,
+  "grid": [
+   33,
+   33,
+   0.009966450849263253
+  ],
+  "grasp": [
+   {
+    "grasp": "corners",
+    "vertex": 1155,
+    "from_frame": 3,
+    "vertices": 4,
+    "lift_frame": 12,
+    "hand_horizontal_m": 0.022837114690460486,
+    "held": true
+   },
+   {
+    "grasp": "corners",
+    "vertex": 1122,
+    "from_frame": 3,
+    "vertices": 4,
+    "lift_frame": 12,
+    "hand_horizontal_m": 0.034684590940899936,
+    "held": true
+   }
+  ],
+  "qc": {
+   "residual": {
+    "median_mm": 2.979286565716692,
+    "p90_mm": 7.864733013076225
+   },
+   "residual_train": {
+    "median_mm": 2.741473345008806,
+    "p90_mm": 6.242373000299835
+   },
+   "residual_test": {
+    "median_mm": 4.482642959278912,
+    "p90_mm": 12.68056395049546
+   },
+   "residual_median_mm_every_10th": [
+    2.0859299285500494,
+    2.508769141388331,
+    2.5573242511267567,
+    2.5293541808752162,
+    2.7963192232931084,
+    2.7838453836393304,
+    3.054293061390542,
+    3.264483440672638,
+    4.017125517907933,
+    3.960944639675319,
+    3.9391909749468157,
+    5.242978837254056
+   ],
+   "annotated": {
+    "median_mm": 3.728723728350328,
+    "p90_mm": 11.309948542893745
+   },
+   "annotated_test": {
+    "median_mm": NaN,
+    "p90_mm": NaN
+   },
+   "drift_train_mm": 7.141276330776129,
+   "drift_test_mm": 9.326309390174071,
+   "strain_median": 0.00013967574806422745,
+   "strain_p90": 0.0005654952315583438,
+   "strain_p99": 0.0015743547385322272,
+   "rest_height_spread_mm": 5.583121379108361,
+   "tracked_points": 4742,
+   "visible_share": 0.7687875512020061
+  }
+ },
+ "double_lift_cloth_3": {
+  "notes": "grey woven cloth; two hands take the two far corners and raise that edge, the cloth folds over",
+  "frames": 118,
+  "grid": [
+   42,
+   56,
+   0.010006247802152061
+  ],
+  "grasp": [
+   {
+    "grasp": "corners",
+    "vertex": 0,
+    "from_frame": 1,
+    "vertices": 4,
+    "lift_frame": 8,
+    "hand_horizontal_m": 0.07357247380957362,
+    "held": true
+   },
+   {
+    "grasp": "corners",
+    "vertex": 2408,
+    "from_frame": 1,
+    "vertices": 4,
+    "lift_frame": 8,
+    "hand_horizontal_m": 0.05627065313505703,
+    "held": true
+   }
+  ],
+  "qc": {
+   "residual": {
+    "median_mm": 2.2438620058995817,
+    "p90_mm": 8.998224195178912
+   },
+   "residual_train": {
+    "median_mm": 2.126427784932931,
+    "p90_mm": 4.488843427613152
+   },
+   "residual_test": {
+    "median_mm": 3.147062873138396,
+    "p90_mm": 116.89204462557574
+   },
+   "residual_median_mm_every_10th": [
+    1.1443916996305594e-13,
+    2.0385773228665283,
+    2.008962081335013,
+    2.0873637034152117,
+    2.1700697408999847,
+    2.259600243586602,
+    2.142379833938669,
+    2.180933193028248,
+    2.452515007689426,
+    2.633039090486218,
+    3.338472879242556,
+    7.622827614184828
+   ],
+   "annotated": {
+    "median_mm": 3.119046145356587,
+    "p90_mm": 5.903858862450666
+   },
+   "annotated_test": {
+    "median_mm": NaN,
+    "p90_mm": NaN
+   },
+   "drift_train_mm": 7.062297960047366,
+   "drift_test_mm": 7.947628085387709,
+   "strain_median": 9.31316199933585e-05,
+   "strain_p90": 0.00035342028589577804,
+   "strain_p99": 0.0010373009494540654,
+   "rest_height_spread_mm": 7.0701804259921115,
+   "tracked_points": 7521,
+   "visible_share": 0.7628549665456495
+  }
+ },
+ "single_clift_cloth_1": {
+  "notes": "green cloth; one hand lifts a corner diagonally",
+  "frames": 80,
+  "grid": [
+   33,
+   33,
+   0.009966774232987417
+  ],
+  "grasp": [
+   {
+    "grasp": "corner",
+    "vertex": 1122,
+    "from_frame": 15,
+    "vertices": 4,
+    "lift_frame": 28,
+    "hand_horizontal_m": 0.036664810753749194,
+    "held": true
+   }
+  ],
+  "qc": {
+   "residual": {
+    "median_mm": 3.2845115131165827,
+    "p90_mm": 10.04852425768796
+   },
+   "residual_train": {
+    "median_mm": 2.9474331167554753,
+    "p90_mm": 6.376320760551089
+   },
+   "residual_test": {
+    "median_mm": 5.0495057477116,
+    "p90_mm": 27.092449004797327
+   },
+   "residual_median_mm_every_10th": [
+    2.895859998581707,
+    3.172367583437947,
+    2.7518130051570724,
+    2.7190974234008505,
+    3.0045693696035864,
+    3.23430155733883,
+    3.9019466490007058,
+    5.52236928496345
+   ],
+   "annotated": {
+    "median_mm": 3.4804373440587906,
+    "p90_mm": 11.83312501676921
+   },
+   "annotated_test": {
+    "median_mm": NaN,
+    "p90_mm": NaN
+   },
+   "drift_train_mm": 7.297566929269833,
+   "drift_test_mm": 9.580301032921426,
+   "strain_median": 0.0001654013166316748,
+   "strain_p90": 0.0005917775022692641,
+   "strain_p99": 0.0015944066888727917,
+   "rest_height_spread_mm": 7.9311927361658645,
+   "tracked_points": 6490,
+   "visible_share": 0.8885364713216957
+  }
+ },
+ "single_clift_cloth_3": {
+  "notes": "grey woven cloth; one hand lifts a corner diagonally",
+  "frames": 97,
+  "grid": [
+   42,
+   56,
+   0.009994463260620402
+  ],
+  "grasp": [
+   {
+    "grasp": "corner",
+    "vertex": 0,
+    "from_frame": 11,
+    "vertices": 4,
+    "lift_frame": 20,
+    "hand_horizontal_m": 0.047032139774142605,
+    "held": true
+   }
+  ],
+  "qc": {
+   "residual": {
+    "median_mm": 2.1852618690544325,
+    "p90_mm": 4.9123426611294185
+   },
+   "residual_train": {
+    "median_mm": 2.084146702901032,
+    "p90_mm": 3.837099321214664
+   },
+   "residual_test": {
+    "median_mm": 2.638828709765381,
+    "p90_mm": 14.767404914668722
+   },
+   "residual_median_mm_every_10th": [
+    2.25208445813771,
+    2.4550689070278118,
+    2.0219162510120596,
+    2.030643606217797,
+    2.120654116333869,
+    2.0857918479886886,
+    2.074158803446181,
+    2.190914503815157,
+    2.742867674925046,
+    3.2379659601365938
+   ],
+   "annotated": {
+    "median_mm": 5.337878120386514,
+    "p90_mm": 43.149144958803966
+   },
+   "annotated_test": {
+    "median_mm": NaN,
+    "p90_mm": NaN
+   },
+   "drift_train_mm": 7.804069237517167,
+   "drift_test_mm": 11.867016360016374,
+   "strain_median": 0.0001192311595422102,
+   "strain_p90": 0.0005193258866579511,
+   "strain_p99": 0.0015336108323723784,
+   "rest_height_spread_mm": 5.570379372208104,
+   "tracked_points": 8158,
+   "visible_share": 0.9100684599516318
+  }
+ }
+}

@@ -1,0 +1,299 @@
+<title>[SoG] Making the Training Data</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap">
+<style>
+/* Shoulder of Giants leaf page: the main page's palette and type (paper and ink; blue = given, green = exact). */
+:root{
+  --paper:#fbfaf7; --panel:#ffffff; --sunk:#f2f0ea; --ink:#16191c; --ink-2:#454b52; --ink-3:#737a82; --rule:#dcd9d1;
+  --given:#2b5f86; --exact:#1f6b4f; --warn:#a4561a;
+  --serif:"Source Serif 4","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#111315; --panel:#171a1d; --sunk:#1d2124; --ink:#e8e9e6; --ink-2:#b0b6bc; --ink-3:#848b92; --rule:#2c3034;
+  --given:#79b0d8; --exact:#63b48f; --warn:#e0955a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#111315; --panel:#171a1d; --sunk:#1d2124; --ink:#e8e9e6; --ink-2:#b0b6bc; --ink-3:#848b92; --rule:#2c3034;
+  --given:#79b0d8; --exact:#63b48f; --warn:#e0955a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.62;margin:0}
+.wrap{max-width:1000px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 72px}
+.col{max-width:70ch}
+.crumb{font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--ink-3);margin:0 0 22px}
+.crumb a{color:var(--ink-2);text-decoration:none;border-bottom:1px solid var(--rule)}
+.crumb a:hover{color:var(--ink);border-bottom-color:var(--ink-3)}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(31px,5vw,44px);line-height:1.08;margin:.35em 0 .4em;
+  text-wrap:balance;max-width:24ch}
+h2{font-family:var(--serif);font-weight:600;font-size:clamp(23px,3.2vw,29px);line-height:1.2;margin:0 0 .5em;
+  text-wrap:balance}
+h3{font-family:var(--sans);font-weight:600;font-size:16.5px;margin:1.2em 0 .3em}
+p{margin:0 0 .9em}
+.lede{font-size:clamp(17.5px,2.1vw,19.5px);line-height:1.55;color:var(--ink-2);max-width:62ch}
+a{color:var(--given);text-underline-offset:2px}
+a:focus-visible{outline:2px solid var(--given);outline-offset:2px;border-radius:2px}
+section{padding-block:44px 8px;border-top:1px solid var(--rule);margin-top:40px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;background:var(--rule);
+  border:1px solid var(--rule);margin:30px 0 0}
+.facts div{background:var(--panel);padding:12px 14px;min-width:0}
+.facts b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:500;margin-bottom:2px}
+.facts span{font-size:15px}
+figure{margin:26px 0 14px}
+.scroll{overflow-x:auto}
+figure svg{display:block;width:100%;height:auto;color:var(--ink);min-width:640px}
+figcaption{font-size:14px;color:var(--ink-3);margin-top:8px;max-width:78ch;line-height:1.5}
+.vid .frame{border-radius:3px;background:var(--sunk);overflow:hidden}
+.vid video{display:block;width:100%;height:auto}
+.vidgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:4px 18px;margin:8px 0}
+.spec{margin:14px 0 6px;border-bottom:1px solid var(--rule);max-width:92ch}
+.spec .row{display:grid;grid-template-columns:11rem minmax(0,1fr);gap:4px 18px;padding:10px 0;border-top:1px solid var(--rule)}
+.spec .k{font-weight:600;font-size:15px}
+.spec .v{font-size:15px;color:var(--ink-2);min-width:0}
+.why{background:var(--sunk);padding:14px 18px;border-radius:3px;margin:18px 0 6px;font-size:15.5px;max-width:78ch}
+.why b{color:var(--ink)}
+ul.plain{margin:.3em 0 .9em;padding-left:1.2em}
+ul.plain li{margin:0 0 .35em}
+code{font-family:var(--mono);font-size:.88em;background:var(--sunk);padding:1px 4px;border-radius:2px;
+  overflow-wrap:anywhere}
+.foot{margin-top:48px;font-size:13.5px;color:var(--ink-3)}
+@media (max-width:640px){
+  .spec .row{grid-template-columns:minmax(0,1fr)}
+  section{margin-top:28px;padding-top:32px}
+}
+</style>
+
+<div class="wrap">
+<p class="crumb"><a href="https://claude.ai/artifact/5WR9dMDTujSfrNAyhjCEQJ">[SoG] Shoulder of Giants</a> &nbsp;›&nbsp; Making the training data</p>
+<header>
+  <div class="eyebrow">[SoG] · how the data is made · as of 2026-11-25</div>
+  <h1>Every training example is a run of a classical simulator, recorded</h1>
+  <p class="lede">The network learns by copying a teacher: NVIDIA's Newton physics engine, run on GPUs. A generator
+  builds a random tabletop scene, gives every object a random material, plans what a gripper does, lets the teacher
+  simulate it and records the result at 30 frames a second. There are two datasets, one for rigid and hinged objects
+  and one for cloth. Real recordings are kept for testing and for the last stage of training only.</p>
+  <div class="facts">
+    <div><b>Rigid teacher</b><span>Newton 1.7, the Kamino hard-contact solver, 240 steps a second</span></div>
+    <div><b>Cloth teacher</b><span>Newton's explicit integrator, 1,000–2,150 steps per frame</span></div>
+    <div><b>Rigid data</b><span>50,048 episodes of 6 s, plus 12,800 on slopes (3.9 GB)</span></div>
+    <div><b>Cloth data</b><span>20,032 episodes of 4 s, plus 1,024 held out (27 GB)</span></div>
+  </div>
+</header>
+
+<section id="recipe">
+  <div class="col">
+    <div class="eyebrow">The recipe</div>
+    <h2>Scene, material, action, simulate, check</h2>
+    <p>Both generators follow the same five steps. Before recording, the teacher runs unrecorded (0.5 s for rigid scenes, 1.5 s for cloth) so that
+    dropped objects and cloth have landed. Each gripper action is planned only when the previous one has finished,
+    from where things actually are by then. Plans made in advance had the gripper come down on objects that had
+    already moved.</p>
+  </div>
+  <figure>
+    <div class="scroll">
+    <svg viewBox="0 0 900 190" role="img" aria-label="The generator's five steps: sample a scene, sample materials, plan the next gripper action from the current state, simulate with the teacher and record at 30 frames a second, then check and store; after each action the next one is planned from the new state.">
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+      <g font-family="IBM Plex Sans, system-ui, sans-serif" font-size="13" fill="currentColor">
+        <g fill="none" stroke="currentColor" stroke-width="1.3">
+          <rect x="10" y="40" width="150" height="74" rx="4"/>
+          <rect x="190" y="40" width="150" height="74" rx="4"/>
+          <rect x="370" y="40" width="160" height="74" rx="4"/>
+          <rect x="560" y="40" width="170" height="74" rx="4" stroke="var(--exact)" stroke-width="2"/>
+          <rect x="760" y="40" width="130" height="74" rx="4"/>
+        </g>
+        <text x="85" y="68" text-anchor="middle" font-weight="600">1 · Scene</text>
+        <text x="85" y="88" text-anchor="middle" font-size="12">objects, table,</text>
+        <text x="85" y="103" text-anchor="middle" font-size="12">drawer or lid, plank</text>
+        <text x="265" y="68" text-anchor="middle" font-weight="600">2 · Material</text>
+        <text x="265" y="88" text-anchor="middle" font-size="12">friction, bounce, mass,</text>
+        <text x="265" y="103" text-anchor="middle" font-size="12">stiffness, at random</text>
+        <text x="450" y="68" text-anchor="middle" font-weight="600">3 · Plan an action</text>
+        <text x="450" y="88" text-anchor="middle" font-size="12">push, lift, fold, shake…</text>
+        <text x="450" y="103" text-anchor="middle" font-size="12">from the current state</text>
+        <text x="645" y="68" text-anchor="middle" font-weight="600">4 · Teacher runs it</text>
+        <text x="645" y="88" text-anchor="middle" font-size="12">record every frame</text>
+        <text x="645" y="103" text-anchor="middle" font-size="12">at 30 frames / s</text>
+        <text x="825" y="68" text-anchor="middle" font-weight="600">5 · Check, store</text>
+        <text x="825" y="88" text-anchor="middle" font-size="12">no explosions,</text>
+        <text x="825" y="103" text-anchor="middle" font-size="12">shards of 64–128</text>
+        <g stroke="currentColor" stroke-width="1.3" fill="none">
+          <line x1="160" y1="77" x2="186" y2="77" marker-end="url(#ar)"/>
+          <line x1="340" y1="77" x2="366" y2="77" marker-end="url(#ar)"/>
+          <line x1="530" y1="77" x2="556" y2="77" marker-end="url(#ar)"/>
+          <line x1="730" y1="77" x2="756" y2="77" marker-end="url(#ar)"/>
+          <path d="M645,114 C645,165 450,165 450,118" marker-end="url(#ar)"/>
+        </g>
+        <text x="548" y="172" text-anchor="middle" font-size="12" fill="var(--ink-3)">when an action ends, plan the next (rigid up to 4, cloth 1–2 per episode)</text>
+        <text x="450" y="22" text-anchor="middle" font-size="12" fill="var(--ink-3)">before recording: 0.5–1.5 s unrecorded, so everything has settled</text>
+      </g>
+    </svg>
+    </div>
+    <figcaption>The generator. Only step 4, the teacher, is physics; the rest is sampling and bookkeeping. The green
+    box is what the network learns to copy.</figcaption>
+  </figure>
+</section>
+
+<section id="rigid">
+  <div class="col">
+    <div class="eyebrow">Dataset 1 · rigid and hinged</div>
+    <h2>Scanned household objects pushed, struck and dropped on a table</h2>
+    <p>Each scene is a table with one to six scanned objects. Some are stacked, and most are dropped from
+    5–25 cm. Four scenes in ten also get a small cabinet with a drawer or a lid. A gripper then carries out up to
+    four actions. It always goes for the object that has been touched least, so most objects get handled.</p>
+  </div>
+  <div class="vidgrid">
+    <figure class="vid">
+      <div class="frame"><video data-auto src="media/data_rigid_median.mp4" poster="media/data_rigid_median.jpg" controls loop muted playsinline preload="metadata"></video></div>
+      <figcaption>A typical scene. A tube drops between two magazine racks, the gripper (the grey T) pushes it along, then it goes to the cabinet's drawer.</figcaption>
+    </figure>
+    <figure class="vid">
+      <div class="frame"><video data-auto src="media/data_rigid_drawer.mp4" poster="media/data_rigid_drawer.jpg" controls loop muted playsinline preload="metadata"></video></div>
+      <figcaption>A drawer scene. The drawer slides open and back along its rail against its damping, then the gripper presses on a shoe.</figcaption>
+    </figure>
+    <figure class="vid">
+      <div class="frame"><video data-auto src="media/data_rigid_lid.mp4" poster="media/data_rigid_lid.jpg" controls loop muted playsinline preload="metadata"></video></div>
+      <figcaption>A box with a hinged lid. Small objects land, the gripper knocks a bottle over against a shoe, then moves to a roll of tape.</figcaption>
+    </figure>
+  </div>
+  <div class="spec">
+    <div class="row"><div class="k">Objects</div><div class="v">Scans from Google Scanned Objects: 780 tabletop-sized
+    ones, 702 for training and 78 kept for testing. For collisions each is split into up to 12 convex parts. The
+    network sees 48–600 points on each surface.</div></div>
+    <div class="row"><div class="k">Materials</div><div class="v">Friction 0.1–1.2, bounciness 0.05–0.85. Density
+    50–3,000 kg/m³ for solid objects; hollow shells (four in ten) get 1–5 mm walls. Six objects in ten hide one to
+    three dense lumps, which move the centre of mass. Mass is kept between 5 g and 5 kg. Drawers and lids get a
+    random damping.</div></div>
+    <div class="row"><div class="k">Gripper</div><div class="v">A 0.5 kg body that a controller pulls along the
+    planned path, with its force capped at 60 N (5–15 N in a fifth of scenes). It is not moved directly: a gripper
+    moved without any force limit crushed objects into the table with forces up to 303 kN.</div></div>
+    <div class="row"><div class="k">Actions</div><div class="v">Push, off-centre push, tilt and release, strike,
+    knock one object into another, open a drawer or lid, sweep, random moves. In three episodes in ten an object also
+    gets a kick that nothing visible causes: its velocity jumps by 0.1–1 m/s.</div></div>
+    <div class="row"><div class="k">Recorded</div><div class="v">6 s at 30 frames a second (181 frames): every body's
+    position, orientation and velocity, the gripper's included; the force, point and torque between each pair of
+    bodies in contact; the gripper's force, and whether it is at its cap. Surface points are rebuilt from the poses
+    when training.</div></div>
+    <div class="row"><div class="k">Slopes</div><div class="v">A further 12,800 episodes, half of them with a 50 × 30 cm
+    plank at 5–30° and one or two objects resting on it. They start at rest, so no object is ever released on a slope (see the
+    limits below).</div></div>
+    <div class="row"><div class="k">Cost</div><div class="v">About 5,800 episodes per GPU-hour, 128 per file.</div></div>
+  </div>
+  <div class="why"><b>Why this teacher.</b> Four of Newton's solvers were compared on the same checks. Kamino was the
+  only one right on all of them: the law for a block sliding down a slope, no creep at rest, exact stacking and joint
+  limits, bounce that does not depend on friction, and 0.69 mm from 93 real sliding objects. Isaac Lab's default,
+  MuJoCo-Warp, was rejected because its soft contacts tie bounce to friction: a bouncy cube slid down a 20° slope it
+  should rest on.</div>
+</section>
+
+<section id="cloth">
+  <div class="col">
+    <div class="eyebrow">Dataset 2 · cloth</div>
+    <h2>One towel, seven things a gripper does to it</h2>
+    <p>Each scene is one towel or napkin on a table, sometimes over a scanned object or a tilted plank. A gripper
+    grasps it and does one or two of seven things: lift and drop, lift and place, drag, fold, shake, push and slide.
+    The overlay in the video gives each towel's size and material.</p>
+  </div>
+  <figure class="vid">
+    <div class="frame"><video data-auto src="media/data_cloth_grid.mp4" poster="media/data_cloth_grid.jpg" controls loop muted playsinline preload="metadata"></video></div>
+    <figcaption>Four cloth episodes from the training set, as the teacher simulated them: a fold on a plank, a slide
+    then a lift-and-drop, a fold over the table's edge, and a held towel shaken next to an object.</figcaption>
+  </figure>
+  <div class="spec">
+    <div class="row"><div class="k">Cloth</div><div class="v">15–50 cm per side (at most 2:1), a grid of points 1 cm
+    apart: 256–2,601 points. It starts flat, over the edge, crumpled, draped on an object, held, or on a plank at
+    10–40°.</div></div>
+    <div class="row"><div class="k">Materials</div><div class="v">Weight 50–500 g/m², stretch stiffness 300–30,000
+    N/m, bending length 1.5–5 cm, friction 0.1–1.2, each drawn independently so that none can be guessed from
+    another (except that the lightest cloths are never the stiffest).</div></div>
+    <div class="row"><div class="k">Gripper</div><div class="v">Moved directly along its path. A grasp holds up to 24
+    cloth points within 1.2 cm of the fingertips. The planner keeps the gripper above everything in the scene, and
+    when placing it stops as soon as the cloth pushes back. A gripper driven into the plank pinched the cloth and
+    made it explode.</div></div>
+    <div class="row"><div class="k">Recorded</div><div class="v">4 s at 30 frames a second (121 frames): every cloth
+    point's position at full precision, the gripper's pose and planned path, the grasp force, and the force on the
+    cloth from the table, the gripper and objects. Objects in cloth scenes never move.</div></div>
+    <div class="row"><div class="k">Held out</div><div class="v">1,024 test episodes, with obstacles never seen in
+    training.</div></div>
+    <div class="row"><div class="k">Cost</div><div class="v">About 3,000 episodes per GPU-hour, 64 per file; the
+    whole set took 6.8 h on one GPU.</div></div>
+  </div>
+  <div class="why"><b>Why this teacher.</b> Newton's cloth solvers were run on one towel against formulas
+  for how a strip hangs, how far a ledge droops, and how a towel slides. VBD and Style3D run stably, yet simulate a
+  different cloth from the one they are given: VBD does not converge on light, stiff cloth, and Style3D resists turning.
+  XPBD explodes. The explicit integrator passed all twelve checks. We added bending at the right strength, damping of
+  stretching, contact with friction, the cloth's contact with itself (2 mm), and air drag.</div>
+</section>
+
+<section id="checks">
+  <div class="col">
+    <div class="eyebrow">Checks</div>
+    <h2>Nothing is generated before the teacher passes, and nothing is used before the data does</h2>
+    <p>A dataset inherits every defect of its teacher, so three kinds of check run first.</p>
+    <h3>The teacher against known answers</h3>
+    <p>Before any dataset is generated: the slide law within 2%, bounce within 0.05 of its label, momentum in free
+    flight, drift at rest below 1 mm/s, penetration below 2 mm, and real sliding objects (Physics 101) within 2 mm.
+    Cloth gets the same treatment from formulas.</p>
+    <h3>Can the material be seen at all?</h3>
+    <p>A network can only learn a parameter from motion if changing it changes the motion by more than the
+    teacher's own noise. For cloth, weight changes what is seen in 92% of actions, bending 89%, stretch stiffness
+    80% and friction 68%. For rigid objects, measured on 128 episodes of the dataset: friction 61%, bounce 65%, mass
+    66%, centre of mass 68%, drawer and lid damping 82%.</p>
+    <h3>The generator itself, on what it produces</h3>
+    <p>The first 16,000 cloth episodes showed four defects the solver comparison had never tested. Towels bounced
+    3–5 cm off the table. 12% ended passing through themselves. Towels pinched by the gripper exploded, and light
+    towels pressed into piles exploded too. All four were fixed in the generator's own teacher and checked there, and
+    the dataset was regenerated. In the current set no episode explodes.</p>
+  </div>
+</section>
+
+<section id="limits">
+  <div class="col">
+    <div class="eyebrow">Limits</div>
+    <h2>What the data does not contain, and what that costs</h2>
+    <ul class="plain">
+      <li><b>No camera, no video.</b> Only 3D positions and forces. Video matters only upstream, to turn real
+      recordings into mesh motion.</li>
+      <li><b>No object released on a slope.</b> The slope episodes are recorded after objects have settled, so the
+      data only shows objects staying put on slopes. A network without the physics layer therefore never slides on
+      the real ramp (82 mm off, where the friction law alone is 1 mm). Most cloth starts on a plank also slide off
+      during the unrecorded settling.</li>
+      <li><b>The teacher is not exactly repeatable.</b> GPU arithmetic differs slightly from run to run. Once a towel
+      is let go, those tiny differences grow: five restarts of one episode from the same state end 21–687 mm apart.
+      Rollout errors below that spread mean the network memorised a recording, not that it is accurate.</li>
+      <li><b>Not yet built:</b> ropes and soft objects (both teachers pass their checks), scenes mixing cloth with
+      moving rigid objects, and objects held on a slope and let go.</li>
+    </ul>
+    <h3>Real data, for testing and the final stage</h3>
+    <p>93 tracked slides of real objects down a ramp (Physics 101); eight real cloth recordings from PhysTwin, scored
+    on hand-marked points; and 407 windows of a robot moving cloth from PGND, scored against the observed point
+    clouds two and four seconds on.</p>
+    <h3>In the repository</h3>
+    <p>Rigid: <code>src/lsim/data/</code> (scene, materials, actions, episode) and <code>scripts/l1_generate.py</code>,
+    teacher in <code>src/lsim/teacher/newton_teacher.py</code>. Cloth: <code>src/lsim/data/cloth.py</code>,
+    <code>src/lsim/teacher/cloth_teacher.py</code>, <code>scripts/l1_generate_cloth.py</code>. Checks:
+    <code>scripts/l0_teacher_gate.py</code>, <code>l0_cloth_gate.py</code>, <code>l0_cloth_teacher_check.py</code>,
+    <code>l1_gate.py</code>, <code>l1_cloth_gate.py</code>. The full record, dated: <code>docs/DIRECTION.md</code>,
+    "Phase 1" and "Phase 3: cloth episodes".</p>
+  </div>
+  <p class="foot">Part of <a href="https://claude.ai/artifact/5WR9dMDTujSfrNAyhjCEQJ">[SoG] Shoulder of Giants</a>.
+  Results are on <a href="https://claude.ai/artifact/FZbzJtpVHJWYpDXgYTGpzj">[SoG] Test Results</a>; the networks that learn
+  from this data are on <a href="https://claude.ai/artifact/QDsKHiZi79nEwTZ7wvUh31">[SoG] Architecture</a>.</p>
+</section>
+</div>
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce || !('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      var v = e.target;
+      if (e.isIntersecting) { var p = v.play(); if (p && p.catch) p.catch(function(){}); } else { v.pause(); }
+    });
+  }, {threshold: 0.4});
+  document.querySelectorAll('video[data-auto]').forEach(function(v){ io.observe(v); });
+})();
+</script>

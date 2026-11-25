@@ -1,0 +1,30 @@
+{
+ "slots": [
+  "density",
+  "stretch",
+  "bend",
+  "mu"
+ ],
+ "rows": [
+  {
+   "slot": "density",
+   "r2_vertex": 0.05907750129699707,
+   "best_step": 3000
+  },
+  {
+   "slot": "stretch",
+   "r2_vertex": 0.3073046803474426,
+   "best_step": 9000
+  },
+  {
+   "slot": "bend",
+   "r2_vertex": 0.570117861032486,
+   "best_step": 9000
+  },
+  {
+   "slot": "mu",
+   "r2_vertex": 0.010139405727386475,
+   "best_step": 2000
+  }
+ ]
+}

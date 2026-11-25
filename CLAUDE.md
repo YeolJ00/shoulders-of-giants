@@ -2,34 +2,214 @@
 
 ## What this project is
 
-We make authored 3D assets **simulation-ready**: recover physical parameters **θ**
-(mass, friction, restitution/damping, centre of mass, stiffness) so an asset moves the way
-its material should. Authored assets never physically existed — there is no footage and no
-ground truth — so the definition of "moves right" must come from a model that has watched the
-real world, and the simulator guarantees every output is physical.
+**Shoulder of Giants** (the GitHub repo's name since 2026-11-24, renamed from `reify`; the Python package stays
+`lsim`). The project is being handed over to Jungwoo, a student who will take it on: `README.md` (compact: what it
+is, where it stands, setup, the best networks' commands, layout, box rules), the brief and the test-results page are
+written for him -- keep all three current.
 
-**Core design: video models never generate our targets.** We never fit to generated pixels.
-The simulator (Newton/Warp) produces candidate rollouts under different θ — every one physical
-by construction — and an external plausibility signal scores them. Hallucination cannot enter
-θ because no external model ever manufactures a motion; it only reacts to motions we made.
+We are building a **learned household simulator**: one generative model over explicit 3D
+meshes (rigid objects, hinged parts such as drawers and doors, cloth) that simulates the
+scenes a robot acts in. It is pretrained by distilling a classical simulator over many
+objects, materials and interaction types, then fine-tuned on real motion so that it ends up
+more real than its teacher.
 
-**Which external signal, as of now:**
-- **Cosmos 3 as a chat judge (yes/no logits, absolute or pairwise) is retired as the
-  optimisation signal.** Measured: approves 52.8% of clips at p > 0.90; ρ = −0.02 with
-  density, −0.07 damping, −0.25 friction over 10× sweeps; bounce counts 1–2 against a true
-  1–21; three fits of one object gave densities 244 / 188 / 356. This matches the literature:
-  multimodal LLMs score near untrained networks on intuitive-physics benchmarks. It is kept as
-  a **baseline** and for **one-bit threshold questions** (see Next, item 1).
-- **Candidate replacement: predictive-model surprise (V-JEPA 2).** A self-supervised
-  *predictive* video model — not a generator, not a chat model — sees part of one of our
-  clips, predicts what happens next in representation space, and the prediction error is
-  "surprise." Plausible dynamics ⇒ low surprise. We would optimise θ to **minimise surprise.**
-  No prompt, no language, no sampling: a deterministic network, so `d(surprise)/d(pixels)`
-  exists and, through the differentiable render + contact path, gives true gradient MAP.
-  **The harness is built and passes V0** (`src/surprise/`, 7/7 gates, `docs/PROBE_SURPRISE.md`).
-  Whether it depends on θ is what V1 answers. Rule 1 applies to it exactly as to any probe.
-- **Absolute scale** never comes from a video model (they see ratios and mismatches). It comes
-  from the **balance probe** against a reference block, plus the prior.
+- Every input is a **slot that is given or empty** (parameters, forces, past frames); the
+  model generates the empty ones: future motion, an unmeasured friction, a push nobody saw.
+- The network predicts **forces**; an exact physics layer (gravity, F = ma, rigid
+  aggregation, joint projection) moves the vertices. Sequences use **diffusion forcing**
+  windows (8 past + 8 generated frames), so past motion is optional and length unlimited.
+- **No camera in the loop** (video only matters upstream, to turn real recordings into mesh
+  motion) and **no LLMs in the method** (initial setup or baselines only).
+- **For now every input is given** (the user, 2026-11-24: "maybe we should start with all inputs given"): hiding the
+  material and the gripper's force cost the rigid plain transformer a third of its fit; the empty slots come back
+  once a forward simulator fits (rigid `l2_overfit.py --plain --aug 1`; cloth `cloth_train --given`, from 2026-11-25:
+  scored on its own inputs, `l2_coverage_score.py --roll_given`, it rolls out level or closer than the hidden-input
+  twin, 23.8 against 25.6 mm at 1 s, and keeps the cloth's shape, strain 12% against 61%, area 1.06x against 2.2x;
+  `--random_past` keeps the stretch, 98%). **Score every network on the inputs it trained with**: the first score
+  hid the material in rollouts from `--given` networks and read as "blown up" (64 mm, area 5x).
+
+The bet, as three testable claims: (1) composition is solved, coverage is not --
+generalization follows the diversity of local interactions seen in training, not the number
+of trajectories; (2) inferring an object's material from its motion emerges with material
+diversity; (3) a modest amount of real data makes the student more accurate than its teacher.
+
+**Design, encodings, data sizes and the phased plan with gates: `docs/DIRECTION.md`,
+amended by `docs/PHASE1_AMENDMENT.md` (identifiability-first data design; it wins where they
+disagree: every parameter slot needs an interaction that makes it observable).**
+Human-facing pages: **`docs/PROJECT_BRIEF.html` (the project for a newcomer -- another lab member: why, what it is for,
+what came before, what makes it possible, where it stands, what's next; https://claude.ai/artifact/5WR9dMDTujSfrNAyhjCEQJ;
+the user asked for it to be MAINTAINED, and on 2026-11-24 set its form: a HIGH-LEVEL SUMMARY -- an at-a-glance status
+list and a few short paragraphs, no cards holding long text, rendered scenes as VIDEOS not still images, and nothing
+about the earlier 3D-asset simulation-ready work; plain words, no run codenames) and `docs/TEST_RESULTS.html` (the
+detailed test results the brief links to: every chart, table and video by track, plus the runs in progress with their
+predictions; https://claude.ai/artifact/FZbzJtpVHJWYpDXgYTGpzj; new results go HERE first, and only their one-line
+consequence into the brief). Videos live in `docs/media/` (git-ignored; copied from `outputs/lsim/render_*`) and are
+published beside each page through the Artifact tool's `files` map as `media/<name>.mp4` + `.jpg` poster; scratch
+builders `build_pages.py` / `build_brief.py` made the split. Third page: `docs/DATA.html` ("[SoG] Making the Training
+Data", https://claude.ai/artifact/Bqgkb28DtrCtLMpWj1hLtt: how the rigid and cloth episodes are simulated, recorded and
+checked, with teacher videos). Fourth: `docs/ARCHITECTURE.html` rebuilt 2026-11-25 as "[SoG] Architecture"
+(https://claude.ai/artifact/QDsKHiZi79nEwTZ7wvUh31: both networks as built, training, the measurement behind each
+choice, open problems; replaces the October page described below -- keep it in step with the code). Structure (the user, 2026-11-25): the brief is the MAIN page; every other page is a leaf
+linked from its "Pages" line and "Further reading", and links back by a breadcrumb; every page's `<title>` starts with
+`[SoG]` so the user can spot them in the gallery. The October pages below (LEARNED_SIM, ARCHITECTURE, ROLLOUTS,
+CLOTH_GATE, REAL_CLOTH) were no longer published on 2026-11-25 and their local files are stale: rebuild before
+relinking.** and `docs/LEARNED_SIM.html` (the design pitch, October; published at
+https://claude.ai/artifact/4BwqT4sp6vmT6DcsAh85hC) and `docs/ARCHITECTURE.html` (the model as built,
+with the measurement behind each choice; https://claude.ai/artifact/QDsKHiZi79nEwTZ7wvUh31) and
+`docs/ROLLOUTS.html` (rendered rollouts: a real slide and held-out scenes, teacher beside v0 and v1;
+https://claude.ai/artifact/XSWQDU6fTngBxg7zZGm2mQ; generated, git-ignored, media from `scripts/l2_render.py`) and
+`docs/CLOTH_GATE.html` (the cloth teacher gate -- three Newton cloth solvers on one towel, renders and checks -- and the
+cloth episodes it generates, with their chaos and identifiability, and the first cloth models;
+https://claude.ai/artifact/KAGAsw1Zp3biVMKWX26uBB; generated, git-ignored, media from `scripts/l0_cloth_render.py`) and
+`docs/REAL_CLOTH.html` (the teacher and the model against 8 real PhysTwin cloth recordings, scored on hand-annotated
+points; https://claude.ai/artifact/AHLnB7GMZV58ZjEAm5B2s7; generated, git-ignored).
+Republish a file to update its page; keep ARCHITECTURE.html in step with the code.
+
+## How we got here
+
+From July to October 2026 the project tried to make authored 3D assets simulation-ready by
+recovering their physical parameters theta (mass, friction, restitution, centre of mass,
+stiffness). The simulator side worked: exact mesh contact, probes that pass
+parameter-dependence sweeps, and real Physics 101 slides reproduced to 0.4-1.0 mm. The
+reading side never did: every external model asked to judge or supply theta -- Cosmos 3 as a
+judge, V-JEPA 2 surprise, an SSv2 outcome classifier, the FPT and MYRIAD motion priors,
+Wan 2.2, frontier LLMs -- returned a generic prior or tracked motion magnitude instead of the
+material. A literature review on 2026-10-07 then found that the asset-parameter route (name
+the material, look up a table) is already the field's standard. The user rejected its
+instrument-plus-benchmark recommendation and set the frame instead: simulators are not real
+enough, which is why robotics has a data problem, and the answer should be a deep-learning bet
+about how simulation scales. That led to learned simulators that compose, then to distilling
+Isaac and fine-tuning on reality (decided 2026-10-16).
+
+The theta problem survives inside the new model: inferring parameters from motion is what the
+empty slots and object tokens have to learn, and claim 2 tests whether that emerges. Full
+record of the theta track (probes, every external-signal test, real-footage results,
+simulator fixes): `archive/theta_track/docs/THETA_TRACK.md`. The 2026-10-07 review:
+`archive/theta_track/docs/DIRECTION_2026-10-07.md`. All theta-track code, docs, assets, model
+weights and outputs were moved to `archive/theta_track/` on 2026-10-16 (git renames, nothing
+deleted); new work never imports from it.
+
+## Now: phase 3, cloth (teacher gate passed 2026-10-20: the explicit integrator teaches cloth; VBD and Style3D fail it)
+
+| phase | weeks | status |
+|---|---|---|
+| 0 `lsim` env + teacher gate T0 | 1 | rigid teacher passed 2026-10-16; cloth teacher gate passed 2026-10-20 (DIRECTION.md "Cloth teacher gate") |
+| 1 data engine per PHASE1_AMENDMENT.md; dataset v0 (rigid + hinged); real-data audit | 2-3 | identifiability gate passed 2026-10-16 (coverage mu 0.74, e 0.70, mass 0.68, CoM 0.71, damping 0.84); v0 done (50,048 episodes, 3.1 GB) + v0r ramp supplement (12.8k); real-data audit: OakInk2 2.0% hand-free -- claim-3 scope needs the user |
+| 2 model v0, baselines B1-B3, gates G1-G5, Physics 101 real check | 3-6 | **model v0 trained and evaluated 2026-10-17** (DIRECTION.md "Model v0"): beats constant velocity where things move (1 s p90 52 vs 125 mm; 5.7 s p90 219 vs 2,197 mm), G2 stability passes (1.000 inside), penetration 1.6 mm passes; FAILS resting drift (74 mm / 5.7 s), G4 in-context identification (head stays at the prior) and Physics 101 (83 mm: the support prior keeps the cube from sliding). **v1 = the Coulomb default** (2026-10-19): the default alone fits the 93 real slides to 0.99 mm (Kamino 0.69), 0.94-0.95 mm after 100-episode training, where every support run stays at 80-82 mm; held-out moving p90 286 -> 154 mm; rest over 30 frames slightly worse (2.3-4.4 vs 1.6-2.5 mm). **Full v1 trained 2026-10-19** (DIRECTION.md "Model v1 trained"): better than v0 everywhere (G1 30-frame median 2.4 vs 4.0 mm, G2 end 69 vs 96 mm, resting drift 16 vs 74 mm, penetration 0.7 mm), but **the direct baseline B2 beats it on every rigid gate** (G1 1.75 mm, G2 end 38 mm; B2 never slides on the real board, 81 mm), G4 stays at the prior, and **training re-learned a brake**: Physics 101 26 mm, slides at 20-30% of the slide law, and from clean history it decelerates harder the faster a body moves. Final (2026-10-20): **B1 (GNS) is the strongest on the teacher's own distribution** (G1 30-frame median 0.21 mm, drift diagnostic resting 0.06 / moving 33 mm, against B2 1.15 / 38 and v1 1.25 / 55) and, like B2, never slides on the real board (82 mm); G4 at the prior for all. The physics layer buys reality transfer, not teacher fit. Rendered rollouts (`docs/ROLLOUTS.html`) show what no gate measures: neither model follows the gripper when it opens a lid or drawer (hinged parts are in no reported error). The user questioned the rigid-only scope (2026-10-19) and chose deformables (2026-10-20): phase 3 below. Rigid follow-up kept: the friction cone on the learned contact force; a hinged-part error in `l2_eval`. **Small-fit test, rigid (2026-11-23; DIRECTION.md "The small-fit test, rigid track"; `scripts/l2_small_fit_rigid.py`): the 2.4M rigid network does not fit ONE episode** -- 12,000 steps on one v0 episode: one frame 0.597 of constant velocity as it is, 0.358 with `--plain` (no augmentation or hidden slots, but `--plain` leaves the 3 mm chunk noise and the pushforward on: a 2-3 mm error on every moving body-frame whatever its size, the noise's size -- but the noise-free arm fits no better: 0.355 with `--plain --noise 0,0 --pf 0`, 0.517 with the augmentation on; cloth reaches 0.044 on one episode; without the physics layer (`--direct`) it fits far worse, 0.824: the layer is not in the way; the 28M `--d 384 --layers 8` arm is slow and unstable at lr 1e-3, `outputs/lsim/rigid_fit1_size.sh`); its replay drifts resting bodies 0.3 mm a frame and misses the fast late moves (median body 3 / 4.5 / 133 mm at 1 s / 2 s / 5.7 s, left in place 10 / 10 / 142); the plain replay explodes. **Diagnosis so far (DIRECTION.md "Rigid, one episode: ... what the network can see and push on"): four FIXED windows trained alone for 1,500 steps stall at 0.34 (first step) / 0.13 (all 8 steps) -- a floor, not training length.** The episode's motion is all drops, a gripper push and a poke with the collisions after it; 68% of the one-frame error is on body-frames in contact with another object, 17% where a given force acts and the network changes nothing (**it has no learned force on gripper edges by construction**), and objects hit or landing from beyond the 3 cm contact radius within one frame have no edge at all (v0 bodies travel up to 6 cm a frame). **Confirmed by intervention on the four windows (`outputs/lsim/rigid_fixed_2x2.sh`): with a 3 cm reach the network memorises every body-frame it has a contact edge for (0.05-0.27 mm against constant velocity's 17-20) and 82% of what is left is one landing from 4 cm up with no edge at all; with a 7 cm reach the floor is gone (first step 0.026, all eight steps 0.010 of constant velocity; with the gripper force too 0.000 / 0.002) at 4x the time and 5x the memory (44.6 GB for four windows: a graph by radius does not scale to the reach the data needs).** **Whole-scene attention in place of the graph (`Simulator(trunk="attn")`: the cloth network's `QwenBlock`s, rotary positions on the world position, each dynamic vertex given what is nearest within 10 cm (`net.near_features`), plus a per-vertex force head; contact edges, the Coulomb default and the physics layer unchanged) fits the four windows exactly at the graph's cost: first step / all eight steps 0.000 / 0.000 of constant velocity (0.004 / 0.005 mm, largest body-frame error 0.02 mm) with 1.6M parameters in 1,241 s and 7.8 GB (graph as built: 2.4M, 0.335 / 0.134, 1,142 s, 8.4 GB).** Four memorised windows, not a fitted episode: on every moving frame of the episode in the rollout's view (`outputs/lsim/rigid_moving.sh`, 68 one-step windows, 4,000 steps, ~440 views each) the graph reaches 0.21 (from the all-windows run's 0.36), still falling -- impact frames are memorised one by one, slowly; the 1.6M attention trunk reaches 0.160 (object-object frames 1.37 mm against the graph's 2.75), the 8.4M one 0.231 (more parameters do not memorise impacts faster), the 5 cm graph with the gripper force 0.257 with a replay that explodes; **at 12,000 steps (~1,400 views a window; `rigid_moving_attn_small_12k` / `rigid_moving_base_12k`) the attention trunk fits the episode's frames -- one frame 0.033 of constant velocity (0.064 over every frame; object-object frames 0.26 mm) -- where the graph stalls at 0.182 (0.205; 2.06 mm): the rigid one-frame N = 1 fit, at cloth's level (0.044). It is memorising: on two frames outside its windows it moves an object 7-10 mm before the gripper reaches it, and its replay still drifts (no noise in training).** **The rigid N = 1 proof (2026-11-23; `outputs/lsim/rigid_fit1_attn.sh`: `rigid_fit1.sh`'s two arms through the unchanged trainer, noise and pushforward on, with `--trunk attn --d 128 --layers 6`): with `--plain` (`rigid_fit_1_attn_plain`) one frame 0.102 of constant velocity (graph 0.358) and a replay from frame 8 that stays at ~0.1 mm (mean of the five bodies; worst body 0.7 mm in the bounces, < 0.4 after) for 4.5 s through the bounces, the shove and the first poke, then 7 mm on one object during the gripper's slow push (no learned force on gripper edges), 10.9 mm median / 16.7 worst at the end (the last K frames are never trained in the rollout's view: `l2_overfit.py` draws starts below T - K); as it is (`rigid_fit_1_attn`) 0.208 (graph 0.597), replay 1.1 / 1.7 / 21 mm median -- the random yaw and hidden slots cost this trunk too. The graph's replays: as it is 3 / 4.5 / 133 mm median, `--plain` explodes. Predictions (0.20-0.28; 0.40-0.50; end above 50 mm) all wrong on the good side. Rendered: `outputs/lsim/render_rigid_fit1/fit1_ep0.mp4` (scratch `rigid_render_fit1.py`, `rigid_replay_curve.py`, `rigid_replay_chart.py`).** **128 episodes, the recipe as it is (`outputs/lsim/rigid_pilot128.sh`; 12,000 steps, ~2 views a window; scored on 32 held-out episodes of v0's second shard by `l2_small_fit_rigid.py --shard 1`): the prediction (attention ahead by 0.05, both 0.6-0.9) failed -- one frame 1.97 (graph) and 2.21 (attention) of constant velocity, paired +0.22 [+0.04, +0.42] -- and the references scored afterwards on the same episodes show the run could not answer: the fully trained v1 is at 1.80 (the brake, as a one-frame score: the physics-layer model under the as-it-is recipe is worse than constant velocity over one frame at any data size), B2 0.63, B1 (GNS) 0.56. Nothing on the rigid track fits one frame better than 0.56, and the rigid one-frame fit had never been scored (the gates were 30-frame rollouts). The clean view is above 1 too (`outputs/lsim/rigid_pilot128_clean.sh`; the prediction "both below 1" failed): held-out one frame graph 1.620, attention 1.491 (attention - graph -0.114 [-0.203, -0.031]: ahead, as predicted), own 32: 1.449 / 1.235; the graph with `--plain` and the noise kept 2.025 (noise and pushforward cost +0.47 on one frame; augmentation and hidden slots nothing). THE CAUSE (`scripts/l2_rigid_where.py score / join`, DIRECTION.md "The rigid layer model starts behind constant velocity"): the exact layer ALONE (force heads zeroed) is at 1.736 of constant velocity on the same held-out moving body-frames, and the fully trained v1 answers as its untrained layer does (1.795; category by category) -- the rigid model's one-frame error from clean history is the layer's at any data size. The layer is exact in flight (0.01 mm, constant velocity 11) and level for a body alone on the table; it loses wherever the gripper or a second object is involved (317 of 563 body-frames, 69% of the error): the recorded gripper force is integrated as an external force with nothing to balance it (a 31 g object pushed by 4.6 N against another object is thrown 150 mm in a frame; a plate pushed low turns 104 deg because the default's reaction passes through the centre of mass; bodies touching another object have no default and fall), on given-force body-frames every layer network equals the layer (7.1-8.0 mm; constant velocity 1.8; B1 / B2 1.8) because the network has no force on gripper edges, and B2 starts at constant velocity by construction. Without the given force the layer alone is 1.504, without its torque 1.716. The gripper's force is a reaction of the motion, not its cause: an explicit integrator fed with it needs large forces cancelled to a per cent. Open design question (hypotheses in DIRECTION.md: the gripper as a moving body with a learned edge force and the slot read, not integrated; a zero output that means constant velocity where the gripper or an object touches; or no layer on the teacher). Running since 17:22 UTC, clean view, attention trunk, 128 episodes (`outputs/lsim/rigid_pilot128_start.sh`, prediction in its header): `rigid_pilot128c_attn_direct` (`--direct`, the plain transformer, GPU 5; predicted below 1) and `rigid_pilot128c_attn_grip` (`--grip_force`, GPU 7; predicted still above 1.2); and `rigid_pilot128p_attn_direct` (direct with noise and pushforward, GPU 3, for a replay). **The switch: constant velocity where the gripper or another moving body is within a body's contact reach, the exact layer elsewhere, scores 0.897 before any learning** (layer alone 1.736; at rest 0.04 mm against 0.39). Built as `Simulator(touch_cv=True)` / `l2_overfit.py --touch_cv` (default off; on a touched body the support default is off and gravity and the given gripper force are cancelled, so the network's forces are its whole net force and the force slot is read, not integrated; default path checked unchanged to 0.0003 mm, heads zeroed 0.895). Queued behind the clean arms (`outputs/lsim/rigid_pilot128_touch.sh`, prediction in its header): `rigid_pilot128c_attn_touch` (GPU 5) and `rigid_pilot128p_attn_touch` (noise, GPU 7). **RESULT of the three arms (20:11 UTC): the plain transformer -- attention trunk, `--direct` (no physics layer), `--plain` with the noise and pushforward kept, 128 episodes, 12,000 steps, 1.6M parameters (`rigid_pilot128p_attn_direct`) -- scores one frame 0.571 on the 32 held-out episodes (own 0.540) and replays them at 2.0 / 3.7 / 28 mm median (bodies that moved by 1 s: 4.5 mm), level with B1 (0.556; +0.044 [-0.006, +0.108]; 3.7 / 9.5 / 41; 6.5) and B2 (0.631; -0.050 [-0.110, +0.024]), both trained on all 50,048 episodes; without the noise the same network learns nothing (0.982, constant velocity in every category), and the layer network with `--grip_force` stays at 1.500 (1.491 without). Predictions: direct clean failed (0.75-0.95), `--grip_force` held, direct with noise failed on the good side (0.85-1.05). No train / held-out gap, so the levers are queued (`outputs/lsim/rigid_direct_levers.sh`): 36,000 steps on the same 128 episodes (`rigid_pilot128p_attn_direct_36k`, GPU 3, ~7.4 h) and 1,024 episodes at 12,000 steps (`rigid_pilot1024p_attn_direct`, GPU 5 behind the clean switch arm; `l2_overfit.py --episodes` above 128 reads further shards; held-out = shard 8). Not shown for it: hinged parts, the real ramp, anything beyond the old baselines' level.** **The switch arms (22:26 UTC): clean view 0.780 held-out (own 0.737; it learned on its layer side only), with the noise 0.807 (own 0.723) and a replay of 3.1 / 12.8 / 75 mm (moved by 1 s: 11.8) -- behind the plain transformer on one frame (+0.170 [+0.095, +0.238], better in 5 of 32) and on the replay (4.5 mm): with the noise the layer's side costs (flight 2.35 mm where the layer is exact, table 3.19 against 2.07). The layer's domain buys nothing for teacher fit at this size. Physics 101 with the plain transformer: it does not slide on the real board, 82.1 mm (B1 82, B2 81; v1 26.7; the Coulomb default alone 0.99) -- teacher fit 0.57 without the layer against >= 0.78 with any form of it; the real ramp 1 mm from the default against 82 mm without: the open design question, the user's. Rendered on two held-out episodes (`outputs/lsim/render_rigid_held/`): both networks on the teacher at 1 s, neither follows what the gripper knocks over from 2 s on (46-58 mm). Running since 22:32 UTC: the size lever, d256 x 8 (`outputs/lsim/rigid_direct_big.sh`, `rigid_pilot128p_attn_direct_big`, GPU 7).** **Eight times the episodes at equal training is no better (23:26 UTC; `rigid_pilot1024p_attn_direct`, 1,024 episodes, 12,000 steps): 0.568 on 32 held-out episodes of shard 8 against the 128-episode network's 0.539 there (+0.055 [+0.007, +0.118]); no train / held-out gap at either size (prediction held): the fit is set by training length or the network, not the number of episodes, at this budget. Running: the fourth cell, 1,024 episodes x 36,000 steps (`outputs/lsim/rigid_direct_levers2.sh`, `rigid_pilot1024p_attn_direct_36k`, GPU 5, ~7.3 h), beside 128 x 36,000 (GPU 3, ends ~03:30 UTC) and the size lever (GPU 7, ends ~03:30).** **The recipe AS IT IS costs the plain transformer a third (2026-11-24; `rigid_pilot128_attn_direct`: random yaw and shift, hidden parameter slots, hidden gripper, shorter past, history noise): 0.765 held-out against `--plain`'s 0.571 (+0.175 [+0.099, +0.243]; predicted 0.60-0.72), and its replay lets resting bodies drift (never-moved bodies 7 / 22 / 142 mm against 0.9 / 2.1 / 7.8). Two arms split it (`outputs/lsim/rigid_direct_recipe.sh`; `l2_overfit.py --aug 0|1` sets the yaw and shift alone): `rigid_pilot128p_attn_direct_yaw` (GPU 0) and `rigid_pilot128_attn_direct_noyaw` (GPU 6), ~2.5 h; predicted: the yaw carries most.** **The split (05:03 UTC) came out the other way round: the yaw and shift alone cost nothing (0.550 held-out against `--plain`'s 0.571, -0.015 [-0.041, +0.011], and a steadier replay) and the full recipe without them is as bad as with (0.747; resting bodies drift) -- for the rigid world-frame transformer the random yaw is free (unlike cloth) and the cost is in the hidden inputs (slots hidden with p 0.5, gripper force hidden in 30% of windows, shorter past, history noise; the loss ends 10x higher with them: l_pos + l_par + l_f share one trunk and one clip). One arm each on top of `--plain` (`outputs/lsim/rigid_direct_recipe2.sh`; `l2_overfit.py --p_hidden --p_hide_grip --all_past --p_hist_noise`) was started and STOPPED at step ~2,750 on the user's decision.** **DECISION (the user, 2026-11-24): "maybe we should start with all inputs given" -- all inputs given is the working recipe (rigid `l2_overfit.py --plain`, optionally `--aug 1`; cloth `cloth_train --given`: no slot hidden, grasp force never hidden, all 8 past frames); hidden slots (claim 2) return once a forward simulator fits. The cloth twin with every input given (`outputs/lsim/given_seven.sh`, `cloth_cov_seven_ownup_given`; 14:17 UTC): one frame 0.764 against 0.753 (+0.012 [+0.002, +0.021], as predicted) but ROLLOUTS BLOW UP -- 64.3 / 127.0 / 153.5 mm at 1 s / 2 s / 3.8 s against 25.6 / 78.8 / 115.4 (+38.7 [+33.7, +44.2] at 1 s), strain 215% against 61%, area median 5.0x against 1.0x (predicted level: failed). For cloth, every input given is NOT free; until the split reports, cloth keeps the twin's recipe. Running (`outputs/lsim/given_split.sh given_rp 0`, ~7.5 h): `--given --random_past` (new flag: slots and grasp force given, the random shorter past kept; it differs from `--given` only by the past); predicted level with the twin's rollouts: the shorter past is the stabiliser (the `--all_past` arm was stopped at its start: diagnosing hidden inputs waits).). given_rp RESULT: one frame 0.763, rollouts 73 mm at 1 s, area 11x -- and BOTH given rollouts were CONFOUNDED: `l2_coverage_score` rolls out with the material hidden, which `--given` networks never saw. **Re-scored with the material given (`outputs/lsim/given_rescore.sh`, 2026-11-25 01:19 UTC; same 336 episodes): `--given` 23.8 / 77.0 / 107.4 mm against the twin's 25.6 / 78.8 / 115.4 (-1.8 [-3.3, -0.3] / -1.8 [-5.3, +1.7] / -8.0 [-17.4, +1.1]), strain 12% (median 5.6%) against 61% (11%), area 1.06x against 2.23x, less stretch in every family -- prediction (level) held, better on shape; `--given --random_past` level on position, strain 98%, area 3.7x; the twin with material given within 1.2 mm of hidden. Cloth's recipe is `--given` from here; tested at the frontier by `outputs/lsim/full_ownup_cont2_given.sh` (`cloth_q64_ownup_cont2_given`, a third 24k from `cloth_q64_ownup_cont/step23999.pt`, GPUs 2,3, ~17 h, paired with `cont2`; prediction in its header).** **Three times the training puts the plain transformer ahead of B1 on one frame; five times the parameters does not (03:42 UTC; 128 episodes): 36,000 steps (`rigid_pilot128p_attn_direct_36k`) own 0.411, held-out shard 1 0.501 (12k: 0.571, -0.080 [-0.110, -0.050]; B1 0.556, -0.036 [-0.081, +0.021]), shard 8 0.454 (12k: 0.539, -0.114 [-0.188, -0.062]; B1 0.512, -0.121 [-0.218, -0.032]); replay level with the 12k network on shard 1 (1.9 / 4.4 / 28.6 mm), closer on shard 8; the 8.5M network (`..._big`) 0.617 held-out (+0.021 [-0.053, +0.088]) and a worse replay. Both predictions held in the reading: training length is the lever, size is not, and a train / held-out gap has opened (0.41 against 0.45-0.50) -- the 1,024 x 36,000 cell (GPU 5, ~06:50) tests whether data now matters. Running: the ramp-data test for the real board (`outputs/lsim/rigid_direct_ramp.sh`, `rigid_pilot128p_attn_direct_ramp` on v0r's first shard then `l2_phys101.py`, GPU 3; predicted: still no slide, because recorded episodes start settled).** **Replays of the 36,000-step network (scratch `rigid_replay_paired.py`): over the bodies that moved, level with B1 to somewhat closer (shard 1: 5.6 against 11.5 mm median at 2 s, mean difference -2.6 [-7.0, +1.9]; shard 8 closer in ~72%), level with its own 12,000-step version (the better step bought no better replay), and behind B1 on the two busiest episodes rendered (`outputs/lsim/render_rigid_held36k/`: 88 and 63 mm at the end against 39 and 46 -- B1 tips the bottle the gripper hits, the transformer leaves it standing; a topple is a rare event in 128 episodes). Hinged parts scored for the first time (`scripts/l2_rigid_hinged.py`, 52 parts of shard 1, 16 moved): the plain transformer follows the gripper-moved ones (11 mm at the end; v1 9; B1 86 = not at all) and lets shut ones drift open (27 mm; v1's joint 0.1; B1 0.9); nobody beats constant velocity over one frame there (1.15-1.20; v1 4.2).** **Ramp episodes are not enough for the real ramp (06:22 UTC; `rigid_pilot128p_attn_direct_ramp`, the plain transformer on v0r's first shard): Physics 101 81.2 mm, no slide, as predicted -- episodes are recorded settled, so every object the data shows at rest on a slope stays; the real cube is released at t = 0. A network without the layer needs release events in its data (an object held on a slope and let go): a "which data" item, not built.** **The rigid 2 x 2 (06:59 UTC; plain transformer, all inputs given; shard 8 unseen): one frame 128 x 12k 0.539, 1,024 x 12k 0.568, 128 x 36k 0.454, 1,024 x 36k 0.447 -- steps set the one-frame fit almost whatever the data (1,024 against 128 at 36k: -0.012 [-0.045, +0.019]); episodes close the train / unseen gap (own 0.476 against 0.411) and make replays closer (moved bodies 2.9 against 5.8 mm median at 2 s, closer in 76%). `rigid_pilot1024p_attn_direct_36k` is the first rigid network clearly ahead of B1 on both: one frame -0.133 [-0.234, -0.045], replay -6.1 [-8.2, -3.8] mm at 2 s. Running: 1,024 episodes x 108,000 steps (`outputs/lsim/rigid_direct_long2.sh`, GPU 5, ~22 h, predicted 0.37-0.42), and the yaw at 36k (`outputs/lsim/rigid_direct_yaw36k.sh`, GPU 6). **Size with long training (2026-11-25, `rigid_pilot1024p_attn_direct_big36k`, 8.5M, 1,024 x 36k): worse, 0.543 against 0.447 on shard 8 (+0.136 [+0.088, +0.202]), worse on its own episodes too and in replays (prediction "within 0.04" failed) -- at equal steps the larger network trains slower; size is not the lever, steps are.**** **Nine times the training (2026-11-25, `rigid_pilot1024p_attn_direct_108k`, 1,024 x 108k): one frame 0.368 on shard 8 against 0.447 (-0.103 [-0.138, -0.071], 31 of 32; shard 1 0.381; own 0.381, no gap; B1 -0.236), prediction 0.37-0.42 held -- but replays of moved bodies are no closer (2 s median 4.0 against 2.9 mm, mean level) and farther at the end (+8.3 [+4.1, +13.8] mm): one-frame fit and running alone have parted, as on cloth's third stretch; renders `outputs/lsim/render_rigid_held108k/`.** **The random yaw at 36,000 steps (128 episodes, 13:54 UTC) is extra data: own 0.462 against 0.411, unseen 0.465 / 0.441 against 0.501 / 0.454 (shard 1 -0.029 [-0.054, -0.004]), no gap left, replays of moved bodies closer at the end (-6.9 [-14.9, -0.2] mm) -- prediction held; the scale-up recipe is `--plain --aug 1`.** Reference table: scratch `rigid_ref_table.py <result tags>`.** New options, defaults unchanged: `Simulator(r_contact=, grip_force=, trunk=, touch_cv=)`, `l2_overfit.py --r_contact --grip_force --trunk --touch_cv`; `rollout` builds its windows with `near=model.near` |
+| 3 cloth; coverage-law study | 6-10 | **started 2026-10-20** (the user: rigid-only defeats the purpose of a learned simulator; go with deformables). Cloth teacher gate (`scripts/l0_cloth_gate.py`, page `docs/CLOTH_GATE.html`): **VBD fails** (not converged on light, stiff cloth), **Style3D fails** (resists rotation), XPBD explodes; **the explicit integrator passes all 12 checks** and is the fastest with self-contact. **Cloth episode generator built 2026-10-20** (`lsim.teacher.cloth_teacher`, `lsim.data.cloth`, `scripts/l1_generate_cloth.py`, DIRECTION.md "Phase 3: cloth episodes"): towels/napkins 15-50 cm, 6 starts (flat, over the edge, crumpled, draped on a scanned object, held, on a 10-40 deg plank), 7 gripper families (lift-drop, lift-place, drag, fold, shake, push, slide); **the first 16k episodes exposed four teacher defects the gate never tested** (pinches by a gripper driven into the plank/objects: 0.16% exploded; 12% of episodes ending self-crossed; undamped contact: towels bounced 28-49 mm; a fixed contact stiffness exploding light towels pressed into piles) -- all fixed and re-gated on the generating module itself (`scripts/l0_cloth_teacher_check.py`, all pass; DIRECTION.md "Phase 3"); **c1 regenerated 2026-10-20** (20,032 episodes + `c1_test` 1,024, fp32 positions, 0 exploded in 329 shards; 6.8 h on one GPU), the first version kept as `c1_pinch`. Cloth identifiability gate (`scripts/l1_cloth_gate.py`, per action, frame by frame against chaos), re-measured on the regenerated c1: **every parameter above 0.6** -- density 0.92, bending 0.89, stretch 0.80, friction 0.68 (G; the first teacher's friction was 0.53). **The fixed teacher is ~10x less chaotic** (same state, two runs: median 0.05 mm after 10 frames, 0.6 mm after one second, against 0.5 / 5.4 mm for the first teacher: undamped contact amplified float noise); the tail still diverges (p90 20 mm at one second), so G5 still applies there. **Cloth model path built** (DIRECTION.md "Phase 3: the cloth model"; `lsim.train.cloth_windows`, `lsim.model.cloth_net`, `lsim.train.cloth_train`, `scripts/l2_cloth_eval.py` / `l2_cloth_slots.py` (G4) / `l2_render_cloth.py`, `tests/test_cloth_physics.py`): per-vertex forces in units of the vertex weight (internal zero-sum on an unheld cloth, contact only where a contact edge is), an exact layer (gravity, the teacher's air drag implicit, Coulomb contact by default -- exact planes for table/floor/plank, points for objects, never pushing out -- held vertices given) that reproduces the teacher given its exact forces to p99 0.05 mm; per-frame attention across the cloth, the gripper's next move and accelerations as inputs, a Gaussian slot posterior and a one-step uncertainty head. Pilot (8k steps, 6.5k episodes): level with constant velocity over a frame on moving cloth, ahead at 1 s (p90 175 vs 365 mm); underfits (forces ~10% of g); width 256 fits no faster than 128. **v1 at step 8k** (DIRECTION.md "v1 overnight"): moving cloth at one second 59 mm median vs constant velocity 111 (p90 129 vs 353), but **resting cloth drifted 13 mm** -- the network held every table vertex up itself (92-99% of its weight: the chunk noise sank vertices below the default's reach) and layer 1 capped friction by the default's share alone, so towels slid. **Layer 2** (friction from the surface's whole normal impulse; planes push sunk vertices out) holds the same network's flat towels (30-frame errors 1.2 / 17 / 3.0 -> 0.0 / 3.2 / 0.0 mm). v1 stopped at 12k (kept); **v2 (layer 2, from scratch) at 8k: rest holds (0.05 mm), moving cloth unchanged (60 mm; one frame 1.5 vs constant velocity 0.8 mm) -- the forces are imprecise everywhere** (moving breakdown: worse than constant velocity over one frame in every family). The model's cloth stretched 1% in one step (teacher 0.01%): a strain-limit layer and a cloth-on-cloth layer were built, measured and **removed (the user, 2026-10-21: the point is to learn, not build)**; **v3 = v2 + a mesh-edge length loss** (`--edge 1`). **v2, v3, B2 trained to 24k (2026-10-21; DIRECTION.md "v2, v3 and B2 trained")**: v3 holds resting cloth to 0.05 mm over 1 s (B2 4.2), moving cloth 0.75 mm after a frame (constant velocity 0.80, B2 0.69) and 29 mm after 1 s (constant velocity 111, B2 39); **but the learned cloth stretches like rubber** -- edge strain 0.9% after a frame, 3.7% after ten (teacher 0.014%); B2 the same, the edge loss took off a third; renders: 3 of 4 held-out clips 178-183 mm off after 2 s (pages: CLOTH_GATE "The model", ARCHITECTURE "Cloth"). G4 moved: stretch read (corr 0.73), density/bending barely, friction not. **Hypothesis under test: the per-vertex 1 mm chunk noise** (the rigid recipe's size, not its kind) strains the inputs' edges by 7%, 10,000x the teacher's; `--noise rigid` (each cloth moved as a body + 2e-5 m white) fine-tuned v3 as `cloth_v4r` against the control `cloth_v4c`: **rejected** (one-frame / ten-frame strain 0.77% / 3.71% vs 0.96% / 3.70%). **The edge loss's weight is the lever** (fine-tunes at step 2,000: weight 1 / 10 / 100 -> 0.89 / 0.50 / 0.29% and 3.69 / 2.16 / 0.93%, position error unchanged); **v5 = v3's recipe with `--edge 100`, from scratch on GPU 3 (2026-10-22, ~8 h; `v5_chain.sh`)**, a fine-tune at 1,000 on GPU 4. **Real cloth (2026-10-22; DIRECTION.md "Real cloth")**: PhysTwin's 8 cloth recordings converted (`lsim.real.cloth`, `scripts/l1_real_cloth.py`: a 1 cm grid fitted to ~5k tracked points; grasp type per recording from its video); the dense tracks drift on folding cloth, so scores are against the 9 hand-annotated points (PhysTwin's protocol: fit on 70% of frames, predict the rest). The teacher with fitted material predicts the test frames 1.4-4x worse than PhysTwin's own fitted twin, about as well as no cloth forces on corner/edge lifts, its best materials at its range's edges; v3 is worst everywhere and diverges on long pinches. **The edge weight at 4,000 steps** (DIRECTION.md "v2, v3 and B2 trained"): 10 halves the stretch at no cost in position (0.46% / 2.04%; moving 0.72 / 8.5 / 29 mm), 100 cuts it 3-5x but moving cloth worsens (1.14 / 11.4 / 46 mm), 1,000 worse still; on real cloth the loss stops v3's divergence on long pinches but no weight beats the layer alone (88-99 vs 72 mm). **PGND converted 2026-10-22** (`lsim.real.pgnd`, `scripts/l1_real_cloth_pgnd.py`; DIRECTION.md "Real cloth"): its trajectories are a first-frame cloud carried by a velocity field (7.6 mm off the observed surface after 2 s, lagging fast motion), so each window is unrolled (Isomap) and fitted at its observed first frame, tracked 10 frames, driven by the robot's path, and **scored against the observed clouds 2 s and 4 s on**; long tracking through the carried points failed (dropped, not built). 175 of 407 windows converted when its 32 forked workers wedged the NVIDIA driver (rule below); all 407 after the reset (2026-10-23). **On PGND the fitted teacher is twice as good as every model** (held-out recordings, 2 s / 4 s: teacher 15.8 / 16.8 mm, PGND's own carried points 14.3 at 2 s, layer alone 33 / 39, v3 32 / 51, higher edge weights worse) -- claim 3's target is 16 mm. The model's real rollouts are chaotic (gradients through 53 frames reach 1e14), so **the fine-tune on observations** (`lsim.train.cloth_real`, `scripts/l2_real_cloth_finetune.py`: cloud distance at frames 60 / 120, gradients through the 10 frames before each) ran from v3 as `cloth_r0` / `cloth_r1` and **gamed the one-sided score** (6.5 mm by blowing the cloth up 17,500x; rule below) -- now two-sided as `cloth_r2` / `cloth_r3`. **v3 is a poor copy of its teacher over seconds** (c1_test from frame 7: 34 / 127 / 200 mm at 1 / 2 / 3.8 s; PGND windows 37 / 62 / 139): the horizon, not the scene. **v6 = v3 + a long-rollout loss** (`cloth_train --roll 60 / 100`, `v6a` / `v6b`, `outputs/lsim/train_cloth_v6.sh`, scored by `outputs/lsim/v6_chain.sh` with `scripts/l2_cloth_long.py`); teacher episodes on PGND's windows (two grippers, 50-63 cm) in `data/datasets/c1_pgnd` for the coverage arm. **Since (2026-10-23/25):** the corrected real fine-tune (reverse distance unclipped + a strain loss; clipped it was gamed again, 350,000x area) halves v3's real error without gaming (r5: 23.2 / 25.3 mm vs the fitted teacher 15.8 / 16.8) and **plateaus there whatever the data (10-285 windows), init, weighting or gradient depth** (deeper than 10 frames diverges); the student ignores a given material (given = hidden within 0.3 mm, on real and teacher data). v6 at lr 3e-4 eroded the one-step fit; **v6e (lr 3e-5, 100-frame rollouts) is the first model well ahead of a still cloth over seconds** (c1_test 30 / 85 / 107 mm at 1 / 2 / 3.8 s; still 57 / 144 / 168, v3 34 / 127 / 198) and plateaus there (checkpoints swing +-10 mm: compare paired, rule below); the coverage arm (v6g), given slots (v6h), more rollouts (v6i), weight averaging, lower lr do not move it; a hidden material explains at most ~20 mm. **v7** (v3's recipe 4x longer) tests whether step precision is the floor; stopped at 45k (2026-10-26) for **a Qwen3-style network** (the user: follow Qwen, ~500M; `lsim.model.cloth_qwen`, `cloth_train --arch qwen`, DIRECTION.md "Real cloth" last bullets): pre-RMSNorm, GQA + QK-norm, SwiGLU, no biases, divided space-time attention with rotary positions on (rest u, v) and frame, no message passing (precise local geometry as token inputs); 509M at 10.9 s / step on one A6000 after optimisation; **training since 2026-10-28: 509M on 4 GPUs (~50 h) and 64M on 2 (~17 h), same 192k windows**. **64M (2026-10-29)**: one-step training alone matches v6e over seconds (c1_test 27 / 72 / 108 mm), the long-rollout fine-tune takes it to 25 / 65 / 86 at step 500; before real data it shreds PGND's cloth (8.4x area at 4 s; renders: `scripts/l2_render_real_cloth_pgnd.py`), **after r5's real fine-tune it is level with the fitted teacher** (17.8 / 18.1 vs 15.8 / 16.8 mm; paired +2.0 [+0.2, +3.9] / +1.3 [-0.9, +3.6]; r5 23.1 / 25.3): the real plateau was the network's capacity. **Beyond cloth (2026-10-30, the user: ropes and squishy objects are the basics)**: rope gate (`scripts/l0_rope_gate.py`) and soft-body gate (`scripts/l0_soft_gate.py`) -- **the explicit integrator passes both, with our bending/contact (rope) and our contact, stick friction and strain-rate damping (soft, `semi_pm`); VBD, XPBD (and MPM) fail both**; linear tets lock in bending (>= ~8 tets through a bending section). **Fit first (the user, 2026-11-06: fit the data, then decide whether to scale beyond 20k, then which data, then which post-training; DIRECTION.md "Why it does not fit" and the bullets after it)**: the 64M network leaves ~2/3 of the frame-to-frame acceleration unexplained (error / constant velocity 0.67 on free cloth). Ruled out as the cause, each by a test: data size (train = test error), the training noise (clean training 1.85 -> 1.77 mm), bf16 (fp32 1.72), stiffness (Spearman +0.07), the objective (side heads apart 0.848 vs 0.819 mm), the network type (graph and Qwen fit alike), 30 fps (60 / 120 fps: 0.84 / 0.80), contact (free cloth carries 87% of the squared error), global coupling (one frame reaches ~4-8 cm). **The inputs carry the next frame** (the teacher restarted from 3 frame positions: 0.25): the learned map is the bottleneck. **Space, not time** (2026-11-19): given the teacher's true velocities (`--oracle_v`, record_v data c1v) the same network reaches 0.80 on free cloth against 0.84 from positions (paired -0.035 [-0.053, -0.017]; teacher from its full state 0.01): it fails to learn the one-frame map from the full state. **The map is set by the material and the network ignores it** (2026-11-19, DIRECTION.md "The map is set by the material"): the teacher's next frame moves 0.90 of constant velocity's error under another episode's material (bending x2 alone 0.48; twice the substeps 0.015: converged), the network's 0.06; from 3 frames the teacher reaches 0.24 with its own material, 1.00 with another's. At one material it fit no better (c1m: 0.90 vs 0.85) -- **withdrawn 2026-11-21**: at one material the slot posterior's variance collapses and its gradient (100-500 vs ~5) swamps the position signal under the shared gradient clip. A local MLP on each vertex's 9x9 grid stencil (3 frames, own axes) is data-limited on c1 (`scripts/l1_local_probe_scale.py`: 0.68 from 13.7k episodes, -0.07 per decade, a train/test gap). **Correction (2026-11-20; DIRECTION.md "The 8,000-step networks were early in training"): every 8,000-step / 1-GPU comparison (ck1 and its variants) saw 1/6 of q64's windows; the fit is compute-limited** (same 300 c1_test windows, free cloth: ck1 0.87, q64 along its run 0.78 -> 0.67; training windows score like held-out ones), and **fully trained the network is level with the local rule** (2,000 windows, its vertices: q64 0.667 vs the MLP 0.68; ck1 0.87, where ~190 episodes put the local rule). The stencil input (`--patch 4`) is worth ~2x the windows at 8,000 steps (-0.09 vs ck1, level with q64 at the same step). Running (`outputs/lsim/full_compute_chain.sh`, ~20 h): q64's recipe + `--patch 4`, and q64 continued for another 24k steps -- does the fit keep falling past the local rule's level, or stall where more episodes become the lever? **Mid-run (2026-11-20; DIRECTION.md "At equal windows neither 8x the parameters nor the stencil moves the fit")**: 509M at the same windows seen is level with 64M (192k: 0.686 vs 0.672, paired +0.014 [-0.004, +0.032]; train = test for both), and the stencil at full compute is level with q64 at the same steps (8k / 12k: -0.019 / +0.002) -- optimisation length is the lever left; the trainer's 64-window val swings +-0.1 mm (the 509M's 0.53 vs 0.73 did not survive the 300-window metric). **Final (2026-11-20; DIRECTION.md "Final")**: twice the training (`cloth_q64_cont`) -0.02 on every set (c1_test 0.656, 2,000 windows 0.634, local-rule vertices 0.646 vs the MLP 0.66-0.68), no gap opens (held-out - train offset +0.02 for every run) -> **scaling beyond 20k episodes is not indicated by the fit**; the stencil at full compute level over one frame but -14 mm at 3.8 s (109 vs 123) with strain 5.5% vs 29%. **Not the material** (`scripts/l1_teacher_blind.py`): the teacher averaged over prior materials scores 0.74 on all materials and 0.43 at one material; the networks ~0.63 and ~0.65, and still ignore a given material (response 0.04-0.07 vs the teacher's 0.90). **Fine-tunes (2026-11-21; DIRECTION.md "Three fine-tunes")**: more annealing 0.000, no chunk noise or pushforward -0.007 (the noise costs ~0.01: not the cause); one material made even its own training windows worse (+0.087) because of the same slot collapse -- rerun with `--side_apart` (2026-11-21): **one material fits no better** (c1m_test 0.628 vs 0.632 mixed, paired -0.004 [-0.009, +0.001]; the teacher from the same 3 frames 0.255) -- not the material; `--side_apart` alone -0.013 to -0.018 (keep it). **Not precision** (the control fine-tune in fp32 throughout, `outputs/lsim/fp32_ft_chain.sh`: +0.003 [-0.002, +0.010] against bf16); **not stiffness** (`scripts/l1_teacher_precision.py`: the teacher from 3 frames jittered per vertex 30 / 100 / 300 um: 0.26 / 0.30 / 0.52; the map needs ~100 um, the inputs carry far more). **The error is calibrated shrinkage with the motion's own scale** (`scripts/l2_error_scale.py`, `l2_error_field_plot.py`): predicted acceleration regressed on true 0.645, best rescale 0.98, its spatial scale that of the acceleration itself; it misses bands that sweep across the cloth -- but **not waves, not one mechanism** (`scripts/l2_error_by_kind.py`, `l2_error_normal.py`: every family, phase and material tercile within 0.53-0.77, fast-wave cloth fits better; normal and in-plane halves alike, 0.70 / 0.59 regression), and **its response to input detail is ~60% of the teacher's** (`scripts/l2_input_jitter.py`), except a shortcut: it reads the clean frames' 1e-4 strains through asinh(1e5 strain) (10 um jitter moves its prediction 0.17 of the signal, all through that feature; worth ~0.04 of its accuracy; absent in real data and in its own rollouts). The trunk's gradient comes from moving cloth (`scripts/l2_grad_split.py`); a 4-window gradient is nearly all sampling noise at the end of training. **Not the frame rate** (the 30 / 120 fps networks at 3x the training, `outputs/lsim/fps_cont_chain.sh`, paired on the same instants): 120 fps keeps a lead after one 30 fps frame (0.96 vs 1.32 mm, -0.36 [-0.46, -0.27]) and less stretch (0.41-0.68x), but none after four (4.85 vs 4.77, +0.09 [-0.20, +0.37]; at 8k steps it led by 0.70) -- no data at a higher rate. (caveat: both trained `--pf 4`, so the horizons practised differ 4x). **The micrometre "shortcut" is worth ~0.01 and the feature is the network's stretch gauge -- keep it** (`outputs/lsim/no_micro_chain.sh`, 4,000-step fine-tunes vs the side-apart control): trained on inputs jittered 10 um (`cloth_train --in_jit 1e-5`) one frame +0.013 on clean inputs (level on jittered), level over 3.8 s (109 vs 113 mm) and on PGND (31 vs 32 mm at 4 s); with asinh(1e5 strain) zeroed (`--drop_fine`) one frame +0.006 but rollouts worse (131 mm, cloths blow up: strain 73% vs 28%) and **the stretch modulus is no longer read (corr 0.77 -> 0.06): claim 2's stretch reading comes from 1e-4 strains, simulation precision.** **At one material the slot NLL's gradient must be kept off the trunk (`--side_apart`)**: any data where a slot never varies collapses its variance. **Fit stage closed; the coverage study (claim 1) running since 2026-11-22** (the user: "Move to which data, run the coverage test"; DIRECTION.md "The coverage study, cloth"; `outputs/lsim/coverage_chain.sh`): six 64M networks from scratch at equal compute (12k steps x 1 GPU), trained on 2,000 episodes of one gripper family (drag; lift_place), two, five, 8,000 of the same five (the trajectory control) and all seven (the ceiling); fold and shake held out of all but the last (`scripts/l1_coverage_subsets.py`, `cloth_train --subset`), scored family by family by `scripts/l2_coverage_score.py`. **The small-fit test (2026-11-22, the user: "can we even fit the teacher on small data?"; DIRECTION.md "The small-fit test"): the trainer cannot fit ONE episode (0.64 of constant velocity on its own episode, 0.70 on 16, rollouts of its own episodes explode) -- the full-data ceiling at every data size.** One fixed window is memorised to 0.01 and 8 windows of an episode to 0.06 (`scripts/l2_overfit_batch.py`), but re-yawed every step as the trainer does they stall at 0.71: **in world coordinates every orientation is a new example.** `cloth_train --own` (`cloth_qwen._forward_own`: every vector a cloth token reads and gives in the vertex's own frame, plus gravity and the grip in that frame) follows the un-yawed curve on the re-yawed windows (0.050 at step 1,200 vs 0.72; the shift alone, a random shorter past and the side heads cost nothing: 0.048 / 0.065 / 0.072 against 0.063 as they are). **Through the trainer as it is, one episode: world frame 0.641, without the augmentation 0.101, `--own` 0.092** -- the ceiling was the rotation. **But `--own` did not cancel gravity on held-out cloth** (16 episodes, held-out val 4.6-5.4 mm vs 1.6 world frame; vertical error on held cloth 5.1 vs 1.5 mm, the exact layer alone 5.7): 'up' is a constant in world coordinates and a function of the frame's tilt in a vertex's own -- the problem's symmetry is a yaw and a shift, gravity names the vertical. **`--own_up`** (`--own` + the world-z part of every vector a cloth token reads and a zero-initialised force head along world z) gives it back (held-out val 2.20 / 1.62 mm at 500 / 1,000 steps vs 2.46 / 1.58 world frame) and is the candidate. **Fitting the frames is not a replay**: the no-noise one-episode networks multiply their own error ~4x per frame (216-550 mm after 1 s); with the chunk noise and pushforward the `--own` one replays its episode to 12 / 40 / 93 mm at 1 s / 2 s / 3.8 s (still cloth 283 / 311 / 272) -- rendered, it follows for about a second, then stretches and crumples (area 3.1x). **The world-frame network at one orientation with the same noise replays its episode "cleanly" (`cloth_fit_1_noaug_pf`: frames 0.160, replay 8.7 / 4.8 / 17 mm at 1 s / 2 s / 3.8 s; `outputs/lsim/render_small_fit/`) -- and that is a recital, not a simulation: the teacher itself, restarted from the same recorded frame, ends 21 / 44 / 85 / 231 / 687 mm from its own recording of that episode** (`scripts/l1_teacher_chaos.py --shard`; it agrees to 2-7 mm while the gripper holds the towel and fans out within 0.3 s of the release; over 16 c1 episodes exact restarts end over 40 mm off in 23 of 80; 48 fresh episodes from the true state: median 0.0 / 0.3 / 0.7 mm at 1 / 2 / 3.8 s, mean 2.8 / 11.6 / 14, p90 5 / 39 / 45). The own-frame networks' endings (`--own_up` 30-76 mm, `--own` 93-98) lie inside the teacher's own spread; what is left to them on that episode is 3-18 mm against the teacher's 2-5 while the cloth is held, and stretch (16-62% against none). **One episode trained 3x longer (`cloth_fit_1_ownup_pf12k`, `--own_up`, the trainer as it is, 12,000 steps): frames 0.044, replay 0.5-0.6 mm at 1 s, 0.6-0.7 at 2 s, at most 1.1 mm until the release, 13 mm at the end, strain 3-4% -- the N = 1 proof is complete (fit and reproduce a teacher episode to under a millimetre while it is reproducible at all), the 4,000-step replays' drift and stretch were under-training, and at 13 mm it too recites the film (below all five teacher restarts); ~460 views per window, so memorising does not scale.** Earlier, at 4,000 steps: **why `--own` replays worse than the world-frame network: the frames themselves** (not the augmentation, not the random shorter past: `replay_attrib.sh`); the vertical halves the first two seconds (12 / 40 -> 5-7 / 16 mm). **Sixteen episodes, 8,000 steps, on their own 16: world frame 0.70, without the augmentation 0.53, `--own` 0.59, `--own_up` 0.40 and still falling.** **The 2,000-episode held-out comparison, `cloth_cov_seven_ownup` against its world-frame twin `cloth_cov_seven`** (`ownup_seven.sh`; same 1,400 held-out windows, error / constant velocity): step 3,000 0.949 vs 1.163 (-0.214 [-0.269, -0.177]), **step 6,000 0.866 vs 0.973 (-0.106 [-0.132, -0.089])**, every family; `--own_up` at 6,000 = the twin at 9,000-12,000 (0.867 / 0.871), train = held-out (0.844 / 0.866) -- worth 2x the steps; **step 9,000: 0.780 vs 0.867 (-0.086 [-0.109, -0.070]), below where the twin ends (0.871, flat from 9,000): it ends lower at equal compute, not `--patch 4`'s pattern**; **held-out rollouts at step 6,000 on the same 112 episodes: 37 / 105 / 151 mm at 1 s / 2 s / 3.8 s against the twin's 65 / 245 / 296 (-28 [-36, -21] / -140 [-168, -113] / -145 [-179, -111]; strain 166% vs 289%, both mid-training)**; **final, step 11,999: one frame 0.753 vs 0.871 (-0.118 [-0.142, -0.101], every family; the lead widened as the twin stalled); rollouts on the same 336 held-out episodes 25.6 / 78.8 / 115.4 mm against 42.5 / 135.3 / 170.6 (-17 [-21, -14] / -56 [-65, -48] / -55 [-67, -43], closer in 71-77% of episodes); strain mean 61% vs 50% but median 11% vs 32%, area median 1.00 vs 0.79 -- its cloth typically keeps its size where the twin's shrinks, and a tail blows up (area 2.5-3.3x mean in fold, shake, the lifts). Against the best full-data world-frame network (`cloth_q64_cont`, 10x the episodes, 8x the windows): one frame worse (0.753 vs 0.667), rollouts level (+1 / -1 / -6 mm, intervals through zero).** No train / held-out gap (its own 2,000 episodes 0.736 vs 0.753 held-out, the usual +0.02). Rendered on four held-out episodes (`outputs/lsim/render_heldout_pair/pair_figure.jpg`): neither follows the teacher over seconds. **All 20,032 episodes at the 2,000-episode run's exact compute (`cloth_cov_all_ownup`, `outputs/lsim/ownup_all.sh`): one frame 0.754 against 0.753 (+0.001 [-0.007, +0.012]) -- the prediction held, 10x the data adds nothing at this compute; rollouts 27.9 / 85.8 / 133.9 mm against 25.6 / 78.8 / 115.4 (+2 / +7 / +18.5 [+10.6, +27.0]: worse at 3.8 s, outside the predicted band) with half the stretch (strain 32% vs 61%, area 1.54 vs 2.23).** **What a decade of data is worth at FULL compute (`outputs/lsim/own2k_full.sh`, `cloth_q64_ownup_2k`: the 2,000-episode subset at the full run's 24,000 steps x 2 GPUs; ended 2026-11-24): 0.015 on one frame -- held-out 0.603 against the full-data run's 0.588 (+0.015 [+0.007, +0.024]), its own episodes 0.584 (a gap of 0.019; the full-data run has none), rollouts 18.6 / 68.9 / 102.1 mm against 17.6 / 64.7 / 97.0 (+1.0 [+0.2, +1.9] / +4.3 [-0.4, +9.8] / +5.1 [-1.7, +12.2]). Just under the predicted bands (0.02-0.05; gap 0.03-0.05) and between the decision rule's thresholds, and the full-data network has no gap left for data to close: SCALING BEYOND 20k EPISODES IS NOT INDICATED (the question returns if a later network opens a train / held-out gap). Levers measured on this network: 4x the compute 0.753 -> 0.59-0.60, the local frame 0.688 -> 0.588, 10x the data 0.603 -> 0.588.** **200 episodes at the same compute (`cloth_cov200_ownup`): held-out 0.781 (2,000 episodes 0.753: -0.028 [-0.043, -0.015] for 10x the episodes), its own episodes 0.722 -- a 0.06 gap where 2,000 has 0.017; the training fit is the same at both sizes (set by compute), data only closes the gap; and it beats the world-frame network on 2,000 (0.871). Its held-out rollouts equal the 2,000-episode run's (26.5 / 78.8 / 114.5 vs 25.6 / 78.8 / 115.4 mm, strain 39% vs 61%) -- three networks sit at ~25 / 79 / 115-122 mm (`--own_up` on 200 and 2,000 episodes, `cloth_q64_cont`) whatever their one-frame fit (0.78 / 0.75 / 0.67); what sets that rollout level is open.** **The full-data run `cloth_q64_ownup` (q64's recipe + `--side_apart --own_up`, GPUs 6-7, ~17 h, `outputs/lsim/full_ownup.sh`) was launched 2026-11-22 20:30 UTC** with a prediction on file (DIRECTION.md: one frame ~0.656, the twice-as-long run's level -- faster, not lower; q64 by checkpoint 0.959 / 0.809 / 0.731 / 0.688 at 4k / 8k / 16k / 24k, seven-family mean of `l2_coverage_score`) and a stop rule in the script (stop if the pair's last two checkpoints put `--own_up` level or behind on one frame AND its rollouts at 11,999 are no better than the twin's 42 / 135 / 170 mm). **Its step 4,000 on c1_test: 0.883 against q64's 0.959 at the same step (-0.075 [-0.095, -0.056]; six families of seven, drag +0.043); step 6,000 0.824 vs 0.849 (-0.026 [-0.047, -0.007]); step 8,000 0.816 vs 0.809 (+0.007 [-0.012, +0.027]); step 10,000 0.742 vs 0.768 (-0.026 [-0.046, -0.007]); step 12,000 0.716 vs 0.785 (-0.069 [-0.091, -0.050], every family); **step 16,000 0.638 vs 0.731 (-0.093 [-0.113, -0.076], every family): two thirds through, already below q64's end (0.688), `cloth_q64_cont` (0.667) and the prediction written for its own end (~0.656) -- lower, not only faster** (single checkpoints swing +-0.04); **FINAL, step 23,999 (2026-11-23): one frame 0.588 against q64's 0.688 (-0.100 [-0.120, -0.082]) and `cloth_q64_cont`'s 0.667 (-0.079 [-0.098, -0.063]), every family; rollouts on 336 held-out episodes 17.6 / 64.7 / 97.0 mm at 1 s / 2 s / 3.8 s against `cloth_q64_cont`'s 24.4 / 79.6 / 121.7 (-6.8 [-8.5, -5.2] / -14.9 [-20.8, -9.8] / -24.8 [-33.3, -15.9]), strain 11.9% against 38.6% (median 3.4% vs 24%), area median 0.98 vs 0.69 -- `cloth_q64_ownup/step23999.pt` is the best cloth network on every measure; the prediction (~0.656, faster not lower) failed in the good direction** (its score on 2,000 of its training episodes 0.599: no train / held-out gap at full data either; four held-out episodes rendered beside `cloth_q64_cont` in `outputs/lsim/render_heldout_full/pair_figure.jpg`: it keeps the cloth's size, reproduces the dropped towel to 17 mm, is still 113-123 mm off on the fold and the shake, and in the push both leave the towel at the table's edge where the teacher's slides off, ~0.7 m; `outputs/lsim/full_final_extras.sh`); **on real cloth before any real data (PGND held-out, tag `q64_ownup`) it is 31.2 / 44.9 mm at 2 s / 4 s -- no closer than the layer alone (33.2 / 39.4), behind `fp_ctl_sa` (22.0 / 31.9) -- but keeps the cloth's shape (strain 4.5% / 6.2%, area 1.0x / 1.2x; q64: 162% and 8.4x at 4 s); r5's real fine-tune of it as run for q64 (`outputs/lsim/real_ft_ownup.sh`, `cloth_rq64_ownup`) ended level with `rq64`, as predicted, with a quarter of the stretch: 17.6 / 19.8 mm at 2 s / 4 s against 17.7 / 18.2 (paired -0.1 [-2.1, +1.8] / +1.6 [-0.5, +3.6]), strain 1.8% / 1.9% against 7.4% / 8.0% (lower in every window), area 1.0x against 0.8x, reverse distance 12.8 / 13.1 against 10.9 / 10.8 (`rq64`'s cloth is 20% smaller); not below the fitted teacher (15.8 / 16.8) -- claim 3 not shown, the real plateau at ~18 mm is reached by two networks of different frames and teacher fits**; **the cloth layer ALONE scores 2.22 of constant velocity over one frame (tag `cov_cloth_layer_alone`: the best network with its force heads zeroed; 1.93-2.85 by family) -- every cloth network started from there, and the current one has never been trained without the layer; the twin without the layer (`outputs/lsim/direct_seven.sh`, `cloth_cov_seven_ownup_direct`, 2,000 episodes, 12k steps) started ahead on one frame (3k / 6k: -0.042 / -0.038) and ENDED LEVEL (0.747 against 0.753, -0.006 [-0.029, +0.014]; behind by 0.02-0.03 in five families, far ahead only on push, 0.770 against 0.921), with much worse rollouts (34.7 / 110 / 191 mm against 25.6 / 78.8 / 115.4; mean area 4.9x against 2.2x): for cloth the layer does not limit the fit and keeps rollouts stable -- KEEP it; where it costs is the push family (the gripper driving contact, as for rigid)**; **THE COMPUTE LEVER (`outputs/lsim/full_ownup_cont.sh`, `cloth_q64_ownup_cont`: another 24,000 steps from step 23,999; ended 2026-11-24): one frame 0.520 against 0.588 (-0.068 [-0.078, -0.058], every family), 0.539 on its training episodes (no gap), rollouts 15.0 / 57.2 / 85.1 mm against 17.6 / 64.7 / 97.0 (-2.6 / -7.4 / -11.9 [-19.0, -5.7]), strain 6.1% against 11.9% (median 1.3%) -- the prediction (0.555-0.575) was too timid; twice the training is worth 0.068 where ten times the data was worth 0.015: training length is the lever and `cloth_q64_ownup_cont/step23999.pt` is the best cloth network on every measure. **The third 24,000 steps (`outputs/lsim/full_ownup_cont2.sh`, `cloth_q64_ownup_cont2`, 72k in all; 2026-11-25): one frame 0.486 against 0.520 (-0.034 [-0.041, -0.028], every family; prediction 0.475-0.500 held), 0.495 on its training episodes (no gap), rollouts 14.5 / 53.5 / 77.9 mm against 15.0 / 57.2 / 85.1 (-0.6 [-1.2, +0.2] / -3.8 [-7.3, -1.0] / -7.2 [-13.3, -2.1]; prediction 76-84 held) -- BUT a blow-up tail grew: 21 of 336 held-out rollouts end above 2x area against 6 (strain mean 16.6% against 6.1%, median 1.0 vs 1.3%, area mean 1.58 vs 1.04). The tail is real (`outputs/lsim/cont_tail_check.sh`: 27 at cont2's step 20,000, 12 at cont's -- cont swings 6-12; paired at step 20,000 area +0.61 [+0.34, +0.95], 2 s -3.7 mm); on PGND before real data 24.4 / 32.4 mm against 25.6 / 34.7 (level-to-closer) but strain 30% and area 3.4x at 4 s against 6% / 1.3x (`outputs/lsim/cont2_extras.sh`); the four fixed episodes do not show it (push no longer stretched 4x); rendered with the material given, a scored 14.7x blow-up does not blow up and another is 9.2x not 16.7x: the rollouts sit near an instability (`render_heldout_tail/`). Which cloth network is the reference waits on its `--given` twin from the same start (`full_ownup_cont2_given.sh`, ~19:00 UTC 2026-11-25; it also scores cont2 with the material given). **The pushforward trial (`outputs/lsim/pf_trial.sh`, started 2026-11-25 ~08:05 UTC, prediction in its header): short fine-tunes of cont2 (3,000 steps, `--given`) and of the rigid 108k network (6,000 steps) that run alone for longer in training -- cloth pf 4 / 8 / 16, rigid pf 6 / 16 / 30 (new `--K`, chunk frames per window, in `cloth_train` and `l2_overfit.py`; also `l2_overfit.py --init --save_every`) -- does practising longer on its own output remove the blow-ups and the creep?**; **on PGND before real data it is 25.6 / 34.7 mm (24k: 31.2 / 44.9; closer by 5.6 [2.2, 9.5] / 10.2 [2.0, 19.0]) with 4-6% strain -- the teacher fit now carries to real cloth; its real fine-tune (`outputs/lsim/real_ft_ownup_cont.sh`, `cloth_rq64_ownup_cont`; predicted level with 17.6) WENT UNSTABLE (2026-11-24): 26.2 / 28.9 mm against 17.6 / 19.8, area 1.6x; gradients 10-200x the 24k network's under the same settings, real training windows stretched to 150% -- r5's settings do not carry to the sharper network; a gentler fine-tune waits (post-training is last in the user's order). Rendered on the four fixed held-out episodes (`render_heldout_full/*_pair_cont.mp4`): follows the fold (41 mm; 24k 123), slides the pushed towel off the edge like the teacher but stretches it 4x while falling, worse on the shake (156 mm; 24k 113)** -- in the middle of the run on all the data with 2 GPUs the one-frame lead shrinks to 0.02-0.03 after 4,000 steps (carried by drag, push, slide; one checkpoint in three loses it to the swing), where the 2,000-episode pair on 1 GPU kept 0.09-0.12 to the end. Hypotheses for the difference: `--own_up` gains per optimiser step rather than per window (0.753 at 48k windows as 12,000 steps x batch 4, 0.824 as 6,000 x batch 8), or the anneal; `cloth_cov_all_ownup` separates them. Rollouts of both at 8,000 (336 held-out episodes): 31.7 / 109.9 / 139.0 mm against 42.6 / 149.2 / 285.2 (-11 / -39 / -146), strain 24% vs 423%, area 1.29x vs 14.9x -- level on one frame, but the own-frame network already keeps the cloth's shape where the world-frame one still blows it up (it settles later: `cloth_q64_cont` 24 / 80 / 122).** Later checkpoints are scored by `outputs/lsim/full_pair_step.sh <step>` (both networks; mid-schedule checkpoints swing, read several), rollouts of both at 8,000 by `full_pair_mid.sh`. **The coverage study's result: its prediction failed and it cannot answer with networks that do not fit** (one frame on held-out fold / shake: lift-and-place alone 0.78 / 0.73, two families 0.86 / 0.80, five 0.90 / 0.90, 8,000 of the five 0.85 / 0.78, all seven 0.87 / 0.84; drag alone 1.06 / 1.05; no arm fits its own families, 0.66-0.98) -- transfer follows the kind of motion, but at equal compute more families only dilute; re-ask it when a network fits what it trains on. |
+| 4 real fine-tune (HOT3D, ARCTIC, OakInk2, PhysTwin) | 10-14 | -- |
+| 5 write-up | 14-16 | -- |
+
+- **Teacher.** Isaac Sim 6.0 and Isaac Lab 3.0 want NVIDIA driver >= 580 (CUDA 13); this box
+  runs 575.57.08 (CUDA 12.9). The teacher is therefore standalone Newton, **pinned at 1.7.0
+  (mujoco-warp 3.15.0, warp 1.18.0+cu12)**; every T0 number belongs to that version. Which
+  Newton solver teaches is decided by the solver bake-off (`scripts/l0_solver_bakeoff.py`),
+  not by Isaac Lab's default. PhysX (Isaac Sim) waits on a driver update.
+- **Gate the teacher before generating any dataset** (T0, `scripts/l0_teacher_gate.py`): a
+  dataset inherits every teacher defect. Ramp slide law within 2%, drop restitution within
+  0.05 of its label, free-flight momentum, resting drift < 1 mm/s, penetration < 2 mm, cloth
+  inside a spatial bound, Physics 101 slides within 2 mm, throughput measured.
+- **Teacher = Kamino** (Newton's hard-contact solver), chosen by the solver bake-off
+  (`scripts/l0_solver_bakeoff.py`, `docs/results/l0_solver_bakeoff.json`, DIRECTION.md "Solver
+  bake-off"): the only candidate right on every check -- slide law 0.0%, no creep, exact stacking
+  and joint limits, restitution independent of friction, concave meshes, contact forces within
+  4%, different objects per parallel world, 0.69 mm on the 93 real Physics 101 slides.
+  **MuJoCo-Warp (the Isaac Lab default) is rejected**: its soft contacts tie restitution to static
+  friction, so a bouncy cube slides 10-1,700 mm/s down a 20 deg slope it should rest on.
+  Kamino is BETA in Newton 1.7 and ~11k six-second mesh episodes per GPU-hour; keep batches at
+  <= 256-512 worlds (int32 overflow at 1,024), `max_contacts_per_world` 512, unique shape labels.
+  All of this lives in `lsim.teacher.newton_teacher.Teacher`.
+- **Kamino collides objects as convex parts**: it makes no contacts between two moving triangle
+  meshes (they pass through each other). `scene.add_convex_parts` uses the CoACD parts.
+- **The gripper is a force-capped tracking controller** (60 N; 5-15 N in 20% of worlds), not a
+  kinematic body: kinematic grippers crush objects against the table at up to 303 kN.
+- **Cloth teacher = the explicit integrator** (`lsim.teacher.cloth_teacher`, `SolverSemiImplicit` at 1,000-2,100
+  substeps per 30 fps frame; stable while dt <= ~1/2 sqrt(m_vertex / Y), so substeps per batch come from its lightest,
+  stiffest cloth). Newton's VBD and Style3D run stably and settle, yet simulate a different cloth from the one they are
+  given (DIRECTION.md "Cloth teacher gate"). On top of Newton's explicit solver: per-edge bending stiffness in its
+  kernel's own units (2 x discrete shells / (A1 + A2)); our strain-rate membrane damping (Newton's damps rotation);
+  our contact -- penalty, damping and friction per unit mass (2e7 / s^2 critically damped, 2e4 / s below the Coulomb
+  cap: a fixed stiffness exploded light cloth in piles), the damping implicit over a vertex's active contacts; our
+  vertex-triangle AND edge-edge self-contact (2 mm; triangles alone let edges slip through); normal-velocity air
+  drag (rho Cd / 6 per triangle). The planner raises every gripper pose over a height map of the scene and places
+  force-guarded (a kinematic gripper pinches cloth against what it is driven into).
+- **Gate the module that generates the data, on what the data does**: the cloth gate ran its own copy of the physics
+  and never dropped, folded or piled cloth; the first 16k episodes bounced, crossed themselves and exploded in piles.
+  `scripts/l0_cloth_teacher_check.py` runs the closed forms through the generator's teacher plus bounce, crossing,
+  pile and generator-batch checks (explosions, contact over weight, self-crossings); rerun it after any teacher change.
+- **This box's driver is CUDA 12.9**: PyPI warp >= 1.18 is a CUDA 13 build and silently falls
+  back to CPU -- the `lsim` env uses the `+cu12` wheel from GitHub releases.
+- **Reproducibility**: Kamino reruns differ by < 0.05 mm; record seeds and use that tolerance.
+- **Identifiability is measured in the model's information setting** (`scripts/l1_gate.py`):
+  probe a RANDOM object (the most-pushed one hid that only 32% of objects were ever touched),
+  replay the gripper's RECORDED pose, and count a parameter as identified when what the model
+  sees changes -- motion, plus the gripper's force when the force slot is given. Pokes are
+  defined by their velocity change, so they never identify mass.
+- **The physics layer runs on frame-average velocities (two poses), with an implicit gyroscopic
+  term.** Instantaneous velocities cannot match an impact inside a frame; the explicit
+  gyroscopic term diverges at 30 Hz. Predicted slots reach it detached.
+- **Never `pkill -f <pattern>` (or wait on `pgrep -f <pattern>`) from a shell whose own command line contains the
+  pattern**: pkill kills the shell (exit 144), pgrep always finds it (a wait loop never ends). Find PIDs with
+  `ps aux | grep "[p]attern"` -- and only in a command that contains the plain pattern nowhere else (a heredoc or
+  comment naming the script killed the shell twice on 2026-10-23); kill and write scripts in separate commands.
+- **CPU worker pools never see a GPU**: importing anything under `lsim.teacher` (and so `lsim.real.cloth`/`pgnd`,
+  `lsim.data.cloth`) initialises warp's CUDA on every visible GPU. A 32-process `multiprocessing.Pool` forked from a
+  parent that had imported it wedged the NVIDIA driver's lock for the whole shared box (2026-10-22: every user's
+  `nvidia-smi` hung, the workers stuck in `os_acquire_rwlock_write`, unkillable). CPU-only scripts set
+  `CUDA_VISIBLE_DEVICES=""` before any import and use `get_context("spawn")` pools; never fork after CUDA is initialised.
+- **Judge rollout changes on 30-frame rollouts, resting and moving bodies apart** (the drift
+  diagnostic in DIRECTION.md "Resting objects drifted"), never on the 8-frame window rollout the
+  trainer logs: that ranked a diverging variant best. The large chunk noise (1 cm, 0.05 rad per
+  frame) is what keeps rollouts stable -- every variant with less of it grew bodies that leave.
+- **Contact forces are scaled per body pair** (`Simulator(pair_norm=True)`): reduced mass of the
+  two bodies over their number of contact pairs, so a resting body needs a mean output of 1.
+- **Contact with fixed surfaces is a default, not something the network learns**: the network starts
+  from free fall and cannot cancel gravity exactly. v0's default (`Simulator(support=True)`) held a
+  touching body up by m g, shared so that it passes through the CoM (zero torque; a CoM outside the
+  contacts keeps its torque and tips; without the balancing the prior itself turned resting bodies
+  1.3 deg per step) -- and so it also held bodies on slopes: Physics 101 83 mm, the cube never slid,
+  and training never released it. v1's default (`support="coulomb"`, `--coulomb`) is Coulomb contact:
+  normal force against gravity and the given pushes, friction that stops the body within a frame
+  capped at mu N (mu = average of the object's slot and the surface's, Kamino's rule), shared through
+  the CoM. Constant velocity (B0) is the reference for anything not moving; measure drift in VERTEX
+  error (rotation counts).
+- **Judge identifiability on chaotic data frame by frame, from the same state**: a towel that falls or folds
+  amplifies float-order noise (0.03 mm after two frames, 5 mm after one second), so whole-episode replays (21-33 mm apart unchanged) hide every
+  parameter; compare one second of response from the recorded state at first touch, with what is given (the
+  gripper path, the held vertices) held fixed, against the noise at the same frame.
+- **Judge a cloth solver by closed forms, not by whether it settles**: a hanging strip's extension w g L^2 / 2Y, the
+  Peirce cantilever against the heavy elastica, the slide law, free fall by a quadratic fit (one position carries
+  implicit Euler's g dt / 2 offset). VBD and Style3D are both stable and both wrong; a non-converged solver behaves
+  like a different material, and the dataset would teach that material. Check a test can fail before trusting a pass
+  (the fold counter saw 172 crossings in two crossing sheets; a flat-sticking drape needed a hang criterion).
+- **Judge a trained model against the law its default encodes, from clean history** (slide law, free
+  fall): full v1 slid at 20-30% of a = g(sin th - mu cos th) and, given 8 clean frames of a body already
+  sliding by the law, decelerated harder the faster it moved, where the default alone is exact and
+  100-episode runs barely drift. A deterministic force head on squared error predicts the mean future;
+  household bodies mostly stop soon, so the mean brakes.
+- **Recipe as of 2026-10-19** (DIRECTION.md "Rest has to be the default", "v1 tests"): `--pair_norm
+  --coulomb --pf 6 --noise 0.003,0.015 --mix` (v0 ran `--support` in place of `--coulomb`). The squared loss alone erodes rest (0.6 mm/step); the distance
+  loss alone lets moving bodies diverge; small noise needs the 6-frame pushforward to stay stable.
+- **Learn, don't build** (the user, 2026-10-21: "be careful to not build an entire simulator again, the point of this is to learn not build"). The exact layer holds only what the network demonstrably cannot learn -- gravity, F = ma, the teacher's air drag, held vertices, contact with fixed surfaces (the rigid track's lesson: it cannot cancel gravity exactly) -- and repairs to those. A model failure is answered on the learning side (losses, inputs, architecture, data, training), not with solver parts: a strain-limit projection and cloth-on-cloth contact both worked as layers and were removed for this reason.
+- **A default must stay the default under the training noise**: when the noise puts the state where the exact layer's default does not act (cloth vertices sunk into the table below its 1 mm reach), the network learns to do the default's job everywhere -- and whatever the default computed from its own share (friction from its normal impulse) silently goes. Cap friction by the whole normal impulse, whichever part supplies it, and keep the noise inside the default's reach (layer 2). Trace what the network outputs where the default alone is exact, and run every change to the layer with the network's outputs at zero on resting starts (`l2_cloth_eval.py --layer N` without a checkpoint): a projection run after the contact once slid overhanging towels off the table, which the network's tension had hidden.
+- **A score used as a loss must be checked on its blind side** (2026-10-23): fine-tuned on the one-sided
+  cloud-to-surface distance (chosen so a fold's hidden layer is not penalised), the cloth model "beat" its fitted
+  teacher (6.5 vs 15.8 mm) by blowing the cloth up to 17,500x its area -- a surface everywhere is near every point.
+  Report the reverse distance, strain and area beside any one-sided score (`l2_real_cloth_pgnd_eval.py` does), and
+  never optimise one direction alone.
+- **Compare checkpoints paired, with an interval, and never on one checkpoint** (2026-10-25): along a long-rollout
+  plateau adjacent checkpoints differ by +-10 mm at 2 s on the same 64 episodes (v6e2: 75.7 then 84.3), far more than
+  the episode sample's noise; a single good checkpoint looked like a trend. Bootstrap the per-episode difference.
+- **Check a training process's RAM before leaving it**: the shard loader once gave every episode its
+  own int64 copy of the shard's whole contact table -- 237 GB per DDP rank on this shared box
+  (killed at 28 min, swap full). Now ~13 MB per shard (~7 GB for v0 + v0r per process).
+- **Before a model diagnosis at scale, check it can fit a handful of its own training episodes** (2026-11-22): two weeks of full-data diagnostics ruled out a dozen causes of the 0.65 fit while the trainer could not fit ONE episode (0.64), which a 1-hour run shows. `scripts/l2_overfit_batch.py` (fixed windows, with any one part of the trainer's view switched on) and `scripts/l2_small_fit.py` (a run on N episodes scored on those episodes, rolled out on them) are the first tests of any change to the network, loss or batch construction. The same holds for a baseline brought in from outside (2026-11-24): WorldParticle trained 7.2 GPU-hours on 2,000 cloth episodes with our trainer and learned one constant (constant velocity, 1.00), which a one-episode run shows in 6 minutes (`scripts/l2_wp_small_fit.py`); five one-episode variants (loss horizon, length, precision, lr) all stay at 1.00 -- no WorldParticle result obtained, stopped there (DIRECTION.md, WorldParticle entry). And **check what is on a GPU before stopping a job to free one**: a coverage arm was stopped for a test that had already started elsewhere.
+- **Score the exact layer ALONE on moving bodies, beside constant velocity, before training anything on it** (2026-11-23, `scripts/l2_rigid_where.py`): the rigid layer with the network's outputs at zero is 1.74x worse than constant velocity over one frame on held-out moving bodies (exact in flight, level for a body alone on the table, 7 mm against 1.8 where the recorded gripper force acts, 24 mm where it presses one object against another), and a month of models -- v0, v1, every 128-episode pilot -- inherited that number while the gates looked at 30-frame rollouts. Where learning starts from is a property of the layer, measurable in ten minutes; a direct model starts at constant velocity by construction. And a recorded contact force is a reaction, not an input: integrate one explicitly and the next frame is a small difference of large forces.
+- **Invariance: remove the symmetry the problem has, no more** (2026-11-22). The trainer's random yaw made every orientation a new example for a network reading world-frame vectors (it could not fit one episode); per-vertex frames (`--own`) removed that and with it the vertical, so held-out cloth was no longer held against gravity. Gravity breaks rotation down to a yaw: keep world z as it is (`--own_up`). Check any new input frame on held-out episodes split by vertical / horizontal error (scratch `heldout_split.py`'s read), not only on what it trains on.
+- **A network that memorised a few episodes must be rolled out with windows built as in training** (2026-11-22): `cloth_train.rollout` builds one window over the whole rollout, so its static points are those near the cloth's whole sweep (1,166 tokens against a training window's 878 on c1's first episode); the fully trained network does not notice (12 held-out episodes, level), a one-episode network's first frame is 4x worse. `scripts/l2_small_fit.py`'s `replay` (and `l2_render_cloth.py export --replay`) rebuild the window every frame. And a one-frame fit is not a replay: without noise in training the replay explodes however well the frames fit.
+- **Before judging a replay or a long rollout, run the teacher's own restart of the same episode** (2026-11-22, `scripts/l1_teacher_chaos.py`): cloth after a release is chaotic at the 20-700 mm level within a second (five exact restarts of one episode end 21-687 mm apart; float-order noise alone), so an end distance below that spread is memorisation of a film, not accuracy, and one above it is not a defect. Read replays up to where the teacher's restarts agree, and by shape (strain, area). Aggregates over many held-out episodes stay meaningful (floor: mean 14 mm, p90 45 at 3.8 s). And the teacher itself explodes one frame after 1 mm per-vertex jitter (the chunk noise's size).
+- **Do not crowd a GPU that runs generators**: an OOM during overfit runs killed a v0r generator
+  (shards are resumable -- rerun the same command and it skips finished shards).
 
 ## Non-negotiable rules (each bought with a failure)
 
@@ -64,1234 +244,81 @@ by construction — and an external plausibility signal scores them. Hallucinati
    sensible hypotheses about a scale bug failed in a row; looking at the numbers found it.
 7. **Deterministic, seeded, cached.** Renders and scoring calls are the cost centres.
 
-## State
-
-### The simulator side is strong
-
-- **Exact mesh contact** (`src/sim/mesh_contact.py`, `mesh_scene.py`). Ground contact tests
-  mesh *vertices* against the plane — exact, since a linear function over a triangle is
-  minimised at a vertex. Body–body uses `wp.mesh_query_point_sign_normal` in the *other*
-  body's local frame, so each `wp.Mesh` is built once and never refitted. Replaced a sphere
-  cover that was 2.28 mm from the true surface.
-- **Per-body everything**: friction, mass, damping, contact stiffness. The **table is an
-  object** with its own μ and cd, combined by geometric mean.
-- Bounded tables, arbitrary initial orientation (`rot0`), exact reduced-coordinate revolute
-  joints with per-body damping, real-asset tetrahedralisation.
-
-### Probes
-
-| probe | reads | result | script |
-|---|---|---|---|
-| tilt | friction (vs table) | 0.40° residual, 3 cm–116 cm | `bigscene_sim.py` |
-| balance | **mass** of a real asset | 7/7, brackets 0.182 kg at [0.18, 0.22] | `probe_balance.py` |
-| bounce | damping | ρ = −0.995 | `probe_bounce_settle.py` |
-| settle | damping | ρ = +0.973 | `probe_bounce_settle.py` |
-| spin | friction (vs table) | ρ = −0.952 | `probe_spin_stack.py` |
-| stack | friction **between objects** | ρ = +0.994, residual 2.41° | `probe_spin_stack.py` |
-| cloth drape | stiffness | ρ = −0.786, saturated at soft end | `probe_deformable.py` |
-| soft press | stiffness | **diverges** | `probe_deformable.py` |
-
-**Retired 2026-10-06: the O-track video friction readout (`o13_tilted.py`)** -- a classifier
-calibrated against the simulator can only say what the simulator did, the simulator it
-was calibrated on has since been corrected (slides move 28–63%), and friction now comes
-from real footage fitted through Newton (p1–p5). The sibling video readouts -- damping
-(`o12`), centre of mass (`o14`), mass (`o10`) -- rest on the same construction and were
-computed on the pre-fix simulator; treat their numbers as superseded, not re-validated.
-
-`collide` (×3) and `drop` are **retired** — see `docs/PROBE_SPIN_STACK.md`. Collide's
-observable is provably mass-independent; drop is superseded by bounce. Both are absent from
-`PROBE_MASK`, not zero-weighted, because a retired probe still costs a sim + render + scoring
-call per iteration. `shove` remains but predates the mesh solver and is unverified.
-
-**`PROBE_W` is provisional**: the two retired probes held the only measured Fisher weights, so
-every surviving probe now starts at the unmeasured mean until the yes-region sample is re-run.
-
-### Which probe reads which parameter (`o7_sensitivity.py`, `docs/results/o7_sensitivity.json`)
-
-Every parameter swept through every probe, on the simulator alone. **`range` is the ratio the
-observable spans over the sweep and is reported alongside ρ**, because ρ = +1.000 with a range
-of 1.02× is a dead probe that passes a monotonicity test.
-
-| probe | mass | com | μ | cd | built for |
-|---|---|---|---|---|---|
-| balance | **4.94×** | 3.35× | 1.00× | 1.00× | mass |
-| tilt→slide | 1.31× | 2.07× | **13.27×** | 1.42× | μ |
-| tilt→tip | 1.00× | **6.67×** | 1.08× | 1.00× | com |
-| spin-down | 3.89× | 1.68× | 1.12× | 3.19× | cd |
-| bounce | 4.05× | 1.11× | 1.08× | **5.73×** | cd |
-| settle | 1.12× | 1.29× | 1.00× | 1.18× | cd |
-
-- **Balance is the mass gauge and is immune to μ and cd** (both exactly 1.00×). Read as a
-  **threshold** — the reference mass at which the beam flips — it recovers mass to **±3%**
-  over 0.08–0.40 kg. Read as a magnitude it saturates at its ±12° stops and returns −12° for a
-  payload both far lighter *and* far heavier than the reference, which looks like a broken
-  probe and is a broken readout. The rig is calibrated for ~0.2 kg; at 1.6 kg the payload
-  leaves the pan mid-run. **It is confounded by CoM (3.35×)**, so mass and CoM must be fit
-  together.
-- **Tilt→tip is the cleanest probe in the project**: only CoM moves it (6.67×), with mass and
-  cd at exactly 1.00×. Toppling is mass-independent physics and the matrix shows it. Its
-  resolution is the frame step, so the reading is quantised.
-- **Spin-down does NOT read contact damping.** Under the bounce/settle contact set mass moves
-  it more than cd does (3.89× vs 3.19×) — it reads roughly cd/m. Under the tilt rig's stiffer
-  contact it reads **friction** instead, which is what the probe table already says
-  (ρ = −0.952). **Bounce is the damping probe**: cd 5.73× and μ-immune at 1.08×.
-- **Settle is dead as a magnitude** — nothing moves it more than 1.29×. Its recorded
-  ρ = +0.973 is real and was reported without a range.
-- **Which parameter a probe reads depends on the contact calibration.** Spin reads μ at
-  `pen_frac = 1e-4` and cd/m at `5e-3`; bounce's rebound spans 5.47× over cd at `5e-3` and
-  only **1.03×** at `1e-4`, where the contact is 50× stiffer and cd stops mattering. Each
-  probe must be run at the solver set it was validated at.
-- **Fit order follows from the matrix**: (mass, com) jointly from balance + tip, then μ from
-  tilt→slide, then cd from bounce. `MeshProbeScene(com_offset=...)` re-centres the local
-  vertex cloud, so the frame origin *is* the centre of mass and gravity, inertia and contact
-  stay consistent with no solver change.
-
-### Joint fit of the whole θ on simulator observables (`o8_joint_sim.py`)
-
-θ = [mass, com, μ, cd] recovered together, Levenberg–Marquardt on log θ, observables from
-balance + tip + tilt at 24/30/36° + bounce. Observations come from the simulator, so this
-tests **identifiability**, not model error.
-
-| | mass | com | μ | cd |
-|---|---|---|---|---|
-| target A (0.240, +12 mm, 0.220, 6000) | **+3%** | **+1.8 mm** | **+2%** | **+7%** |
-| target B (0.130, −8 mm, 0.550, 1500) | +10% | +4.5 mm | −12% | +41% |
-
-(Both re-run after the ramp-normal fix below. The pre-fix numbers — A at +0.3 mm and B at
-+7.5 mm / +144% — were produced by a broken tip observable and are withdrawn.)
-
-Target A is essentially exact. **Target B is an identifiability failure, not an optimiser
-one**: its starting residual was 0.39 because μ = 0.55 sits above μ* = 0.441 at 24°, so the
-bowl barely slides and 0.55 and 0.35 give the same 6 cm. Adding 30/36° (μ* = 0.74, 1.17)
-took μ from −40% to −13%. Its balance residual then sticks at +0.374 and never falls,
-because mass is fit against a 6-step bisection whose output is quantised to ~5%.
-
-Three optimiser defects, each of which looked like an unidentifiable system:
-- **Store the PROJECTED iterate.** `to_th` clips to bounds; keeping the unclipped `x` let it
-  drift outside the box while `to_th` returned the same θ, and the residual stopped
-  responding to `dx` at all.
-- **Trust region.** The tip column of J is ~40 against 1–15 for the rest, so an undamped
-  step was almost entirely com and left the other three parameters at their start.
-- **Adaptive damping.** Fixed λ plus four backtracks gave up on the first step and returned
-  the starting point unchanged.
-
-### Rendering the two new probes (`o9_probe_render.py`, `docs/results/o9_new_probes.json`)
-
-| probe | sim observable vs its parameter | classifier reads the observable |
-|---|---|---|
-| bounce → cd | ρ = −1.000, range 4.74× | **ρ = +0.893**, LOO sd 0.087 (factor 1.22) |
-| tip → com | range 4.61× (vase), clean | **ρ = +0.961**, ±4.7 mm over a ±18 mm sweep |
-
-- **Bounce works through the classifier**, on 7 clips, with 117 of 174 classes at |ρ| > 0.5.
-- **Mass works too — the fourth and last parameter** (`o10_balance_render.py`,
-  `docs/results/o10_balance_read.json`). The balance rig rendered as a **threshold**: 3
-  subject masses × 12 references, 36 clips, view b at `CAM_PULL=1.00`, 100% containment.
-  Holding out a whole subject mass, the classifier calls the beam direction correctly on
-  **34/36** clips and the flip point it implies recovers mass to **+9% / +18% / −3%,
-  median 9%** — against 86% for a flat prior and ±3% simulator-side. Read as a magnitude it
-  would fail: the beam saturates at its ±12° stops, so what carries the answer is *which way*
-  it went against a reference we set.
-  Note `CLIP_NF`: the balance rig runs 56 frames (`probe_balance.NF`) and `do_clip`'s hard
-  `V.NF = 64` silently skipped every one of its scenes. Its clips also land in `clips_b`,
-  not `clips`, because the view is b.
-- **CoM works too, once the sweep is big enough.** On 7 clips it read ρ = +0.107 and ±11 mm,
-  which is no better than guessing zero; on **30** clips (15 offsets × 30/36° ramps) it reads
-  **ρ = +0.961 and ±4.7 mm** against 10.3 mm for always guessing zero, with the sign right at
-  every offset and a whole offset held out so nothing in the calibration has seen it. **7
-  points cannot fit a 174-feature readout** — the first result was underpowered, not a
-  verdict. The readout does compress toward the mean (±18 mm reads as ±11 mm), so the
-  ordering is far better than the scale, which is the same pattern as the across-object
-  offset.
-- **A bowl cannot support a topple probe.** It is 0.31 m wide and 0.09 m tall, tips at ~72°,
-  and at μ = 10 it still slid 71 cm without gripping — the "topple angle" was measuring a
-  sliding bowl tumbling. The vase (0.20 × 0.40 m, tips at ~34°) does topple and is exactly
-  immune to mass, μ and cd (1.01× / 1.00× / 1.01×). Its CoM response **saturates past
-  ±15 mm**, where it topples immediately whichever way the offset points and the observable
-  goes even in com, losing the sign.
-- **The camera pull must match at RENDER, CLIP and ANALYSIS time.** Third occurrence:
-  `o4_joint.containment()` hardcoded 1.20 and reported 1 usable clip for a probe the clip
-  stage had just measured at 100%. Now `LAB_PULL` per lab.
-- **Read poses at the stride the scene was BUILT at.** The bounce rig runs 60 substeps and
-  the tilt rig 420; reading a 60-substep rollout at stride 420 returns 9 frames of 64 and
-  the rebound came out non-monotone in cd. `v1_killtest.track(..., stride=)`.
-
-### Friction on a TILTED ramp, 7 assets (`o13_tilted.py`, `docs/results/o13_tilted.json`)
-
-Five fixed tilts (15/19/24/30/37°), the μ grid **per tilt** at μ*(tilt)·[0.85 … 1.55], one
-crop box per asset over its clean conditions, rendered per asset (the grid was dropped —
-see below). 30 clips per asset, 11–23 of them clean.
-
-| asset | clean | tilts | μ range | read error | ρ | held-out μ | (tilting ramp: read) |
-|---|---|---|---|---|---|---|---|
-| sorter | 23 | 5 | 0.15–1.96 (12.8×) | **1.13×** | 0.987 | **2%** | 2.92× |
-| shark | 20 | 5 | 0.15–1.54 | 1.15× | 0.977 | **2%** | 3.46× |
-| box | 20 | 4 | 0.14–1.15 | 1.13× | 0.982 | 3% | 2.01× |
-| teapot | 15 | 3 | 0.15–0.68 | 1.11× | 0.961 | 2% | 1.37× |
-| books | 12 | 4 | 0.14–0.71 | 1.14× | 0.944 | 4% | 1.16× |
-| bowl | 11 | 2 | 0.14–0.41 (3.0×) | 1.18× | 0.945 | 2% | 1.75× |
-| pot | 11 | 2 | 0.14–0.41 | 1.12× | 0.900 | 8% | 1.10× |
-
-**Held-out μ to 2–8%, against 16–23% on the tilting ramp.** Readouts are also uniformly
-tight — every asset 1.11–1.18×, where the tilting ramp ran 1.10–3.46×. The result is
-internally coherent: predicting the recovery as (readout sd)/(leverage) gives 3/7/3/3/3/3/4%
-against an observed 2/8/2/2/3/4/2%, so it is the instrument, not a leak.
-
-**Why it is better**: leverage is 1.75–4.26 decades of slide per decade of μ, against
-0.93–2.49 for the tilting ramp, because every clip sits near its own tilt's threshold where
-the slide is most sensitive.
-
-**Three caveats, all real:**
-- **The comparison is confounded.** Both the ramp (tilting → tilted) *and* the μ placement
-  (fixed grid → threshold-centred) changed. The gain may be mostly the placement, and that
-  is not separated.
-- **The single-vs-joined test is vacuous here.** Because μ = μ*(tilt)·factor, **no μ appears
-  at more than one tilt** (verified: 0 of 11–23 per asset), so "one tilt" and "tilts joined"
-  are literally the same number. This design cannot test the multi-condition effect — it is
-  not evidence against it.
-- **Coverage is uneven and asset-dependent.** The sorter is clean over 5 tilts and a 12.8×
-  μ range; the bowl and pot only over 2 tilts and 3.0×, because a sliding body's base
-  friction torques it forward and they tumble above 19°. Recovering μ to 2% inside a 3×
-  range is a much weaker claim than inside 12.8×.
-
-**The grid renderer was measured, prototyped, and not shipped** (`src/render/grid.py`,
-`RENDER_SCALE_X`). Four cells in one frame measured a real **1.71×** (0.72 s vs 1.24 s per
-cell-frame) and the camera-right layout works (1 px image-y spread, zero overlaps). But it
-does not extend to 7 cells in a row: with `sensor_fit=HORIZONTAL`, widening `resolution_x`
-at fixed `angle` narrows the *vertical* FOV rather than adding horizontal extent, and fitting
-a row of 7 needs the camera ~3 m back where one cell is 14% of the frame width — matching
-single-cell resolution would cost **8.6 Mpx against 1.7 Mpx rendered separately**. Cells must
-lie in one row (a second row on the table plane would put them at different depths), so the
-aspect mismatch is structural. Per-asset framing also gave much better boxes: **344–448 px**
-against the grid's 164–232 px.
-
-### CoM on a tilted ramp (`o14_com.py`, `docs/results/o14_com.json`)
-
-Four tilts (16/20/24/28°) × 9 CoM offsets (±18 mm), vase, μ = 1.30 so it topples rather than
-slides. 36 clips, 32 frames each.
-
-| | tilted ramp | previous (pre-fix render) |
-|---|---|---|
-| one tilt alone | 3.6 mm | — |
-| tilts averaged | **2.6 mm** | 4.7 mm |
-| always guessing zero | 9.0 mm | 10.3 mm |
-| ρ(read, true) | +0.867 | +0.961 |
-
-Unlike the tilted friction sweep, **the multi-condition test is real here** — every CoM offset
-appears at all four tilts — and averaging tilts helps, 3.6 → 2.6 mm.
-
-Two design changes were needed, both from measurements:
-- **The observable is TIME-TO-TOPPLE, not final orientation.** A fixed tilt has no topple
-  angle to read, and the final orientation is the end state of a tumble: at 24° it ran
-  4.5 / 82.9 / 158.2 / 34.7 / 164.6 / 66.3 / 151.7° across a monotone CoM sweep, i.e. noise.
-  Time-to-topple is monotone at every tilt (24°: 1.33 → 0.21 s).
-- **32 frames, not 64.** The observable completes by 0.54 s; the rest is the body rolling off,
-  which the crop box then has to cover — over 64 frames no pull contained every clip (best
-  55.8%). At 32 the box closes at 290 px, 100%. Cost: 7 of 36 clips saturate at "never
-  toppled", and the time is quantised to 1/24 s so several offsets read 0.21 s alike.
-- **`off_table` must be measured only up to the topple.** Flagging any departure marked all 36
-  clips bad, because every one rolls off eventually — that is aftermath, not a different event.
-
-### No asset carries all four probes, and the reason is geometric
-
-| probe | assets that support it (of 13) |
-|---|---|
-| damping (drop) | **all** — a drop has no orientation to lose |
-| friction (tilted slide) | 7 confirmed |
-| mass (balance) | 8 — must fit the 25 cm pan arm |
-| CoM (topple) | vase confirmed; 3 other candidates, 2 of them unusable (sphere rolls, dino topples always) |
-
-**The probes pull against each other.** A body that topples readily (tall, narrow) is good for
-CoM and bad for friction; one that slides stably (wide, flat) is the reverse; and mass needs it
-small enough to weigh. Measured on the two best candidates:
-- **Vase** — strong CoM and mass, but it only slides at **12°** (at 15° and 18° it topples),
-  giving friction a single tilt over a 1.8× μ window.
-- **Teapot** — strong friction and mass, but its CoM signal is 0.29/0.21/0.21 s at 40°,
-  a 1.7× range heavily quantised by the frame rate.
-
-So **θ can be recovered per parameter, but a joint four-parameter fit from video has no asset
-to run on yet.** The joint fit itself works (+3% / +1.8 mm / +2% / +7% on simulator
-observables); what is missing is one object that supports all four probes well. Either the
-CoM probe needs a form that does not require toppling (a poke, which does not exist), or the
-fit accepts per-parameter coverage: most assets give friction + damping, some add mass, few
-add CoM.
-
-### F0 — motion prior (Flow Poke Transformer): FAILED rule 1
-
-`CompVis/flow-poke-transformer`, open-set base (233 M, CC BY-NC), weights on HuggingFace
-despite the README saying otherwise. Conditioning is **image + observed flow at "poke"
-points + a `camera_static` flag — no text**. `forward()` returns a
-`torch.distributions.MixtureSameFamily` (4-component GMM over 2-D flow), so `.log_prob()`
-scores our own motion directly: the simulator supplies the motion, the prior supplies what
-motion is expected. That would have removed the classifier-as-ruler circularity *and*
-restored end-to-end gradients, since the render collapses to one conditioning frame nothing
-backprops through.
-
-Scored on the tilted-ramp clips, poke = the object's own frames 0→4, continuation 4→20:
-
-| | result |
-|---|---|
-| log p spread over a μ sweep | median 2.14 nats — not flat |
-| interior maximum | 3/9 sweeps |
-| \|ρ(log p, motion magnitude)\| | **0.95** |
-
-The predicted mean flow tracked the truth at ρ ≈ 0.92 — and that was **entirely an artefact
-of the poke**. Re-run with a poke that carries no μ information (two static table corners,
-zero flow), the prediction is *identical across the whole sweep*: **`pred range = 1.00×` in
-all 9 sweeps**, ρ(pred, true) scattered −0.90 to +0.77. It was extrapolating the momentum we
-handed it.
-
-**Direction test, and the leak that nearly produced a false positive.** Score the same
-motion with the magnitude held identical and only the direction reversed — downhill, which
-gravity does, against uphill, which is impossible. Result depends entirely on what the poke
-carries:
-
-| poke | downhill preferred | mean log p gap |
-|---|---|---|
-| the object's own frames 0→4 | **43/43** | +0.555 nats |
-| two static table corners, zero flow | **1/43** | −0.580 |
-| no poke at all | **0/43** | −0.637 |
-
-Given only the image, the model systematically prefers the **physically impossible**
-direction. The 43/43 was momentum extrapolation: the poke already showed the object moving
-downhill, so continuing the line needs no knowledge of gravity. This was recorded as "FPT
-knows physics" for one revision on the strength of that leaky test — **the same leak, in the
-same session, that had already inflated ρ(pred,true) to 0.92.** A poke that carries the
-answer invalidates any conclusion drawn downstream of it.
-
-**Where the probability comes from, and its one valid use.** `predict_parallel` returns a
-4-component Gaussian mixture over flow at each query point; `.log_prob(our_flow)` is that
-mixture's DENSITY at our value — not a probability mass. It is only meaningful as a RATIO
-between two flows scored under the SAME distribution (same image, same poke). The direction
-test is such a ratio and is valid. The μ sweep is not: every μ is a different clip, hence a
-different image and poke, so those log p values come from different distributions — which is
-part of why magnitude dominated there.
-
-**Using the prediction as a TARGET (the Cosmos-3 architecture, motion model in place of a
-judge) does not work either, and the number says why.** Let the model predict the future
-trajectory, then fit theta so the simulated trajectory matches it. FPT's predicted mean
-motion over 16 frames is **0.54-0.60 px** (tight crop) or **0.70-0.77 px** (full frame),
-against a true **16-43 px** -- a ratio of 0.01-0.03. The target is "nothing moves", so
-fitting theta to it drives friction to its maximum for every object. Feeding it the whole
-tilted table instead of a crop changes this by 30% and not by the 25x needed.
-
-This is the model being RIGHT, not wrong: in real video an object sitting on a table does
-not spontaneously slide, and a still frame does not say the tilt is about to matter. Our
-scene is the out-of-distribution one. For this architecture to work the model must know that
-motion IS occurring, which needs a poke carrying real observed motion (then it extrapolates
-momentum and the target is whatever we poked with), real footage (the standing gap), or
-conditioning on the interaction -- which FPT structurally cannot express, having no text
-input.
-
-**The self-consistency fit, which needs no real footage, has no solution.** Poke with the
-CANDIDATE's own early motion (observable from our own render), take FPT's predicted
-continuation as the target, and look for the mu where the simulated continuation agrees.
-Across 9 sweeps: **0 crossings**. log(pred/true) runs −2.4 to −0.66 everywhere — FPT
-under-predicts motion by **1.9x to 11x at every mu tested**. The gap narrows as mu rises, so
-agreement lies above the top of every sweep: the fit drives friction to its maximum.
-
-**Two design suggestions ruled out by inspection, not opinion.** (1) There is no
-video-conditioned variant: FPT and MYRIAD both take `"b c h w"`, a single frame, and
-`predict_simulate` rolls out autoregressively from it rather than observing real frames.
-(2) Starting from an already-tilted ramp is what the tilted design does — the table is at
-full angle in frame 0 and the full-frame test confirms the whole ramp is visible; the
-prediction is still 0.7 px.
-
-**Verdict: no physics extractable from our renders through this model.** It joins the judge
-(ρ ≈ 0, wrong 9/9 on one-bit questions) and surprise (47% on categorically impossible
-motion). What is NOT established is any claim about the model itself: μ is genuinely not in a
-static frame, and the direction result is on OUR renders, which real-video models have failed
-on three times now — that pattern points at the render gap as much as at any model.
-Script `f0_fpt_gate.py`, results `docs/results/f0_fpt_gate.json`.
-
-### The balance rig weighs COMPACT payloads only (`probe_balance.py`)
-
-Extending the balance beyond the apple exposed two real defects and one hard limit. The
-classifier was faithfully reading a broken instrument in both failing cases — **the sim-side
-gate should have run before the renders, and did not.**
-
-- **Seating used half the LONGEST extent.** `p0[bi,2] = z_floor + s.sizes[bi]*0.5` lifts an
-  elongated payload by half its *length*: the vase (0.40 m tall) started 0.20 m above the pan
-  floor, the shark (0.167 m long) 0.084 m, and both were dropped in. Now seated on the
-  payload's own lowest vertex, as `seat_on_plane` does. Same class as the documented shell
-  bug, opposite direction.
-- **The payload must STAY IN THE PAN, and that is what actually broke it.** Printing the
-  subject's displacement settles it: the apple moves 2–8 cm, the **shark 16–25 cm and the
-  vase 20–26 cm** — they fall out, after which the beam slams to a stop and reads the same
-  angle at every reference. That is why the shark never flipped. Two wrong hypotheses were
-  chased first (seating depth, then `PIVOT_RISE` — swept 0.030→0.150 with no setting
-  working) before printing the trajectory.
-- **Shrinking fixes an over-wide payload, not a tall one.** The shark at scale 0.455
-  (0.076 m) stays in the pan (6.2 cm) and reads **+14% / +12% / +14%**. The vase still
-  travels 25 cm at a *quarter* size, because scaling preserves aspect: it is 2:1 tall at any
-  scale. Laying it on its side (`BAL_ROT=90`) does not help either — then it is a cylinder
-  and **rolls** out, 17–19 cm.
-
-| payload | status | flip error |
-|---|---|---|
-| teapot | works | −13% / −6% / −5% |
-| apple | works | +14% / +12% / −5% |
-| shark | works **at scale 0.455** | +14% / +12% / +14% |
-| vase | **cannot be weighed** — topples upright, rolls on its side | — |
-
-So the rig needs payloads that are **compact and non-rolling**, and its accuracy is a
-per-asset bias of order ±15%. `BAL_PIVOT_RISE` and `BAL_ROT` are now env-settable for
-re-tuning. Pixel-side mass currently stands at **teapot 5%** (35/36 beam directions) and
-**apple 9%** (34/36); the shark is re-renderable at the corrected scale, the vase is not.
-
-### Is it a render gap? Tested against real photographs (n=1 per cell)
-
-The motion prior's "nothing moves" behaviour was tested on real photos, since arguing from
-how realistic our scenes look settles nothing.
-
-| scene | weight on the static mode | largest mode | its weight |
-|---|---|---|---|
-| REAL photo, ball in mid-air | **0.953** | 45.6 px | **0.015** |
-| REAL photo, objects on a table | 0.997 | 29.3 px | 0.000 |
-| OUR render, bowl in mid-air | 0.990 | 25.4 px | 0.001 |
-| OUR render, sorter on a ramp | 0.996 | 30.8 px | 0.000 |
-
-**The model is conservative everywhere** — even a real photograph of a ball in mid-air puts
-95% on "nothing moves", so the dominant effect is its prior, not our renders. **But there is
-a residual**: real separates moving from static by 0.044 and ours by 0.006. One image per
-cell, so suggestive only.
-
-**A specific candidate mechanism, and it is not scene realism.** Mean edge sharpness: a real
-moving photo is **4.23** against **18.95** for a real static one (4.5×), while our moving and
-static renders are **5.51** and **6.20** (1.1×). A real photograph of a fast object is
-BLURRED, and that blur is the strongest single-frame cue that something is in motion. Our
-renders are perfectly sharp — a bowl mid-fall looks like a bowl at rest.
-
-**Motion blur is off and cannot simply be switched on.** `use_motion_blur` was never set
-(Cycles defaults off). Adding `MOTION_BLUR=` changes nothing — edge sharpness 5.29 either
-way — because `blender_render_scene.py` sets object transforms manually and calls `render()`
-per pose without advancing the frame counter or keyframing, so Cycles has no motion vectors
-to blur along. Producing it means keyframing the poses and rendering an animation: a real
-change to the render path, and one that invalidates calibration under rule 5. Worth more
-real images to confirm the blur signal before paying that.
-
-### A MOVING CAMERA unlocks the motion prior (`CAM_ORBIT`)
-
-Under `camera_static=True` — which our locked camera honestly is — FPT puts ~0.99 of its
-weight on "nothing moves", **for real photographs too** (0.954 on a real ball in mid-air).
-It is answering "does a randomly chosen point in a locked-off shot move?", where the honest
-answer is usually no. That is not a render gap and not a failure to know physics.
-
-`CAM_ORBIT=<deg>` swings the camera around its target across the clip (per-frame, unlike
-`CAM_JITTER`'s constant offset). Three things then hold together: the camera really moves,
-`camera_static=False` is truthful, and the induced background flow is measurable from the
-render (**−40 px of 544 = −0.0735** over 24 frames; an earlier guess of 0.012 was badly
-wrong). With all three:
-
-| conditioning | static weight |
-|---|---|
-| locked camera, `camera_static=True` | 0.994 |
-| locked camera, `camera_static=False` | 0.711 |
-| **14° orbit, `camera_static=False`, measured background poke** | **0.001** |
-
-**And it reads the physical situation, not just "an object is here."** Same bowl, same
-scene, same orbit, varying only the frame:
-
-| frame | height above table | predicted flow | static weight |
-|---|---|---|---|
-| 0 | **+29.0 cm, airborne** | **44.3 px** | **0.091** |
-| 6 | −1.7 cm, settled | 2.6 px | 0.529 |
-| 40 | −1.6 cm, settled | 15.1 px | 0.267 |
-| 56 | −0.2 cm, settled | 16.5 px | 0.439 |
-| background (table) | — | 20.9 px | 0.472 |
-
-The airborne frame gets 2.7–17× the predicted motion of settled frames, and is the only
-case where the object beats the background. **Why it works: parallax.** With a locked camera
-a bowl in mid-air and a bowl at rest are visually ambiguous; a moving camera separates them
-in depth. This is the first positive physics signal from any external model in this project.
-
-**But it does NOT discriminate theta, tested properly.** The architecture would be:
-
-    input : one rendered frame + a background poke carrying the MEASURED camera flow
-            + camera_static=False + query points on the object
-    output: a Gaussian mixture over the object's flow for the next second
-    fit   : theta* = argmax_theta  log p( flow_sim(theta) | image, poke )
-
-Because the conditioning is then IDENTICAL for every candidate, this is a proper
-within-distribution likelihood ratio -- unlike the earlier mu sweep, which used a different
-poke and query point per clip and was therefore comparing across distributions.
-
-Run on the damping sweep (9 cd values, one shared conditioning frame), two windows:
-
-| window | argmax | spread | rho(log p, cd) | rho(log p, flow) |
-|---|---|---|---|---|
-| frames 0→24 (contains the fall) | cd = 400, at an edge | 1.03 nats | **−0.089** | **−0.972** |
-| frames 8→32 (post-impact, where cd lives) | cd = 9051, interior | 0.68 nats | +0.638 | **−0.856** |
-
-The first window is a PROBE DESIGN error worth keeping: flow was 189–234 px while the
-rebound varied 6× (186 → 30 mm), because over 24 frames the motion is dominated by the fall,
-which is cd-independent. Bracket the parameter.
-
-The second window has an interior maximum, but it is not damping: the flow magnitudes are
-themselves **non-monotone** in cd (39.7 / 68.6 / 72.0 / 77.3 / 45.5 / 38.6 / 39.1 / 39.2 /
-39.2 px), log p tracks flow magnitude at −0.856, and the "interior max" is simply where the
-flow is smallest. The fit would select whichever theta moves least.
-
-**So the moving camera buys a SUPPORT judgement, not a measurement.** It makes the model
-commit to motion (static weight 0.994 → 0.001) and separate a supported object from an
-unsupported one (2.6×). That is a depth cue. It is not sensitivity to how much friction or
-damping, and the two must not be conflated.
-
-**Fitting theta to the prior's TRAJECTORY (not scoring theta under its density).** The
-prior does not need to respond to theta: it only needs to state what the motion should be,
-and we invert our own monotone forward model to reach it. Under the orbit conditioning the
-target is substantial (32 px, static weight 0.129, against 0.7 px with a locked camera), and
-on a single 24 deg ramp the fit is well posed -- sim flow monotone in mu (96 -> 18 px), a
-clean interior minimum, fitted mu = 0.605 inside a 0.374-0.683 sweep.
-
-**It fails the same-question-twice test.** Asked from four ramp angles, where a real friction
-reading must agree:
-
-| tilt | mu* | target px | fitted mu |
-|---|---|---|---|
-| 15° | 0.160 | 25.3 | 0.247 |
-| 19° | 0.263 | 24.0 | 0.321 |
-| 24° | 0.441 | 32.0 | 0.605 |
-| 30° | 0.741 | 29.5 | 1.148 (at the sweep's edge) |
-
-Fitted mu spreads **4.64x** and tracks mu* at a near-constant 1.2-1.55x. The cause is in the
-third column: **the target is 24-32 px whatever the tilt.** A scene-independent target
-inverted through a tilt-dependent forward model returns
-`mu ~ 1.4 x tan^2(tilt)/mu_table` -- a restatement of "barely slides", not a property of the
-object. The architecture is sound and the prior's output is the problem.
-
-**Joint fit over tilts, 7 assets (`f4_fpt_joint.py`, `docs/results/f4_fpt_joint.json/.png`).**
-One μ per asset fitted to 5 tilts (15–37°) at once, on a COMMON μ grid (0.08–2.5, 18 values,
-sim only), one camera pull (2.0) for every asset, 6° orbit, background poke measured in both
-axes. (The earlier run set the poke's x and y to the same value -- a diagonal camera flow
-that does not exist.) FPT is exactly deterministic (repeat 0.0).
-
-| | result |
-|---|---|
-| target, px over 1 s | **4.6–21.6**, rising with tilt in every asset |
-| variance of log target | **tilt 88%, asset 5%**, interaction 8% |
-| E\|f\| vs \|E f\| | equal -- no cancellation between modes; largest mode 25–34 px at weight ~0.01 |
-| fitted μ vs const-target null / tilt-only null | **1.00× / 1.00×** median |
-
-**Per point, the prediction contains NO downhill motion at all** (`f4_fpt_points.png`).
-Decomposing each of the 16 per-point predicted flows into the background (camera) direction
-and the image-space downhill direction: **downhill −0.6 to +1.3 px in all 35 asset×tilt
-cells; background direction 4.6–21.5 px**, residual 1–5 px. The "rise with tilt" is the
-camera-copy component growing, not a physics response. It is also the wrong camera motion:
-the orbit pivots near the object, so a static object really moves only **1.3–2.3 px**; FPT
-paints it with a large share of the far background's +27 px, as if the object were part of
-the backdrop. Magnitude-only fitting hid this -- a 15 px sideways drift and a 15 px slide
-have the same length. **So there is no object-motion target here to fit to**, and the
-fitted μ (joint 0.40–2.2) is the creep floor matched against a camera artefact. The earlier
-orbit results (static weight 0.994 → 0.001, airborne vs settled 2.6×) were also magnitude
-readings and must be re-checked for this before they are cited: "commits to motion" may be
-"copies the camera poke".
-**Lesson: compare trajectories as per-point VECTORS, decomposed against known directions
-(camera, gravity/downhill), never as a magnitude.**
-
-**MYRIAD (paths, not one displacement) — `f5_myriad.py`, `docs/results/f5_myriad*.{json,png}`.**
-Same group and repo as FPT; `predict_simulate` samples each point's path step by step
-(1/12 s steps). Weights `CompVis/myriad` (CC BY-NC); DINOv3 config is HF-gated, rebuilt as
-ViT-L/16 and verified by a strict load (408 keys renamed for transformers 5 nesting).
-Static camera, `camera_static=True`, background points poked with zero motion.
-- **Positive control, MYRIAD's own images**: object UNPOKED, a basketball in mid-air moves
-  3.5 px of 3685 in 1 s. Poked with its own example poke, it moves 2 steps and **stops in
-  mid-air** (no gravity). A poked rolling ball DECELERATES smoothly (42 → 12 px/step) --
-  the one physical behaviour it shows.
-- **Our 35 asset×tilt cases, unpoked: −0.2 to −0.5 px in 1 s.** Nothing moves.
-- **Self-poked** (each candidate μ pokes with its OWN first simulated 1/12 s -- no external
-  motion enters): MYRIAD continues **0–11 px whatever μ is** (box 10.8 / 10.9 / 10.8 at
-  0.7 / 1.0 / 1.5 μ*) against the simulator's 12–490 px; some bowl/teapot samples fly
-  upward. From rest, 1/12 s of motion is 0.3–3 px for every μ, so the poke carries almost
-  no μ information -- a ramp started from rest is the wrong probe for a poke-driven model.
-**Verdict for the tilted ramp: no path target.** What MYRIAD does model is deceleration of
-something already moving, which points at a shove probe (initial velocity, stopping
-distance v²/2μg), where the self-poke carries v.
-
-**A real ramp changes nothing (`F4_RAMP=1`, labs `f6_*`, `f5_myriad_paths_ramp.png`).**
-Hypothesis tested: a table on tilted legs reads as a table falling over. Replaced by a 1.0 ×
-0.4 m plank lying on the LEVEL table, low end on the tabletop, high end on a block; the
-plank's top face is the sim plane (pivot and extent passed per scene, so the old 5–6 cm
-table-pivot mismatch is gone too). Same 7 assets × 5 tilts. **MYRIAD unpoked: −0.2 to
-−0.6 px in 1 s. Self-poked: 0–11 px whatever μ is** (box 11.3 / 11.0 / 11.0 against the
-sim's 62 / 43 / 14). **FPT: downhill +0.1 to +0.8 px**, along-camera 8.8–20.5 px. Both
-models behave as on the tilted table, so the scene's plausibility was not the blocker.
-Batching cases into one `predict_simulate` call (`MYRIAD_CHUNK=8`) took MYRIAD from ~40 s
-to ~3.5 s per case: the rollout is ~290 sequential tiny rounds, launch-bound on one CPU
-core at a 33% GPU.
-
-**Shove probe + k-sweep (`f7_shove.py`, `f8_ksweep.py`, `docs/results/f7_*`, `f8_*`).**
-MYRIAD's condition is one image (frame 0) plus KNOWN positions of every track for steps
-1..k after it; it fills in the rest. Each candidate μ is conditioned on its OWN first k
-simulated steps (k = 1/2/4 = 0.08/0.17/0.33 s); only the continuation (step k → 1 s) is
-compared. Shove: level table, v0 = 0.8/1.2/1.6 m/s, sim slide matches v0²/2μ_eff g to ~3%
-below μ ≈ 0.5 (rule 1); the box trips over above μ ≈ 0.6.
-- **The poke is MYRIAD's only μ-dependent input.** At k = 1 friction enters solely as a
-  shorter first step (box 0.8 m/s: 12.0 px at μ = 0.08 → 7.1 at 1.67). Its "response to
-  friction" is a response to the speed it was handed.
-- **Shove, k = 1**: the first real motion from MYRIAD -- the right direction, plausible
-  slides -- but longer than physics at nearly every μ, including 0.08, and growing slower
-  than v0² (box 119/130/191 px against the sim's 36/84/161). Crossings in 9/21
-  asset×speed cells, spread up to 8.8× (teapot 0.57/0.84/0.10).
-- **Shove, k = 2/4**: for low-μ candidates MYRIAD's continuation ≈ the sim's (sorter k=4:
-  1.02/1.11/1.06) -- kinematic extrapolation of what it was shown, which matches every
-  candidate alike. Crossing spread across speeds 1.8–16×. The one consistent case, pot
-  k=4 (0.085/0.094/0.099), sits at the grid's bottom edge where the pot sim tumbles.
-- **Ramp, even k = 4** (0.33 s of observed downhill motion): MYRIAD's continuation is
-  10–40% of the sim's -- it brakes the object right after the given steps. Crossings
-  appear only where the sim itself barely moves and rise with tilt (box 0.23 → 0.48 at
-  15 → 19°, i.e. ~1.5–1.8 μ*): the "barely slides" answer FPT gave, again set by the tilt.
-**Verdict: no friction reading from MYRIAD at any k, on either probe.** Unconditioned it
-predicts nothing; conditioned it either extrapolates what it is given (shove) or stops
-(ramp). Neither varies with the object.
-
-**MYRIAD setup check on its own benchmark: REPRODUCED (`f10_owm.py`, `f11_dino_versions.py`,
-`docs/results/f10_owm.json`).** Their `openset_prediction.py` run unchanged on OWM-95 with
-our loader (their protocol: 1 known step = true first-step motion of every track, video
-fps, fp32, ensemble 5, 32 frames). Two local changes, neither arithmetic: the fp32
-flex-attention tile is shrunk to fit an A6000's 101 KB shared memory (patch marked in
-`models/myriad/myriad/model.py`), and pandas is vendored in `models/myriad/_deps`.
-
-| best-of-5 mean SQUARED distance, [-1,1] coords | OWM-95 |
-|---|---|
-| static (nothing moves) | 0.066 |
-| constant velocity from the poke | 0.279 |
-| **our MYRIAD** | **0.0294 ± 0.005** (median 0.012; beats static on 76% of videos) |
-| paper (arXiv 2604.09527, Table 1, Best-5) | **0.029** |
-
-**The paper's "minADE" squares the distance** — min_k 1/(KT) ΣΣ‖x̂ − x‖²₂ (Sec. 4.2) — so
-it equals their script's `top_k_MSE`. Read as a plain distance, the same run gives 0.053
-and looked 1.8× off; that was a metric misreading, not a bug. It was chased first through
-the loader: DINOv3 features are **bit-identical** under transformers 5.14 and 4.56 (max
-|Δ| = 0.0 on three images, weights load natively under 4.56), and the checkpoint has no
-EMA copy (`model` + optimizer + scheduler, 665 M values). **So every MYRIAD result in
-f5–f9 was obtained with a correctly loaded model**, and stands — with one caveat of
-protocol: k = 2/4 conditioning is outside what the authors evaluate (their script asserts
-`context_length == 1`). Lesson, same class as the V-JEPA layer-norm finding: **read the
-metric's formula, not its name.**
-
-**MYRIAD as a likelihood over μ (`f12_likelihood.py`, `docs/results/f12_likelihood.*`).**
-Shove, one SHARED conditioning per asset × speed (the frictionless launch: a rigid shift of
-v0·1/12 s), so all 18 μ are scored under the same distribution -- a proper likelihood
-ratio. 256 samples, fp32 (the reproduced precision; `.float()` also converts MYRIAD's bf16
-KV cache), per-step 2-D KDE of the object-centre path.
-- **The density is strongly lopsided -- toward the lowest friction.** Argmax at μ = 0.08,
-  the grid floor, in **15/21** asset×speed cells; log-likelihood gaps 9–85 nats,
-  bootstrap-stable. MYRIAD's prior is that a shoved object keeps sliding.
-- **Where it is interior, it moves with speed, not object**: only at v0 = 1.6 m/s
-  (0.12–0.33), where the lowest-μ sim paths outrun MYRIAD's sublinear growth.
-- **Identical across objects**: 0.08 for all seven at 0.8 and 1.2 m/s -- porcelain, brass,
-  cardboard alike.
-The band test (f8) said "too wide to exclude anything"; the likelihood says "prefers ice,
-for everything". Both are the same fact: MYRIAD's sense of a slide is not conditioned on
-material. Same pattern as every earlier signal: a monotone curve set by motion magnitude.
-
-**Wan 2.2 i2v as the motion source -- PILOT (`f13_wan.py`, `docs/results/f13_wan.*`).**
-A generated video as the target, revisited by decision; guarded by tracking. Wan2.2-I2V-A14B
-(Physics-IQ Verified 32.2, best open i2v with HunyuanVideo 1.5 -- API models are not better:
-Sora 2 26.5), from our real-ramp frame 0, prompt NEUTRAL on the outcome, 81 frames at
-16 fps, 40 steps, guidance 3.5; CoTracker3 on the same 16 object points + 8 background.
-2 assets × 19/24/30° × 2 seeds, ~15 min per clip on an A6000 with CPU offload.
-- **11/12 clips: the object does not move** -- |downhill| ≤ 2 px over 5 s, box and sorter,
-  including 30° (tan 30° = 0.58), where a real box slides.
-- **The one slide is at the SHALLOWEST tilt** (sorter 19°, seed 0: 6 px in 1 s, 45 px by
-  5 s); the same object at 24° and 30° stays put. Not monotone in tilt.
-- Objects stay rigid (0–3% change in point-pair distance); the camera drifts 10–12 px on
-  one seed despite "static camera" in the prompt.
-- Inverted through the sim, "no motion" lands in the creep floor: μ = 0.74–2.5, three of
-  four at or near the grid top -- the same "nothing slides" answer as FPT and MYRIAD.
-Wan's prior from a neutral prompt is a still scene. Untested: a prompt that states THAT it
-slides, leaving HOW fast to the model -- the prompt then fixes the outcome and only the
-speed could carry μ, which must still scale with tilt and differ by object.
-
-**Wan 2.2, prompt "slides down" (`F13_PROMPT=slide`, `docs/results/f13_wan_slide.*`).**
-The prompt fixes THAT it slides; only how it slides could carry μ. All 12 clips slide
-downhill, camera still (0.3–1.3 px), objects mostly rigid (seed 0: 2–8%; seed 1: 12–34%).
-- **No acceleration.** Fitting down(t) ∝ t^p over 0.25–2 s gives **p = 0.91–1.12 in 10/12
-  clips**: the object is already at full speed in the first frame and moves at constant
-  velocity. A body released from rest on a ramp has p = 2. Only one clip reaches 1.76, and
-  it flies off the plank and out of frame (780 px).
-- **The seed sets the speed, not the tilt or the object.** At 1 s: box seed 0 = 10/13/16 px
-  at 19/24/30°, seed 1 = 59/69/71 px -- a 4–6× seed effect against a ≤1.5× tilt effect;
-  sorter seed 1 even slows with tilt (105/92/23 px).
-- Inverted through the sim, fitted μ differs 4–14× between seeds at the same tilt and
-  spreads 1.8–9.3× across tilts.
-**Verdict: Wan generates a plausible-looking slide, but with the wrong kinematics
-(constant velocity from rest) and a speed drawn by the random seed.** Without the prompt it
-does not move; with it, the motion carries no μ. Same end state as FPT and MYRIAD.
-
-**LLM outcome prediction -- rule 1 for TEXT supervision (`f14_llm_outcomes.py`,
-`docs/results/f14_llm_outcomes.json`).** 6 assets (shark excluded: rests on a fin tip),
-incline 10–45° and shove 0.5–3 m/s, image + close-up + dimensions; Claude Opus 5.5,
-GPT-6 Astra, Gemini 3.1 Pro via the Letsur gateway. Ground truth ANALYTIC (incline
-stay/slide/topple and shove distance from mesh b/h with a shell or solid CoM), kept only
-where the outcome is the same for every μ_eff in [0.30, 0.60].
-- **On the 48 unambiguous questions: Claude 100%, GPT-6 100%, Gemini 96%** (chance 28%,
-  majority-per-kind 50%). They apply textbook mechanics with typical friction correctly.
-  **Partly circular**: the truth was built from that same typical range, so this shows
-  coherent reasoning with a generic prior -- not object knowledge.
-- **On the 24 ambiguous questions -- where supervision would actually act -- the implied
-  μ_eff is ~0.4 for everything**: 0.31–0.47 across objects and models, i.e. the middle of
-  the prior. Each model is roughly self-consistent between two routes (incline threshold
-  vs shove distance; Claude 0.41/0.41, 0.44/0.40, 0.47/0.45), but the models disagree on
-  which object is grippier: teapot is Claude's highest (0.47) and Gemini's lowest (0.32).
-**Verdict: LLMs are reliable textbook reasoners and plausibility checkers, not measurers.**
-Their object-specific numbers are a generic prior plus model-dependent noise -- the same
-conclusion CoDimRecon (arXiv 2609.36024) reaches by construction: "accepted values are
-effective properties under the assumed model, not recovered material parameters."
-
-**Not yet established:** n = 1 scene and 4 frames. It must replicate across objects, and it
-must discriminate theta (does it separate high from low damping?) before anything is built on
-it. Rule 1 applies unchanged.
-
-### FIRST REAL-WORLD MEASUREMENT: Physics 101 (`p1_ramp_friction.py`, `docs/results/p1_*`, `p101_density.json`)
-
-Physics 101 (Wu et al., BMVC 2016; `data/phys101/`, 4.5 GB, git-ignored): 101 real objects,
-15 materials, measured mass + volume, ramp at 10°/20° (white board onto a table), drops onto
-5 surfaces, springs; side + top DSLR and Kinect views, ~30 fps. **Precedent to state up
-front: Galileo (NeurIPS 2015) and Physics 101 already fit physics to these real videos**;
-ours differs in the exact-mesh simulator, the transfer to never-real assets, and the
-invariant / repeat-trial checks.
-
-- **Density per material, measured directly** (mass/volume, no model): foam 0.006,
-  cardboard 0.070, hollow rubber 0.37, wooden block 0.68, plastic block 0.86, porcelain
-  1.06, dough 1.38, metal pole 7.8 g/cm³. These are EFFECTIVE bulk densities (hollow
-  cardboard boxes, porcelain cups at 1.06 vs 2.4 solid) -- what an authored asset of the
-  same build needs.
-- **Kinetic friction of cardboard on the ramp board, 20°: μ = 0.229 (IQR 0.210–0.258),
-  93 trials, 9 cubes.** Side view, CoTracker3, s = s₀ + ½at² on the ramp segment (fit RMS
-  0.3–3 mm), μ = tan α − a/(g cos α). Per-cube IQR 0.01–0.03 across 5–14 trials.
-- **Three invariants pass**: (1) every cube STAYS at 10° (μ > tan 10° = 0.18; checked by
-  eye -- the automatic fit tracks the hand when the cube does not move, giving impossible
-  negative μ, so the 10° fits are void); (2) the camera scale from each cube's own edge
-  agrees across all nine, 1633–1724 px/m (±3%); (3) the target (cardboard vs foam) does not
-  change the ramp-segment μ.
-- **μ is insensitive to scale and sensitive to angle**: at 20° the measured term
-  a/(g cos α) is only 0.078, so 10% scale error moves μ by 0.008, while 1° of ramp-angle
-  error moves it by 0.02. The nominal 20° is the dominant uncertainty.
-- **Unexplained**: μ falls with cube size (Spearman −0.80, 0.28 → 0.21), not with contact
-  pressure (mass/area, +0.07). Cubes were filmed in separate sessions; finish or setup may
-  differ.
-- Cardboard first because its volumes are exact cubes (343.0 = 7.0³), giving metric scale
-  from the object itself; the Kinect depth is 8-bit grey video with no recoverable scale.
-
-**All 15 materials on the real ramp (`p2_ramp_all.py`, `docs/results/p2_ramp_all.*`,
-`p2_two_angle.json`).** 643 clips (≤5 per object at 20°, 2 at 10°), one camera scale
-(1661 px/m from p1), each clip classified SLIDES / ROLLS (rigid-fit rotation > 20°,
-excluded: a rolling cylinder's ~⅔ g sin α would read as a false μ ≈ 0.12) / STAYS.
-- **Kinetic μ vs the ramp board, 20°**: dough 0.159, plastic doll 0.163, porcelain 0.166,
-  hollow wood 0.197, metal pole 0.201, wooden pole 0.211, cardboard 0.229, wooden block
-  0.230, plastic block 0.246, plastic toy 0.252, plastic ring 0.330 (wide IQR).
-  **Never slide at 20° (μ_static > 0.36)**: foam 35/35, rubber 23/23, hollow rubber 36/36.
-  Metal coins 20/20 "stay" but are a few px thick in this view -- unverified.
-- **Two-angle invariant passes (rule 1b)**: at 10° only the two materials with μ_k <
-  tan 10° = 0.176 slide -- plastic doll (10/12) and porcelain (4/8) -- and their 10° μ
-  matches their 20° μ: doll 0.155 vs 0.163, porcelain 0.146 vs 0.166. Dough (0.159) stays at
-  10° -- static above kinetic, plausible for a sticky material.
-- **Two pipeline faults found by looking, not by the numbers**: (1) at a 48 px tracking
-  grid, thin objects fell between points and defaulted to STAYS (hollow-wood plates and
-  toys visibly slid); a 19 px grid fixed it. (2) `torch.hub.load` contacts GitHub on load;
-  an HTTP 504, retried per clip, failed 52 clips -- now loaded from the local cache.
-
-**THE LOOP CLOSES: Newton fitted to real footage (`p4_sim_loop.py`, `docs/results/p4_*`).**
-Each real cardboard cube simulated at its measured size and mass on a 20° plane, μ swept
-0.10–0.40, every real trial aligned in release time and offset to the simulated curve.
-- **Simulator-fitted μ = analytic μ**: 93 trials, median |Δμ| = 0.005, correlation 0.84
-  (sim 0.235, analytic 0.229 -- a small upward offset; the outliers are trials where the
-  parabola fit was poor and the time-aligned simulator fit holds up better).
-- **Newton reproduces the real trajectories to 0.4–1.0 mm RMS per cube** -- as close as, or
-  closer than, the parabola (0.4–3.2 mm). First direct check of the simulator against
-  reality in this project, and it passes.
-- **Sim acceleration matches the textbook law within 1%** at μ = 0.15/0.25/0.30 (effective
-  0.150/0.249/0.298), so the V_EPS = 1e-3 friction regularisation costs nothing for sliding.
-  An apparent 11% overshoot was a constant ~6 cm/s HEAD START: `seat_on_plane` leaves 2 mm
-  of clearance and the cube drops onto the slope at release. Harmless for release-aligned
-  fits; matters for anything timed from t = 0.
-
-**Seating gap fixed (`MeshProbeScene.seat_on_plane`, clearance 2 mm → 0).** Verified: the
-sliding cube now matches ½at² to 2.5% at 1 s (was 11%); a grippy cube (μ 0.8, 20°) creeps
-8.8 mm in 1 s instead of 41.8 mm; real assets at rest wobble 2.1–5.7 mm normal to the
-plane instead of 4.7–12.9 mm. **The "creep floor" recorded for the tilted probe (8–23 cm)
-was largely this 2 mm drop**; ~9 mm/s of true no-static-friction creep remains. Results
-computed before the fix (o13, o14, f4/f6, f7, p4) carry the old drop. `probe_balance.py`'s
-own +2 mm pan seating is separate and was left as measured.
-
-**Real friction and density onto our assets (`p5_transfer.py`, `docs/results/p5_transfer.json`).**
-- **The friction rule factorises on real data.** Every slide gives μ_pair(object, ramp
-  board) and, after the ramp, μ_pair(object, table). Their ratio is one constant across
-  block-like materials, 0.75–1.05 (cardboard 0.83, plastic block 0.96, wooden block 0.88,
-  wooden pole 0.85, porcelain 1.01, dough 1.05, plastic toy 0.93, metal pole 0.75); the
-  outliers are shape, not friction (ring 0.31 rolls on the table, doll 1.36 tumbles,
-  hollow wood 1.89 on n = 3). This supports any product-form rule, not the geometric mean
-  specifically.
-- **One anchor is unavoidable** (pair frictions fix per-material μ only up to a common
-  scale) and is stated once: our scene table ≈ the ramp board, so body μ = μ_pair² / 0.45.
-- **Hollow objects scale with AREA.** Cardboard cubes: mass/volume varies 35% with size,
-  mass/area is constant at 0.106 g/cm² (CV 0.03). Volumetric transfer made our big box
-  4.1 kg; areal gives 939 g. Mass now transfers by build: areal (cardboard, measured),
-  solid (toys 49–97 g, C-clamp 1156 g, wooden bowl 1778 g from solid-wood density 0.68),
-  shell (teapot, vase, brass pot, sorter -- NOT measured: assumed wall × handbook density,
-  reported as ranges; open containers' meshes may double-count inner and outer area).
-  Books, baseball, apple have no Physics 101 class.
-
-**Centre of mass and inertia now come from the object's BUILD (`MeshProbeScene(mass_model=)`,
-`src/data/assets.MASS_MODEL`).** The old convention -- centre of mass = plain vertex mean,
-inertia = area-weighted cloud about it -- disagreed with itself and put a hemisphere's
-centre of mass at 0.0624 against a true 0.0375 (solid) or 0.0333/0.0500 (closed/open
-shell). Now one mass point cloud sets both: "shell" (area-weighted surface) or "solid"
-(interior voxels), chosen per asset ("auto", the default); "vertex" keeps the legacy
-behaviour for reproducing old runs. **Checked against textbook values: shell cube inertia
-+0.3%, open-bowl shell centre of mass exact (r/2), closed-hemisphere shell exact (r/3);
-solid cube +0.2%, solid hemisphere +0.6%, solid cylinder +0.4/+1.0%.** Getting the solid
-voxel fill right took three tries, each caught by those numbers: a face lying exactly on a
-voxel boundary leaked the exterior fill inside (a solid cube came out with its shell
-inertia); thickening the wall to close the leaks grew the body outward (+10%, +3%);
-offsetting the grid by an irrational fraction of a voxel, plus half weight on wall voxels,
-fixed both. **At rest on a level plane the wooden bowl stopped rocking: max tilt 19.4° →
-2.5°**, drift 6.6 → 1.4 mm; shark 7.2° → 4.6°; the rest 0.4–2.6° either way.
-
-**What the two fixes do to the probes already run (`p6_recheck.py`, `docs/results/p6_recheck.json`).**
-Every stored o13 / o14 condition re-simulated in memory three ways (legacy / seating fix /
-both). Legacy reproduces the stored numbers (0.006–0.13 cm for 4 assets; 0.6–2.2 cm for
-books, shark, sorter -- GPU nondeterminism on long slides).
-- **o13 slide magnitudes move 28–63%** with both fixes (seating alone 14–42%). Friction
-  ordering survives at the informative tilts (ρ(μ, slide) ≈ −1 at 15–30° for most assets)
-  but breaks at the steepest tilt, where bodies tumble (pot 37° flips to +1.00, box 37°
-  −0.14). The o13 μ readout inverted the OLD forward curve against clips rendered from the
-  old motion, so its reported 2–8% is a statement about the old simulator; re-validating
-  it needs re-simulation, re-render and re-scoring.
-- **o14 vase: unchanged** (time-to-topple identical; the vase's shell centre of mass sits
-  where the vertex mean did). **o14 pot: broken** -- with its true (lower) shell centre of
-  mass it no longer topples in 21 of 36 conditions (was 5), and ρ(com, t) at 16°/20° goes
-  from −0.90/−0.97 to +1.00/−0.27. **The pot's 1.8 mm CoM result was measured on a wrong
-  mass model**; the probe needs steeper tilts to work on the real pot.
-
-**The simulator's restitution, measured (`p7_cd_restitution.py`, `docs/results/p7_cd_restitution.json`).**
-Solid 7 cm cube dropped 0.20 m; e = rebound/impact normal speed every substep.
-- **Bounce-rig settings (pen_frac 5e-3, 60 substeps): e spans 0.97 → 0.04** over cd 50 →
-  30000, and **e is a function of cd / mass, not cd**: at cd 1566 a 0.1 kg cube gets 0.52,
-  a 0.4 kg cube 0.82; at equal cd/m they coincide (0.52/0.50, 0.26/0.24). A probe that
-  sets one cd for bodies of different mass gives them different restitution.
-- **Tilt-rig settings (pen_frac 1e-4, 420 substeps) cannot represent realistic restitution:
-  e = 0.77–1.00 over a 600× range of cd.** Every impact in o13 / o14 / p4 is near-elastic --
-  irrelevant to sliding, wrong for toppling and tumbling. Same root cause as the old note
-  that bounce goes dead at the stiff setting.
-- `p5_transfer.cd_for_restitution(e, m)` turns a real e into a bounce-rig cd through this
-  curve. Real material restitution is still unmeasured: Physics 101's 30 fps drops failed;
-  "Bounce and Learn" (CVPR 2019, 100 fps) bounces one foam ball off many SURFACES, not many
-  materials. A 240 fps phone recording of real counterparts would serve the p3 pipeline.
-- References for uncovered assets, labelled as such: baseball mass 142–149 g and COR
-  0.546 ± 0.032 (rulebook specification, against ash wood at 58 mph) → cd 1837–2341;
-  apple 333–377 g and books 11.6–17.4 kg from published bulk densities, not measured here.
-
-**Tilt-rig settings changed: restitution by Hunt-Crossley α (`src/sim/rigs.py`,
-`MeshProbeScene.set_restitution_alpha`, `scripts/p8_alpha.py`).** The contact law is
-Hunt–Crossley, fn = k·w·pen − HC·cd·w·pen·v, whose restitution is ≈ 1 − α·v with
-α = 2·HC·cd / (3k): it is set by cd/k, not cd -- which is why the stiff tilt rig could not
-bounce (k 50× larger) and why one cd gave different masses different e (k ∝ mass). Damping
-is now specified as α and cd = 1.5·α·k/HC per body, re-applied whenever stiffness changes.
-- **Measured: identical e for 0.1 and 0.4 kg** at every α; the two rigs agree within
-  0.04–0.07 (bounce 0.50 vs tilt 0.54 at α = 0.4, 2 m/s); faster impacts bounce less
-  (0.54 at 2 m/s, 0.70 at 1 m/s), a trend real materials share, more weakly.
-- Rig definitions live in `src/sim/rigs.py` (TILT_RIG: pen_frac 1e-4, 24 fps × 420,
-  **α = 0.4 -- an assumed mid-range default** until real restitution is measured;
-  BOUNCE_RIG: pen_frac 5e-3, 24 × 60, raw cd as validated). o14, p4, f7 now call
-  `apply_tilt_rig`.
-- **Sliding unchanged** (cube acceleration 1.054 vs analytic 1.051). **Topple times
-  unchanged** (decided before landing: vase ρ(com, t) −0.97/−0.97/−0.92/−0.95; pot still
-  broken by its true centre of mass, 23/36 never topple). **Landing changed**: a toppled
-  vase used to keep bouncing and flipping (centre 4–14 cm above the plane, rebounds to
-  0.72 m/s); now it lands, rebounds once at 0.24 m/s and settles on its side at 3.3 cm.
-
-**Pot topple probe redesigned (`p9_pot_topple.py`, `docs/results/p9_pot_topple.json`).**
-Why it broke: with its true shell centre of mass the pot's base leverage is b/h ≈ 1.09, so
-it can only tip once tan(tilt) > 1.09 -- but at the probe's grip (body μ 1.30, μ_eff 0.76)
-it starts SLIDING ~10° earlier; sliding won and 23/36 conditions never toppled. The old
-vertex-mean centre of mass (b/h 0.74) had let it tip inside the sliding window: the probe
-worked for the wrong reason. Toppling must beat sliding: μ_eff > b/h, i.e. body μ > ~2.6.
-- **Design: body μ 4.0 (μ_eff ≈ 1.34), tilts 40/42/44/46°, tilt rig incl. α = 0.4,
-  time-to-topple read every 2 ms off the simulator** (the 1/24 s frame grid flattened every
-  condition above 44° to 0.17–0.21 s; with the video readout retired there is no frame
-  grid to respect).
-- **Sim-side gate**: ρ(offset, time) = −1.00 at every tilt 38–50°; range 2.75× / 2.29× /
-  2.09× / 1.89× at the chosen tilts; no "never toppled"; ≤6 cm of slide before tipping.
-  Below 38° negative offsets never topple; above 46° the range shrinks toward 1.6×.
-- **Rule 1 passes**: time-to-topple moves 2.19× with the ±18 mm offset and 1.00× with mass
-  (0.1–1.6 kg), 1.02× with restitution α (0.05–1.2), 1.01× with friction above the grip
-  threshold (μ 3–15).
-- **Held-out offset recovered to 0.61 mm** (one tilt) / 0.71 mm (tilts joined; max 1.0 mm)
-  on a 4.5 mm grid -- deterministic, so this is interpolation error, not noise; joining
-  tilts cannot help without noise to average.
-- **Caveat for a physical version**: μ_eff 1.34 is not an ordinary surface -- a real rig
-  would need a high-grip (rubber) ramp, and its measured μ would replace the assumed 4.0.
-
-**Restitution from the real drops: FAILED, not reported (`p3_restitution.py`).** 30 fps
-DSLR with long exposure: the fall is ~5 blurred frames. The scale check fails (g spans
-5,750–15,568 px/s², a 2.7× spread on a fixed camera), the two routes (height vs time to
-apex) correlate at only 0.38, and the physics is inverted -- a wooden block "rebounds"
-more on foam (0.46) than on a table (0.24), because on a soft surface the height route
-measures the foam springing back. Restitution needs a higher frame rate than Physics 101.
-
-### The reading side is the bottleneck
-
-Every number in the probe table above was **read by the simulator** (a slip angle, a pan
-going down, a decay rate). The judge contributed to none of them. **We can manufacture
-excellent evidence and still cannot read it off a video** — that is the problem the V-track
-attacks.
-
-## Findings that changed the plan
-
-- **The published 98% is IntPhys 1, and IntPhys 1 is coloured shapes on plain
-  backgrounds.** IntPhys **2** — realistic objects, complex backgrounds, moving cameras —
-  reports that "most models perform at chance levels (50%)", against near-perfect human
-  performance (arXiv 2506.09849). Our scenes are a textured object on a wooden table, i.e.
-  squarely the regime where the benchmark's own authors measure the capability as absent.
-  Any expectation set from the 98% figure is set against the wrong benchmark.
-- **The context must be encoded WITH the mask, not gathered from a full-clip encode.**
-  The reference does two forwards — `context = encoder(pieces, masks_enc)` and
-  `h = target_encoder(pieces, full_mask)` — because a context token computed with full
-  self-attention has already seen the region it is being asked to predict. HF's
-  `VJEPA2Model` gathers instead, and its `VJEPA2Encoder` accepts no mask argument, so the
-  HF path *cannot* do this correctly. Measured leak on the 2.1 ViT-g checkpoint:
-  `max |masked - gathered| = 0.043`, against an effect size of ~0.4%. Every V-track number
-  produced through HF before 2026-09-02 is contaminated, including a null control that
-  came out at rho = +1.000 — which the leak plausibly explains, since context tokens that
-  absorb target-region information make the context itself vary with theta.
-- **Two checkpoints, not one.** Checkpoints ship `encoder` AND `target_encoder`; context
-  uses the former, targets the latter. Using one for both is another silent contaminant.
-- **Sweep the context length densely and slide the window.** The IntPhys2 evaluator does
-  both, for the reason its own comment gives: "in case the physics breaking event happens
-  before CONTEXT + 1". We do not know when a clip goes wrong, so committing to one split
-  throws away the localisation.
-- **A published effect size is part of the calibration, not background reading.** The
-  intuitive-physics result rests on a within-scene gap of ~0.4%, and reverses sign when
-  pooled across scenes. Any experiment aimed at it needs matched pairs and tens of them;
-  a correlation over nine points against a 0.29% noise floor cannot see it. Check the
-  reference implementation's *statistical design*, not just its loss function.
-
-- **V-JEPA's target must be layer-normed before the distance is taken.** Its training loss
-  is `smooth_l1(z, F.layer_norm(h))`, no affine; `VJEPA2Model` hands the target back raw,
-  and the raw encoder output has `mean|·| = 2.15` against a predictor emitting `0.32`. So
-  an un-normalised L1 is a large constant plus a rounding error: measured that way, a
-  **static** clip scored as *more* surprising than a real one and every variant sat within
-  2.4% of 2.03.
-- **Surprise must be read causally, on a short horizon that slides.** CLAUDE.md's own V0
-  sketch — context = first K frames, target = all the rest — is far outside what the
-  predictor was trained on and separates a real clip from a frame-shuffled one by **+0.12%**.
-  Sliding a 2-frame horizon across the clip gives **+2.54%** on the same clips.
-- **The across-object confound reappeared in the new signal, unchanged.** Slowing one clip
-  down monotonically destroys the harness's ability to tell it from a shuffled version of
-  itself (ρ **+0.95** and **+0.83** on two reference clips). Pooled across those two clips
-  the same correlation is **−0.01**. Clip motion is therefore a render design target
-  compared *within* one scene, never a threshold applied across scenes — and every clip we
-  had rendered before V1 sat at motion 0.4–2.3 against natural video's ~17.
-- **Framing is part of the calibration, not a presentation choice.** A crop box computed
-  per clip grows with whatever the object did, so surprise would read the framing — which
-  varies with θ. One box per probe, from that probe's reference θ. And zooming buys nothing
-  on its own: cropping to the trajectory normalises the zoom away, so motion-in-crop is set
-  by object size against *trajectory extent*. The lever is a shorter trajectory.
-
-- **Magnitude observables are not inherently confounded.** The rule that only thresholds work
-  came from measurements taken *across objects*, where shape dominates (a drop probe gave
-  ρ = −0.186 over 14 objects). Holding object and excitation fixed and sweeping only the
-  parameter, the same observable gives −0.995. Magnitudes are fine *within* an object — which
-  is the regime per-object θ already puts us in, and the regime every V-track sweep must use.
-- **`MeshProbeScene`'s centre of mass is the VERTEX MEAN, which is neither physical model.**
-  Measured against an area-weighted shell (right for thin-walled hollow objects) and a
-  voxel-filled solid (right for solid ones), base-edge leverage b/h differs by up to 2.2×:
-  sorter 1.54 (vertex mean) vs 3.34 (shell), pot 0.74 vs 1.09, bowl 1.57 vs 2.55, books
-  2.62 vs 2.22 (solid). Vertex density follows modelling detail, not mass, so every tipping
-  threshold in the simulator inherits this bias. Uniform density is itself an assumption
-  (`scripts/f14_llm_outcomes.py::geometry` computes both shell and solid).
-- **Solver parameter sets are validated jointly, not individually.** `configs/flag.yaml` is a
-  stable point; changing mass alone (0.05 → 0.02) diverges. Stability couples
-  `dt·sqrt(ke/m) < 0.3` and `kd/m·dt << 1`.
-- **`default_particle_radius` must be set** for cloth and soft bodies. Unset, neighbouring
-  particles overlap in the *rest* configuration and the body explodes — 253.7 m of travel in
-  free fall with no contacts, against a correct 1.228 m.
-- **A scan is a crumpled snapshot, not a rest state.** Cloth rest shape sets the strain in
-  every triangle, so simulating a scan's own triangles bakes the folds into the zero-energy
-  configuration and it can never drape. The scan gives dimensions and appearance; the sim
-  mesh should be a regular grid.
-- **The camera pull used to CLIP must match the pull used to RENDER.** `do_clip` reads
-  `CAM_PULL` from the environment and falls back to `V1_KILLTEST.CAM_PULL = 0.65`; rendering
-  at 1.20 and clipping without the variable computes the crop box against the wrong camera
-  and the object leaves frame — worst containment 41.3% against a correct 99.5%. This is the
-  second time bad framing has inverted a result. Containment is now checked per clip in
-  `o4_joint.containment()` and out-of-frame clips are dropped, not scored.
-- **A readout picked by reading class names is worse than one fitted over the vocabulary.**
-  The SSv2 templates whose wording matches the probe track the observable at ρ = +0.343 /
-  −0.462; a ridge over all 174 log-probabilities cuts the read error by a third. Name
-  matching is a hypothesis about what the network encodes, not a measurement of it.
-- **Coarsening a timestep to speed a render changes results.** Balance went 7/7 → 4/7 when
-  substeps were cut 60 → 24 for a render pass.
-- **Inertia carried mass twice.** `set_masses` stored `G = G_unit · m` while `integrate_6dof`
-  forms `Iw = R (m·G) Rᵀ`, so inertia was `m²·G_unit` — for a 0.1 kg body, ten times too
-  little, and ten times the angular acceleration. Fixed; it also improved the tilt probe
-  (residual 0.79° → 0.40°).
-- **The ground plane can now be TILTED, and that is the preferred incline.**
-  `ground_contact_mesh` took a horizontal z-test (`pen = ground_z - world.z`) with an
-  axis-aligned bounds rectangle, so the only way to make an incline was to rotate gravity.
-  It now takes a unit normal `gn`, an in-plane tangent `gt` and a point `gp`; passing
-  (0,0,1)/(1,0,0)/(0,0,ground_z) reproduces the old plane exactly. `MeshProbeScene(tilt_deg=,
-  pivot=)` wires it up. Why switch:
-  - **One frame for sim and render.** Rotating gravity split the world in two — a level
-    simulator frame and a tilted render frame — and produced **four** wrong-frame bugs: the
-    stack probe subtracting in world coordinates, the crop box, the ramp normal, and object
-    poses handed to the renderer untransformed so the object visibly floated free of the ramp.
-  - **No rotating-frame approximation.** A *ramping* gravity omits the centrifugal/Euler terms
-    a real rotating table has (0.05–0.3% of g at our rates, ~0.8% at 60°). A static tilt is
-    exactly equivalent, with nothing omitted.
-  - **The rate dimension disappears.** At fixed μ and fixed final angle, ramp rate alone moved
-    slide 374 → 41 cm (μ = 0.15) and 134 → 12 cm (μ = 0.30) — a 9–11× lever, and a nuisance
-    unless controlled. A fixed angle has no such dimension.
-  - **More leverage.** 57× slide range over a 4.4× μ sweep, against 13–22× for the tilting ramp.
-  **Validated against the analytic threshold**: sliding at three tilts collapses onto one curve
-  in μ/μ* where μ* = tan²(tilt)/μ_table — at μ/μ* = 1.0 the slide is 62/72/82 cm for
-  18/24/30°, at 1.5 it is 15.5/17.5/13.8, at 2.2 it is 8.5/13.0/23.3.
-- **On a real tilted plane the body must be rotated to the plane, and seated along its
-  normal.** With gravity rotated, an identity-orientation body was automatically flat on the
-  ramp. On a tilted plane the same body starts tipped by the tilt angle and rests on the
-  *edge* of its base: only a sliver of weighted contact area engages, effective stiffness
-  collapses, and a 0.4 kg bowl sank **14.5 mm**, was ejected, and slid 4 m at a friction
-  **2.2× above** its slip threshold. Both steps are inseparable and live in
-  `MeshProbeScene.seat_on_plane()` — never re-derive them in a script.
-- **There is no static friction.** `ft = -mue*fn*vt/(|vt| + V_EPS)` can resist motion but
-  cannot stick, so a tilted probe has a **creep floor**: 8–23 cm of slide even at 2.2× the
-  slip threshold. Read a tilted probe as a magnitude against that floor, not as "did it
-  move at all". **Revised 2026-10-05: most of that floor was the 2 mm seating drop**, now
-  removed; ~9 mm/s of genuine no-static-friction creep remains.
-- **Rendering: per-frame FIXED cost dominates sampling 2.5:1.** Measured at 544×448/48
-  samples: startup 0.8 s, then **2.01 s per frame**, of which only **0.58 s** scales with
-  pixels — the rest is CPU-side scene update and BVH rebuild, because objects move every
-  frame. So halving samples saves 14%, and the real lever is **fewer render passes**: N
-  probe cells in one big frame cost `1.43 + 0.58N`, i.e. 2.1× faster at 4 cells and 2.6× at
-  8. The constraint is that each cell sees the camera differently, so **one cell per asset**
-  (constant per asset, absorbed into its own calibration) — never different θ of one asset
-  in different cells.
-- **The simulator tilts GRAVITY; the renderer tilts the TABLE.** `ramp_gravity_seq` keeps
-  the ground plane flat and rotates g, so in simulator coordinates the ramp normal is
-  **(0, 0, 1)** — anything comparing a body's orientation to "the ramp" must use that, not a
-  rotated normal. `o7_sensitivity.tip_angle` compared against a rotated normal *and* got its
-  sign backwards, measuring roughly ramp + body tilt: 39.6° at a 27° ramp against a true
-  22.2°, so every clip of a merely sliding bowl flagged as toppling, including one that moved
-  3 cm. Fixed, the vase's CoM range *improves* 4.61× → **6.50×** and stays exactly immune to
-  mass/μ/cd. Third appearance of a wrong-frame error, after the stack probe and the crop box.
-- **The tip probe needs an object that topples, and the matrix now says so.** On the bowl the
-  corrected observable is a one-sided cliff — 60/60/56/3.1/2.8° across CoM −30…+30 mm, i.e.
-  blind to an uphill offset — and it picks up μ at 2.18× non-monotonically, because whether
-  the bowl topples depends on whether it slid first. On the vase the μ cell is 1.00×. This is
-  what made the joint fit recover target A's CoM (+12 mm, on the informative side) and miss
-  target B's (−8 mm, in the flat region).
-- **Relative motion must be measured in the moving body's own frame.** The stack probe took
-  `top − base` in world coordinates, so the base rotating with the ramp read as sliding and
-  every case collapsed the instant the table moved (ρ +0.933 → +0.994).
-- **Contact coefficients combine as a geometric mean**, so a body slips at
-  `atan(sqrt(μ_body·μ_table))`, not `atan(μ_body)`.
-- **A body pinned at its own centre of mass is in neutral equilibrium.** `MeshProbeScene` puts
-  the origin at the vertex mean, so `set_hinge` without `pivot_local` gives a balance that
-  slams to its stop on any imbalance and reports no magnitude. The pivot rise above the CoM
-  *is* the instrument's sensitivity.
-- **A bowl is a shell.** Near its axis the lowest vertices are the outside of its base; a
-  payload seated there starts inside the floor and gets ejected on contact.
-
-## Next, in order
-
-1. ~~**Ask the judge a one-bit threshold question**~~ **DONE — FAILED**, on the same 57 V1
-   clips (`docs/results/v1_judge.json`), which is the strongest form of the test: identical
-   data, identical framing, both signals side by side.
-   *"Does the bowl bounce back up off the table?"* — p(yes) **0.016–0.110 on all nine**
-   bounce clips, every one of which rebounds; wrong 9/9, and the bounciest clip in the sweep
-   scores p(yes) = 0.026. *"Does it slide down the tilting table?"* — p(yes) **0.78–0.94 on
-   all nine**, from a clip that slides 57 cm to one that slides 1.9 cm; ρ with μ is −0.32.
-   *"Does the bowl move in a physically possible way?"* — p(yes) 0.57–0.78 on five authored
-   violations, with the **teleport rated the most plausible of them**.
-   The judge does not answer one-bit threshold questions either. It keeps only the baseline
-   row it already had.
-
-2. ~~**V0 — surprise harness.**~~ **DONE** — `src/surprise/`, `scripts/v0_surprise.py`,
-   7/7 gates, `docs/PROBE_SURPRISE.md`. No install was needed: the **cosmos** env already
-   has `VJEPA2Model`. Two gates are exact — `encode()+predict()` reproduces
-   `VJEPA2Model.forward` bit for bit, and perturbing a known frame window moves exactly the
-   token ids the code claims. Three parts of the sketch above were wrong and are corrected
-   in the findings section: the target normalisation, the context regime, and the
-   middle-layer knob (the predictor consumes the encoder's **last** hidden state by
-   construction, so that knob cannot apply to it).
-
-3. **V1 — KILL TEST: FAIL, final.** Surprise sits at **chance on categorically impossible
-   motion** in our renders — 47% (wooden bowl), 47% (brass pot, held out), 40% (2.1 ViT-g)
-   over 30 matched pairs. This is the corrected verdict after two defects were fixed: the
-   bowl spawning 11.8 mm inside the table (so the mass "null control" was measuring a bowl
-   sinking), and a context leak in which context tokens were gathered from a full-clip
-   encode and had therefore already attended to the region being predicted. Both were found
-   by looking at the clips and at the reference implementation. Consistent with **IntPhys 2**,
-   which reports models at chance on realistic scenes; the famous ~98% is IntPhys **1**,
-   coloured shapes on plain backgrounds. One thing works: **localisation** — sliding a block
-   mask through time recovers *when* the clip went wrong, median error 1.0 slot, 62% within
-   4 frames against ~16% chance, exact on all six teleport sources. Write-up `docs/V_TRACK.html`.
-   Do not build V2/V3 on surprise.
-
-3b. **O-track — outcome classification. The measurement half PASSES.** A frozen V-JEPA 2
-   ViT-g/384 with the released SSv2 head names the *outcome* of a motion we made, over 174
-   templates. Every single-sweep gate (G-A, G-A2, G-B) failed, and **those were the wrong
-   test**: within one ramp angle, friction and slide distance are the same column of numbers
-   wearing two labels, so no single sweep can separate them. Ramp angle and rate are
-   conditions we *set*. Constraining several at once:
-
-   | held-out μ recovered from | bowl (74 clips, 7 angles) | pot (33 clips, 3 angles) |
-   |---|---|---|
-   | one condition alone | 29% median error | 20% |
-   | conditions joined | **16%** | **15%** |
-   | flat prior on [0.10, 1.20] | 86% | 86% |
-
-   Two corrections were needed first, both worth keeping:
-   - **Read the whole distribution, not classes picked by name.** The two templates chosen
-     by their wording track true slide at ρ = +0.343 / −0.462; the best available reach
-     +0.660 / −0.880 and 92 of 174 carry |ρ| > 0.5. A cross-validated ridge over all 174
-     log-probabilities cuts the read error by a third (bowl 0.294 → 0.220, pot 0.105 → 0.057).
-   - **Bracket the parameter.** Above μ ≈ 0.7 the bowl barely moves at 21–27°, so those
-     clips carry no information and the estimate regresses to the middle. Adding 33/36°
-     (202 → 9 cm span) helps but does not fix it: the high-μ band stays at 61% (bowl) /
-     144% (pot). That is the tilt probe's identifiability limit, not a readout defect.
-
-   **The blind fit works.** Three frictions off the calibration grid (0.175 / 0.245 / 0.390),
-   simulated, rendered and scored separately, recovered with nothing in the calibration
-   having seen them:
-
-   | blind μ recovered | brass pot | wooden bowl |
-   |---|---|---|
-   | median error | **3%** | 23% |
-   | truth inside the reported error bar | 3/3 | 1/3 |
-
-   The fit needs no external ground truth: the readout calibrates against the **simulator's
-   own** slide, which we always have for our own rollout. `μ̂ = argmin_μ Σ_t ‖readout(clip_t)
-   − log slide_sim(μ,t)‖²` — fitting all conditions at once rather than inverting each and
-   averaging, which also removes the monotone-prefix truncation that inversion required.
-   Uncertainty propagates the readout's LOO residual through the local leverage and is
-   honest on the pot: the one hard case (μ = 0.390, where the pot's slide flattens) reports
-   ±51% rather than a confident wrong answer. The bowl's bar is too tight because its
-   readout is 4× noisier (LOO sd 0.211 vs 0.057) and under-reads slide.
-   Baseline for the same question on the same probe: the judge gives ρ = −0.32.
-   Scripts `o5_fit.py` (uncalibrated objective, 32%/28% — worse) · `o6_blind.py`.
-
-   **Two framing defects found and fixed, both of the kind already on this list.** The crop
-   box was computed **per lab**, so `ga` was 342 px and `ga3` 448 px at a different offset —
-   framing varied across the very conditions being compared. Forced to one box
-   (`CROP_BOX` in `o2_boundary.do_clip`); the bowl moved 16% → 18%, the pot was single-lab
-   and unchanged. And a bash timeout SIGTERMs the whole process group, killing backgrounded
-   Blender workers mid-scene — launch long renders with `setsid nohup`.
-
-   **Ten assets, per-asset fits (`o11_assets.py`, `docs/results/o11_assets.json`).**
-   One friction probe (3 ramp angles × 9 μ, 27 clips each), one crop box and one camera pull
-   across every asset, every asset scaled to a common 0.19 m width and given identical mass.
-
-   **Per-asset readouts work on all seven valid assets** — each calibrated on its own sweep
-   against the simulator's own slide, leave-one-out: pot 1.10×, books 1.16×, teapot 1.37×,
-   bowl 1.75×, box 2.01×, sorter 2.92×, shark 3.46× (vase 1.15× but excluded, see below).
-   ρ(read, true) is 0.67–0.97. No per-asset tuning was needed.
-
-   **Three assets of ten cannot support the friction probe, and the SIM tells you which.**
-   The vase topples on 12/27 clips, the lion and triceratops on 27/27 — they read a topple,
-   not a slide. The geometric estimate `atan(halfwidth/com_z)` **under-predicts** toppling
-   for irregular shapes (it gave the lion 59° and the dino 41°), so it is a hint, not a
-   filter. The **sim-side topple count is the filter and it costs no renders** — run the
-   sweep, count topples, render only what slides. The dino also confirms it another way: its
-   slide spans 294–317 cm with a μ leverage of exactly 0.00.
-
-   **The offset is NOT predictable from geometry, and the first look said it was.** Over 42
-   ordered asset pairs the scale offset runs 1.02× to 54.1×, median 2.21×. At four assets
-   `footprint` correlated with the per-asset level at ρ = 1.000 — but an exact permutation
-   test over all orderings, taking the best of six features each time, puts that at **25% by
-   chance**. At seven assets the best feature falls to ρ = 0.429 at **p = 0.78**. A cheap
-   geometric shortcut for calibrating a new asset does not exist on this evidence, so
-   **per-asset calibration is the cost, ~27–100 clips an asset.**
-
-   **What does survive is the ordering.** Borrowing another asset's readout: Spearman median
-   **+0.804**, and **39/42** pairs above +0.5, against only 25/42 pairs beating the mean on
-   R². Removing one constant per pair recovers **38/42** — the error is a single scale factor,
-   not scrambled structure. Since a fit compares candidate θ for one fixed object and never
-   needs a calibrated distance, ordering is what a fit actually consumes.
-
-   **Where it stops: the reading does not transfer across objects, only the ordering does.**
-   Bowl-calibrated readout on the pot gives R² = −4.22 — worse than the mean. Almost all of
-   it is one constant: the readout is off by a factor of **3.4** on the new object. Remove
-   that single offset and R² = +0.61; Spearman survives at +0.734. Survivable for a fit,
-   which compares candidate θ for one fixed object and never needs a calibrated distance.
-   **Not** survivable for comparing a render against real footage — and that comparison is
-   the entire reason for using a model that has watched the real world. Write-up
-   `docs/O_TRACK.html`, scripts `o0_gate.py` · `o2*_*.py` · `o4_joint.py`.
-
-4. **V2 — gradient path** (only after V1 passes). `d(surprise)/d(pixels)` on one clip: finite,
-   and spatially concentrated on the moving object. Route through the **differentiable render
-   path** (`diff_preprocess`, `diff_splat`), **not** Blender Cycles (no gradients), and through
-   `SolverSemiImplicit` — `SolverVBD` gradients are exactly 0.0 in newton 1.4.0. Verify
-   `d(surprise)/dθ` against finite differences per parameter. The two render paths differ in
-   appearance, so compare V3's optimum to V1's Cycles-based minimum rather than assuming they
-   coincide.
-
-5. **V3 — gradient MAP on one probe**: `surprise(render(sim(θ))) − log p(θ)`, one object, one
-   probe with known θ_true (balance for mass, tilt for μ). Compare against ground truth and
-   against the CEM/SPSA fits on the same probe. Multi-start; report scatter (pinned vs
-   unconstrained). **V4** — joint multi-probe via `joint_fit.py`, surprise replacing the judge
-   margin as `s_p`, weights from measured sign-consistency as before.
-
-6. **Instrument work, independent of the V-track verdict** (can interleave):
-   - **Fix the soft-body probe.** Copy `DiffSoft`'s validated set (`k_mu=6000, lam_ratio=2,
-     k_damp=10, density=800, substeps=64, radius = spacing/6`) verbatim, then sweep only `k_mu`.
-   - **Finer cloth grid.** ρ = −0.786 saturates because a 7×5 grid cannot represent a fold.
-     Needs a re-derived stable (mass, cell, ke, kd) point, not a changed cell alone.
-   - **Render bounce and settle** via a `*_render_prep.py` in `blender_render_scene.py`'s
-     format — `balance_render_prep.py` shows the pattern, including the COM-offset convention.
-   - **Per-object focus in the fit**: full-frame global term alongside per-object crops.
-     `multiprobe_build.py` already writes `_FULL.mp4`; `joint_fit.py` ignores it.
-
-## Rules specific to the V-track
-
-- Surprise is a **plausibility** signal, never a mass gauge. Absolute scale = balance + prior.
-- If V1 passes for some probes only, use surprise for those and keep sim-side threshold
-  reading for the rest. Mixed supervision is fine; unvalidated supervision is not.
-- Every V1 plot goes in `docs/results/` with the noise floor drawn on it.
-- **Score through Meta's own codebase (`models/vjepa2_repo`), never HF transformers.** HF
-  cannot pass masks to the encoder, so it structurally cannot reproduce the protocol. Note
-  the repo ships `VJEPA_BASE_URL = "http://localhost:8300"` as a dev override; the real
-  host is `https://dl.fbaipublicfiles.com/vjepa2`.
-- **Only NON-DISTILLED checkpoints can score surprise.** `vjepa2_1_vitb/vitl_dist_vitG_384`
-  predict into a 1664-d teacher space they do not contain. `vjepa2_1_vitg_384` (1B) and
-  `vjepa2_1_vitG_384` (2B) are the teachers and are self-consistent: verified by loading,
-  encoder 1408 and predictor out 5632 = 4 x 1408 Deep-Self-Supervision levels.
-- **Clip framing is fixed per probe and reported.** A crop box that varies with θ, or a
-  clip whose object leaves the frame, is a confound and not a reading.
-- **Carry the motion caveat into every verdict.** A θ that damps harder also moves less, and
-  surprise tracks motion within a scene. A monotone surprise-vs-θ curve is separated from a
-  motion-mediated artefact by *shape*: a plausibility signal has a minimum inside the sweep.
-- Keep all judge code and results; they are the baseline rows of the paper.
+## Carried over from the theta track
+
+Still true, and used by the new track:
+- **The validated simulator (`archive/theta_track/src/sim`, `warp` env)** is the reference route for checking the
+  teacher and the physics layer (rule 2: two routes to one quantity). Exact mesh contact
+  (vertex-vs-plane; body-body through `wp.mesh_query_point_sign_normal`), per-body materials,
+  pair friction by geometric mean, restitution set by the Hunt-Crossley alpha
+  (`set_restitution_alpha`; e depends on cd/k, not cd), centre of mass and inertia by build
+  (`mass_model` shell/solid, checked against textbook values), seating with zero clearance (a
+  2 mm drop once inflated every tilted-probe slide), no static friction (~9 mm/s creep).
+- **Settle before recording.** Objects placed above a surface drop onto it; record only after
+  they settle (the seating lesson above, applied to teacher episodes).
+- **Parameters as physical quantities, never solver settings**: one damping value bounces
+  differently at different masses and contact stiffnesses (`p7`, `p8`).
+- **Gradients.** Plane-contact gradients are exact (`g0_grad_check.py`); gradients through
+  sustained body-body contact are not (`g0b`-`g0d`). The learned simulator does not need them.
+- **Nondeterminism.** Stiff contact on GPU is nondeterministic at ~1.5 mm (atomic-add order,
+  `g0b --diag`); set reproducibility tolerances from a repeat run, not from zero.
+- **Real data on disk.** Physics 101 raw videos in `data/phys101/` (git-ignored); the tracked
+  ramp slides (15 materials, extracted by the theta track's `p1`/`p2`) in `data/real/`, loaded by
+  `lsim.real.phys101`. Newton reproduces them to 0.4-1.0 mm (`p4`). The held-out-object test
+  (`archive/theta_track/scripts/e1_heldout.py`) gives the baselines for the first real check: own-trials oracle
+  1.8 mm, material median 2.6 mm, dataset median 4.4 mm (median trajectory error).
+- **What external models cannot do** (the motivation, and baseline rows): the Cosmos judge is
+  uncorrelated with density; V-JEPA surprise is at chance on impossible motion; FPT and
+  MYRIAD carry no material; Wan 2.2 slides at constant velocity with a seed-set speed; LLM
+  numbers are a generic prior, worse than a dataset median on held-out real slides.
 
 ## Environment & layout
 
-NVIDIA GPU (use one, don't hold idle ones); Newton 1.4.0 / Warp 1.15.0 (alpha, expect churn)
-+ Cosmos 3 (+ V-JEPA 2 for the V-track); VRAM-tight ⇒ scoring as a separate pass over cached
-clips. **Two envs, and it matters**: sim and plots run in `warp`
-(`/home/jooyeolyun/anaconda3/envs/warp/bin/python`), which has **no torch and no
-matplotlib-free scoring stack**; all scoring runs in `cosmos`
-(`/home/jooyeolyun/anaconda3/envs/cosmos/bin/python`, torch 2.11.0+cu128,
-transformers 5.14.1, `VJEPA2Model` present). `matplotlib` is in `warp` only, so every
-pipeline ends with a separate report stage. `src/gpu.py::wait_for_gpu` polls for a free
-card and pins one stage to it — the box is shared and a card is held only while computing.
-Blender at `/home/nas5/jaeseonglee/blender-4.4.3-linux-x64/blender`.
-`SolverVBD` gradients are exactly 0.0 in newton 1.4.0 — use `SolverSemiImplicit` for anything
-differentiable.
+Shared 8x RTX A6000 box (48 GB, sm_86, no FP8; driver 575.57.08 = CUDA 12.9). **The local root disk (which holds `/tmp`, the
+session scratchpad and `~`) fills up from other users' files (2026-11-24: 113 MB free; a `tempfile` write failed): keep
+checkpoints, smoke-test outputs and large temporary files on the NAS (`outputs/lsim/`, `TMPDIR=outputs/lsim/tmp`), and
+delete scratch checkpoints when done.** Use idle GPUs only
+(never one another person's job occupies), as many as the work saturates (the user, 2026-10-22:
+"feel free to use more GPUs if they are available. Not maxing out GPU Util is the important part"),
+and only while computing (`lsim.gpu.wait_for_gpu`, or check `nvidia-smi` and set
+`CUDA_VISIBLE_DEVICES`). Billing is 9 credits/hour per A6000 regardless of utilisation: give each
+training run its own GPU (two cloth runs sharing one ran ~2.5x slower each) and pack light jobs
+(evaluations, diagnostics) onto one card.
+
+Envs -- never mix them:
+- **`lsim`** (`/home/jooyeolyun/anaconda3/envs/lsim/bin/python`, Python 3.12): the learned
+  simulator. torch 2.11 cu128, newton 1.7 (+ mujoco-warp, importers, remesh), pymeshlab, and
+  this repo's `lsim` package installed editable (`pip install -e .`). Built by
+  `scripts/l0_install_env.sh`, pinned in `requirements-lsim.txt`.
+- **`warp`** (Python 3.11): the archived theta-track simulator, newton 1.4.0 / warp 1.15.0,
+  no torch; pinned in `archive/theta_track/requirements-warp.txt`.
+- **`cosmos`**: torch 2.11 cu128 + transformers (V-JEPA 2, Cosmos judge); theta-track
+  scoring only.
+Blender: `/home/nas5/jaeseonglee/blender-4.4.3-linux-x64/blender`. HF weights:
+`HF_HOME=/home/nas5/jooyeolyun/hf_cache` (NAS; local disk is small).
 
 ```
-configs/
-src/
-  sim/        mesh_contact · mesh_scene · deformable · probe_scene (legacy sphere cover)
-  render/     Cycles harness (RENDER_SCALE, CAM_PULL, TABLE_SX/SY) · crop · camera · views
-              · diff_preprocess (differentiable path, for V2+)
-  judge/      Cosmos 3 pairwise + absolute; fp32 head, full-frame decode  [baseline]
-  surprise/   V-JEPA 2 harness: clips · vjepa · regions · cache  [V0 done, 7/7 gates]
-  optimize/   CEM · SPSA with per-object θ · gradient MAP  [V3 — to build]
-scripts/      probe_*.py · bigscene_sim.py · joint_fit.py · iter_report.py · v0_*.py v1_*.py
-docs/         PROBE_*.md · SCALE_RANGE.md · MESH_CONTACT.md · BIGSCENE.md · iters/ · results/
+src/lsim/     the learned-simulator package: gpu.py · real/ (phys101: real tracks; synthetic:
+                hand-built episodes, e.g. a real cube on a 20 deg plank, for the model)
+              · teacher/ (newton_teacher: Kamino and friends; contacts: per-pair force,
+                point and torque recorder)
+              · data/ (assets, library, params, scene, actions, episode: the data engine)
+              · train/ (windows: episodes -> vertex windows and slots; train: losses, loop; cloth_windows,
+                cloth_train: the same for cloth)
+              · model/ (net: the network; physics: the exact layer; gns: baseline B1; rollout:
+                frame-by-frame inference; sampler: chunk denoising, ablation only; cloth_net: the cloth
+                network and its exact layer)
+scripts/      l<phase>_*.py stages: l0 env + teacher gate + bake-off + cloth gate (+ cloth render, cloth teacher check) · l1 assets, generate,
+              gate, dataset_check, real_audit · l2 overfit, eval (G1/G2/G4), rigid_where (one-frame error by what a body touches, beside the layer alone), rigid_hinged (drawers, doors, lids), drift (resting
+              drift), teacher_baseline (B3), phys101 (the model against real slides), render (+
+              blender_render.py: rollouts as side-by-side video), cloth_eval (cloth rollouts), cloth_strain (how much the
+              learned cloth stretches against the teacher's)
+tests/        physics layer against closed forms; frame-average velocities
+docs/         DIRECTION.md (design + plan + phase status) · LEARNED_SIM.html · ARCHITECTURE.html · results/
+data/         phys101/ raw videos (ignored) · real/ small derived real-data files (tracked)
+              · assets/, datasets/ (ignored, generated in phase 1)
+outputs/      run outputs (ignored)
+archive/theta_track/   the theta-recovery track, Jul-Oct 2026: src, scripts, docs
+              (THETA_TRACK.md = the old CLAUDE.md state), configs, assets, models (45 GB) and
+              outputs (51 GB, both ignored). Read-only reference; never imported by new code.
 ```
-
-`scripts/iter_report.py [RUN] --max-clips N` emits one page per object: θ per iteration, the
-per-probe plus/minus scores, and the clip pairs that produced them.

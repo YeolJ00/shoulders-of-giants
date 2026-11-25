@@ -1,0 +1,442 @@
+{
+ "data": "data/datasets/v0r",
+ "shard": 0,
+ "episodes": 128,
+ "probe": "uniformly random object",
+ "replay": {
+  "vs_recording_mm": {
+   "median": 12.201497796922922,
+   "p90": 150.29770731925964
+  },
+  "noise_mm": {
+   "median": 0.20424248214112595,
+   "p90": 25.399422273039807,
+   "max": 767.8472995758057
+  },
+  "force_noise_Ns": {
+   "median": 5.635795423586387e-05,
+   "p90": 0.12729756832122793
+  },
+  "threshold_mm_median": 7.5,
+  "force_threshold_Ns_median": 0.05
+ },
+ "params": {
+  "mu": {
+   "episodes": 128,
+   "median_mm": 13.350586406886578,
+   "median_force_Ns": 0.12745226919651031,
+   "coverage": 0.6953125,
+   "coverage_H": 0.4921875,
+   "by_family": {
+    "collision": {
+     "n": 25,
+     "median_mm": 22.733520716428757,
+     "identified_G": 0.6,
+     "identified_H": 0.48,
+     "identifying_G": true
+    },
+    "drop": {
+     "n": 84,
+     "median_mm": 10.751705151051283,
+     "identified_G": 0.7261904761904762,
+     "identified_H": 0.5,
+     "identifying_G": true
+    },
+    "none": {
+     "n": 3,
+     "median_mm": 0.2380267542321235,
+     "identified_G": 0.0,
+     "identified_H": 0.0,
+     "identifying_G": false
+    },
+    "off_centre": {
+     "n": 21,
+     "median_mm": 10.852424427866936,
+     "identified_G": 0.8571428571428571,
+     "identified_H": 0.42857142857142855,
+     "identifying_G": true
+    },
+    "poke": {
+     "n": 15,
+     "median_mm": 65.8850148320198,
+     "identified_G": 0.8,
+     "identified_H": 0.6,
+     "identifying_G": true
+    },
+    "push": {
+     "n": 50,
+     "median_mm": 20.25048341602087,
+     "identified_G": 0.82,
+     "identified_H": 0.56,
+     "identifying_G": true
+    },
+    "ramp": {
+     "n": 9,
+     "median_mm": 59.699274599552155,
+     "identified_G": 0.5555555555555556,
+     "identified_H": 0.4444444444444444,
+     "identifying_G": true
+    },
+    "stack": {
+     "n": 12,
+     "median_mm": 34.411266446113586,
+     "identified_G": 0.5833333333333334,
+     "identified_H": 0.3333333333333333,
+     "identifying_G": true
+    },
+    "strike": {
+     "n": 18,
+     "median_mm": 22.115938365459442,
+     "identified_G": 0.8333333333333334,
+     "identified_H": 0.6666666666666666,
+     "identifying_G": true
+    },
+    "sweep": {
+     "n": 6,
+     "median_mm": 69.97823156416416,
+     "identified_G": 0.6666666666666666,
+     "identified_H": 0.5,
+     "identifying_G": true
+    },
+    "tilt_release": {
+     "n": 21,
+     "median_mm": 25.83557367324829,
+     "identified_G": 0.8095238095238095,
+     "identified_H": 0.5238095238095238,
+     "identifying_G": true
+    }
+   }
+  },
+  "restitution": {
+   "episodes": 128,
+   "median_mm": 25.686909444630146,
+   "median_force_Ns": 0.025221786461770535,
+   "coverage": 0.703125,
+   "coverage_H": 0.640625,
+   "by_family": {
+    "collision": {
+     "n": 25,
+     "median_mm": 30.709419399499893,
+     "identified_G": 0.6,
+     "identified_H": 0.56,
+     "identifying_G": true
+    },
+    "drop": {
+     "n": 84,
+     "median_mm": 31.775131821632385,
+     "identified_G": 0.8928571428571429,
+     "identified_H": 0.8928571428571429,
+     "identifying_G": true
+    },
+    "none": {
+     "n": 3,
+     "median_mm": 0.02624093758640811,
+     "identified_G": 0.3333333333333333,
+     "identified_H": 0.0,
+     "identifying_G": false
+    },
+    "off_centre": {
+     "n": 21,
+     "median_mm": 30.25924786925316,
+     "identified_G": 0.8571428571428571,
+     "identified_H": 0.7142857142857143,
+     "identifying_G": true
+    },
+    "poke": {
+     "n": 15,
+     "median_mm": 51.09192430973053,
+     "identified_G": 0.6666666666666666,
+     "identified_H": 0.6666666666666666,
+     "identifying_G": true
+    },
+    "push": {
+     "n": 50,
+     "median_mm": 26.233317330479622,
+     "identified_G": 0.68,
+     "identified_H": 0.56,
+     "identifying_G": true
+    },
+    "ramp": {
+     "n": 9,
+     "median_mm": 19.83269490301609,
+     "identified_G": 0.3333333333333333,
+     "identified_H": 0.2222222222222222,
+     "identifying_G": false
+    },
+    "stack": {
+     "n": 12,
+     "median_mm": 22.448452655225992,
+     "identified_G": 0.25,
+     "identified_H": 0.16666666666666666,
+     "identifying_G": false
+    },
+    "strike": {
+     "n": 18,
+     "median_mm": 29.92506232112646,
+     "identified_G": 0.6666666666666666,
+     "identified_H": 0.5555555555555556,
+     "identifying_G": true
+    },
+    "sweep": {
+     "n": 6,
+     "median_mm": 49.03752543032169,
+     "identified_G": 0.5,
+     "identified_H": 0.3333333333333333,
+     "identifying_G": false
+    },
+    "tilt_release": {
+     "n": 21,
+     "median_mm": 35.792604088783264,
+     "identified_G": 0.7142857142857143,
+     "identified_H": 0.6666666666666666,
+     "identifying_G": true
+    }
+   }
+  },
+  "com": {
+   "episodes": 128,
+   "median_mm": 63.44056874513626,
+   "median_force_Ns": 0.16941407322883606,
+   "coverage": 0.78125,
+   "coverage_H": 0.6796875,
+   "by_family": {
+    "collision": {
+     "n": 25,
+     "median_mm": 99.49728101491928,
+     "identified_G": 0.92,
+     "identified_H": 0.76,
+     "identifying_G": true
+    },
+    "drop": {
+     "n": 84,
+     "median_mm": 40.636954829096794,
+     "identified_G": 0.7619047619047619,
+     "identified_H": 0.6785714285714286,
+     "identifying_G": true
+    },
+    "none": {
+     "n": 3,
+     "median_mm": 0.3294404305052012,
+     "identified_G": 0.3333333333333333,
+     "identified_H": 0.0,
+     "identifying_G": false
+    },
+    "off_centre": {
+     "n": 21,
+     "median_mm": 57.59480595588684,
+     "identified_G": 0.9047619047619048,
+     "identified_H": 0.7619047619047619,
+     "identifying_G": true
+    },
+    "poke": {
+     "n": 15,
+     "median_mm": 152.84524857997894,
+     "identified_G": 0.9333333333333333,
+     "identified_H": 0.8,
+     "identifying_G": true
+    },
+    "push": {
+     "n": 50,
+     "median_mm": 71.86730206012726,
+     "identified_G": 0.88,
+     "identified_H": 0.8,
+     "identifying_G": true
+    },
+    "ramp": {
+     "n": 9,
+     "median_mm": 133.62225890159607,
+     "identified_G": 1.0,
+     "identified_H": 0.8888888888888888,
+     "identifying_G": true
+    },
+    "stack": {
+     "n": 12,
+     "median_mm": 181.95809423923492,
+     "identified_G": 0.75,
+     "identified_H": 0.5833333333333334,
+     "identifying_G": true
+    },
+    "strike": {
+     "n": 18,
+     "median_mm": 33.56157150119543,
+     "identified_G": 0.7777777777777778,
+     "identified_H": 0.6666666666666666,
+     "identifying_G": true
+    },
+    "sweep": {
+     "n": 6,
+     "median_mm": 201.27443224191666,
+     "identified_G": 1.0,
+     "identified_H": 0.8333333333333334,
+     "identifying_G": true
+    },
+    "tilt_release": {
+     "n": 21,
+     "median_mm": 102.38488018512726,
+     "identified_G": 0.9523809523809523,
+     "identified_H": 0.7619047619047619,
+     "identifying_G": true
+    }
+   }
+  },
+  "mass": {
+   "episodes": 128,
+   "median_mm": 8.695767261087894,
+   "median_force_Ns": 0.5293494015932083,
+   "coverage": 0.7265625,
+   "coverage_H": 0.3671875,
+   "by_family": {
+    "collision": {
+     "n": 25,
+     "median_mm": 12.252574786543846,
+     "identified_G": 0.68,
+     "identified_H": 0.36,
+     "identifying_G": true
+    },
+    "drop": {
+     "n": 84,
+     "median_mm": 6.261318689212203,
+     "identified_G": 0.7380952380952381,
+     "identified_H": 0.34523809523809523,
+     "identifying_G": true
+    },
+    "none": {
+     "n": 3,
+     "median_mm": 0.009117480658460408,
+     "identified_G": 0.0,
+     "identified_H": 0.0,
+     "identifying_G": false
+    },
+    "off_centre": {
+     "n": 21,
+     "median_mm": 7.24822748452425,
+     "identified_G": 0.9047619047619048,
+     "identified_H": 0.3333333333333333,
+     "identifying_G": true
+    },
+    "poke": {
+     "n": 15,
+     "median_mm": 13.841979205608368,
+     "identified_G": 0.6,
+     "identified_H": 0.2,
+     "identifying_G": true
+    },
+    "push": {
+     "n": 50,
+     "median_mm": 11.85501366853714,
+     "identified_G": 0.84,
+     "identified_H": 0.4,
+     "identifying_G": true
+    },
+    "ramp": {
+     "n": 9,
+     "median_mm": 16.216415911912918,
+     "identified_G": 0.6666666666666666,
+     "identified_H": 0.4444444444444444,
+     "identifying_G": true
+    },
+    "stack": {
+     "n": 12,
+     "median_mm": 50.62743276357651,
+     "identified_G": 0.5833333333333334,
+     "identified_H": 0.4166666666666667,
+     "identifying_G": true
+    },
+    "strike": {
+     "n": 18,
+     "median_mm": 12.767328880727291,
+     "identified_G": 0.9444444444444444,
+     "identified_H": 0.5,
+     "identifying_G": true
+    },
+    "sweep": {
+     "n": 6,
+     "median_mm": 25.295604020357132,
+     "identified_G": 0.8333333333333334,
+     "identified_H": 0.5,
+     "identifying_G": true
+    },
+    "tilt_release": {
+     "n": 21,
+     "median_mm": 13.386863283813,
+     "identified_G": 0.8571428571428571,
+     "identified_H": 0.5238095238095238,
+     "identifying_G": true
+    }
+   }
+  },
+  "joint_damping": {
+   "episodes": 18,
+   "median_mm": 36.50070588110178,
+   "median_force_Ns": 0.2715873271226883,
+   "coverage": 0.8333333333333334,
+   "coverage_H": 0.7777777777777778,
+   "by_family": {
+    "hinge": {
+     "n": 18,
+     "median_mm": 36.50070588110178,
+     "identified_G": 0.8333333333333334,
+     "identified_H": 0.7777777777777778,
+     "identifying_G": true
+    }
+   }
+  }
+ },
+ "coverage_is": "G (force slot given): motion or gripper force changes; coverage_H: motion changes",
+ "free_dynamics_fraction": 0.9507667824074074,
+ "family_fractions": {
+  "push": {
+   "fraction": 0.6953125,
+   "target": 0.6
+  },
+  "off_centre": {
+   "fraction": 0.4140625,
+   "target": 0.4
+  },
+  "tilt_release": {
+   "fraction": 0.390625,
+   "target": 0.3
+  },
+  "strike": {
+   "fraction": 0.3125,
+   "target": 0.3
+  },
+  "collision": {
+   "fraction": 0.3055555555555556,
+   "target": 0.3
+  },
+  "sweep": {
+   "fraction": 0.140625,
+   "target": 0.15
+  },
+  "random": {
+   "fraction": 0.1640625,
+   "target": 0.2
+  },
+  "hinge": {
+   "fraction": 0.2909090909090909,
+   "target": 0.3
+  }
+ },
+ "object_interactions": {
+  "grip": 0.6614583333333334,
+  "drop": 0.6328125,
+  "poke": 0.08854166666666667,
+  "object_object": 0.1796875,
+  "any": 0.9088541666666666,
+  "objects": 384
+ },
+ "invariants": {
+  "finite": true,
+  "max_speed_m_s": 4.37022590637207,
+  "lowest_z_m": -0.7412087321281433,
+  "above_floor": true,
+  "max_xy_m": 1.7440599203109741,
+  "on_floor_plate": true
+ },
+ "targets": {
+  "coverage_mu_e_mass_com": 0.6,
+  "coverage_joint_damping": 0.3,
+  "free_dynamics": 0.5
+ }
+}

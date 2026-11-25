@@ -1,0 +1,84 @@
+{
+ "batch": {
+  "batch0": {
+   "wall_s": 324.0764789581299,
+   "substeps": 2450,
+   "episodes": 64,
+   "episodes_per_gpu_hour": 710.9432956711655
+  },
+  "batch1": {
+   "wall_s": 213.0719895362854,
+   "substeps": 1333,
+   "episodes": 64,
+   "episodes_per_gpu_hour": 1081.3246757653412
+  },
+  "batch2": {
+   "wall_s": 89.85479950904846,
+   "substeps": 495,
+   "episodes": 64,
+   "episodes_per_gpu_hour": 2564.1368213925903
+  },
+  "batch3": {
+   "wall_s": 87.47348284721375,
+   "substeps": 450,
+   "episodes": 64,
+   "episodes_per_gpu_hour": 2633.941081349533
+  },
+  "summary": {
+   "episodes": 256,
+   "exploded": 0,
+   "inverted": 15,
+   "min_J_p1": -0.4474086271413544,
+   "min_J_min": -0.7497907325333008,
+   "contact_over_weight_p50": 5.527462720870972,
+   "contact_over_weight_p99": 381.36881256103317,
+   "contact_over_weight_max": 1590.5753173828125,
+   "table_pen_mm_p99": 2.882086170371622,
+   "table_pen_mm_max": 2.9633574411273003,
+   "pad_pen_mm_p99": 2.9228109445124444,
+   "pad_pen_mm_max": 5.611464381217971,
+   "end_speed_p50": 0.022750708845708616,
+   "end_speed_p90": 0.35163527825853336,
+   "vmax_max": 5.994787175285344,
+   "vertices_mean": 1283.734375,
+   "vertices_max": 2979,
+   "episodes_per_gpu_hour": 1289.8950160417612,
+   "families": {
+    "slide": 35,
+    "lift_place": 30,
+    "squeeze": 38,
+    "press": 33,
+    "drag": 31,
+    "push": 38,
+    "lift_drop": 27
+   },
+   "inits": {
+    "rest": 121,
+    "dropped": 56,
+    "on_object": 23,
+    "against": 31,
+    "ramp": 25
+   },
+   "shapes": {
+    "ellipsoid": 71,
+    "blob": 55,
+    "cylinder": 39,
+    "box": 91
+   }
+  },
+  "pass": false,
+  "wall_s": 1179.746960401535
+ },
+ "_versions": {
+  "newton": "1.7.0",
+  "warp": "1.18.0",
+  "teacher": {
+   "contact_rate": 100000000.0,
+   "contact_zeta": 1.0,
+   "cfl": 0.4,
+   "dt_scale": 1.5,
+   "collide_dt": 0.0008,
+   "gap": 0.008
+  }
+ }
+}

@@ -1,0 +1,93 @@
+{
+ "episodes": {
+  "mix": {
+   "episodes": 64,
+   "exploded": 0,
+   "crossed_at_end": 2,
+   "crossings": [
+    10,
+    3
+   ],
+   "contact_over_weight_p99": 17.929635629653905,
+   "contact_over_weight_max": 23.858928680419922,
+   "fastest_vertex_m_s": 4.310566425323486,
+   "substeps": 2100,
+   "wall_s": 128.9968557357788,
+   "candidates_vt_ee": [
+    20,
+    35
+   ],
+   "pass": true
+  },
+  "fold": {
+   "episodes": 64,
+   "exploded": 0,
+   "crossed_at_end": 0,
+   "crossings": [],
+   "contact_over_weight_p99": 9.721108055114719,
+   "contact_over_weight_max": 16.648250579833984,
+   "fastest_vertex_m_s": 4.7978949546813965,
+   "substeps": 2100,
+   "wall_s": 150.33046579360962,
+   "candidates_vt_ee": [
+    16,
+    27
+   ],
+   "pass": true
+  },
+  "ramp": {
+   "episodes": 64,
+   "exploded": 0,
+   "crossed_at_end": 0,
+   "crossings": [],
+   "contact_over_weight_p99": 5.02518920183181,
+   "contact_over_weight_max": 6.854000568389893,
+   "fastest_vertex_m_s": 4.434842586517334,
+   "substeps": 2050,
+   "wall_s": 86.0307629108429,
+   "candidates_vt_ee": [
+    10,
+    20
+   ],
+   "pass": true
+  },
+  "draped": {
+   "episodes": 64,
+   "exploded": 0,
+   "crossed_at_end": 1,
+   "crossings": [
+    12
+   ],
+   "contact_over_weight_p99": 20.57947725296018,
+   "contact_over_weight_max": 26.778181076049805,
+   "fastest_vertex_m_s": 4.198929309844971,
+   "substeps": 2100,
+   "wall_s": 134.69173789024353,
+   "candidates_vt_ee": [
+    10,
+    20
+   ],
+   "pass": true
+  },
+  "pass": true
+ },
+ "_versions": {
+  "newton": "1.7.0",
+  "warp": "1.18.0",
+  "teacher": {
+   "contact_rate": 20000000.0,
+   "contact_zeta": 1.0,
+   "friction_rate": 20000.0,
+   "self": [
+    0.002,
+    20000000.0,
+    0.5,
+    0.004
+   ],
+   "self_edges": true,
+   "membrane_kd": 0.001,
+   "rho_cd": 1.44,
+   "bend_factor": 2.0
+  }
+ }
+}

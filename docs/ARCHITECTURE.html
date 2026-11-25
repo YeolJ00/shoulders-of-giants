@@ -1,0 +1,436 @@
+<title>[SoG] Architecture</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap">
+<style>
+/* Shoulder of Giants leaf page: the main page's palette and type (paper and ink; blue = given inputs and space
+   attention, purple = time attention, green = the exact physics layer). Reading column with wide figures. */
+:root{
+  --paper:#fbfaf7; --panel:#ffffff; --sunk:#f2f0ea; --ink:#16191c; --ink-2:#454b52; --ink-3:#737a82; --rule:#dcd9d1;
+  --given:#2b5f86; --empty:#6b3fa0; --exact:#1f6b4f; --warn:#a4561a;
+  --serif:"Source Serif 4","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#111315; --panel:#171a1d; --sunk:#1d2124; --ink:#e8e9e6; --ink-2:#b0b6bc; --ink-3:#848b92; --rule:#2c3034;
+  --given:#79b0d8; --empty:#b99ce8; --exact:#63b48f; --warn:#e0955a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#111315; --panel:#171a1d; --sunk:#1d2124; --ink:#e8e9e6; --ink-2:#b0b6bc; --ink-3:#848b92; --rule:#2c3034;
+  --given:#79b0d8; --empty:#b99ce8; --exact:#63b48f; --warn:#e0955a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.62;margin:0}
+.wrap{max-width:1000px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 72px}
+.col{max-width:70ch}
+.crumb{font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--ink-3);margin:0 0 22px}
+.crumb a{color:var(--ink-2);text-decoration:none;border-bottom:1px solid var(--rule)}
+.crumb a:hover{color:var(--ink);border-bottom-color:var(--ink-3)}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(31px,5vw,44px);line-height:1.08;margin:.35em 0 .4em;
+  text-wrap:balance;max-width:24ch}
+h2{font-family:var(--serif);font-weight:600;font-size:clamp(23px,3.2vw,29px);line-height:1.2;margin:0 0 .5em;
+  text-wrap:balance}
+h3{font-family:var(--sans);font-weight:600;font-size:16.5px;margin:1.3em 0 .3em}
+p{margin:0 0 .9em}
+.lede{font-size:clamp(17.5px,2.1vw,19.5px);line-height:1.55;color:var(--ink-2);max-width:62ch}
+a{color:var(--given);text-underline-offset:2px}
+a:focus-visible{outline:2px solid var(--given);outline-offset:2px;border-radius:2px}
+section{padding-block:44px 8px;border-top:1px solid var(--rule);margin-top:40px}
+.toc{display:flex;flex-wrap:wrap;gap:6px 18px;margin:24px 0 0;padding:0;list-style:none;font-size:14.5px}
+.toc a{color:var(--ink-2);text-decoration:none;border-bottom:1px solid var(--rule)}
+.toc a:hover{color:var(--ink);border-bottom-color:var(--ink-3)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;background:var(--rule);
+  border:1px solid var(--rule);margin:28px 0 0}
+.facts div{background:var(--panel);padding:12px 14px;min-width:0}
+.facts b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:500;margin-bottom:2px}
+.facts span{font-size:15px}
+figure{margin:26px 0 14px}
+.scroll{overflow-x:auto}
+figure svg{display:block;width:100%;height:auto;color:var(--ink);min-width:660px}
+figcaption{font-size:14px;color:var(--ink-3);margin-top:8px;max-width:78ch;line-height:1.5}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:8px 32px;margin:10px 0 0}
+.two > div{min-width:0}
+ul.plain{margin:.3em 0 .9em;padding-left:1.2em}
+ul.plain li{margin:0 0 .35em;font-size:15.5px}
+.note{background:var(--sunk);padding:14px 18px;border-radius:3px;margin:18px 0 6px;font-size:15.5px;max-width:78ch}
+.tablewrap{overflow-x:auto;margin:16px 0 6px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:680px}
+th,td{text-align:left;vertical-align:top;padding:10px 14px 10px 0;border-top:1px solid var(--rule)}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:500}
+td:first-child{font-weight:600;width:24%}
+td:nth-child(2){color:var(--ink-2);width:30%}
+td{font-variant-numeric:tabular-nums}
+code{font-family:var(--mono);font-size:.88em;background:var(--sunk);padding:1px 4px;border-radius:2px;
+  overflow-wrap:anywhere}
+.foot{margin-top:48px;font-size:13.5px;color:var(--ink-3)}
+@media (max-width:640px){ section{margin-top:28px;padding-top:32px} }
+</style>
+
+<div class="wrap">
+<p class="crumb"><a href="https://claude.ai/artifact/5WR9dMDTujSfrNAyhjCEQJ">[SoG] Shoulder of Giants</a> &nbsp;›&nbsp; Architecture</p>
+<header>
+  <div class="eyebrow">[SoG] · the model as built · as of 2026-11-25</div>
+  <h1>Two networks, one recipe; only cloth keeps the physics layer</h1>
+  <p class="lede">Cloth and rigid objects each have their own network today, built from the same transformer block
+  and trained the same way: look at the last eight frames of every point in the scene, predict the next frame, and
+  repeat. The cloth network predicts forces and lets exact physics move the cloth. The rigid network predicts motion
+  directly, because the rigid physics layer made it worse. This page says what each one reads, computes and outputs,
+  and which measurement decided each choice.</p>
+  <div class="facts">
+    <div><b>Cloth network</b><span>64.4M parameters: 16 blocks, width 512</span></div>
+    <div><b>Rigid network</b><span>1.6M parameters: 6 blocks, width 128</span></div>
+    <div><b>Window</b><span>8 past frames; in training, 8 more to predict</span></div>
+    <div><b>Running alone</b><span>One frame at a time, always from its last 8</span></div>
+  </div>
+  <ul class="toc" aria-label="Contents">
+    <li><a href="#step">One step</a></li>
+    <li><a href="#block">The block</a></li>
+    <li><a href="#cloth">Cloth</a></li>
+    <li><a href="#rigid">Rigid</a></li>
+    <li><a href="#training">Training</a></li>
+    <li><a href="#choices">Why each choice</a></li>
+    <li><a href="#open">Open problems</a></li>
+    <li><a href="#code">Code</a></li>
+  </ul>
+</header>
+
+<section id="step">
+  <div class="col">
+    <div class="eyebrow">One step</div>
+    <h2>Read the last eight frames, predict the next, append it, repeat</h2>
+    <p>Every point in the scene is a token in every frame: cloth vertices, points on each object's surface, the
+    gripper, and the table and fixed objects near anything that moves. The network sees no absolute positions. It
+    sees motion (velocities, offsets to neighbours) and where things are only through the attention's rotary
+    positions. After the trunk the two networks part.</p>
+  </div>
+  <figure>
+    <div class="scroll">
+    <svg viewBox="0 0 900 310" role="img" aria-label="One step of both networks. The last eight frames of every point are turned into per-point inputs and passed through a transformer. The cloth network outputs a force per vertex, which an exact physics layer turns into the next frame. The rigid network outputs an acceleration per point, steps it forward and fits each object as one rigid body. The new frame joins the window and the oldest frame drops out.">
+      <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+      <g font-family="IBM Plex Sans, system-ui, sans-serif" font-size="13" fill="currentColor">
+        <g fill="none" stroke="currentColor" stroke-width="1.3">
+          <rect x="10" y="115" width="130" height="80" rx="4"/>
+          <rect x="170" y="115" width="150" height="80" rx="4"/>
+          <rect x="350" y="115" width="140" height="80" rx="4"/>
+          <rect x="535" y="30" width="145" height="64" rx="4"/>
+          <rect x="535" y="216" width="145" height="64" rx="4"/>
+          <rect x="705" y="216" width="185" height="64" rx="4"/>
+        </g>
+        <rect x="705" y="30" width="185" height="64" rx="4" fill="none" style="stroke:var(--exact)" stroke-width="2"/>
+        <text x="75" y="145" text-anchor="middle" font-weight="600">Window</text>
+        <text x="75" y="164" text-anchor="middle" font-size="12">last 8 frames of</text>
+        <text x="75" y="179" text-anchor="middle" font-size="12">every point</text>
+        <text x="245" y="145" text-anchor="middle" font-weight="600">Inputs per point</text>
+        <text x="245" y="164" text-anchor="middle" font-size="12">cloth: 203 numbers</text>
+        <text x="245" y="179" text-anchor="middle" font-size="12">rigid: 54 (+34 nearby)</text>
+        <text x="420" y="145" text-anchor="middle" font-weight="600">Transformer</text>
+        <text x="420" y="164" text-anchor="middle" font-size="12">cloth: 16 blocks × 512</text>
+        <text x="420" y="179" text-anchor="middle" font-size="12">rigid: 6 blocks × 128</text>
+        <text x="607" y="57" text-anchor="middle" font-weight="600">Force per vertex</text>
+        <text x="607" y="76" text-anchor="middle" font-size="12">in units of its weight</text>
+        <text x="797" y="57" text-anchor="middle" font-weight="600">Exact physics layer</text>
+        <text x="797" y="76" text-anchor="middle" font-size="12">gravity, drag, table, grasp</text>
+        <text x="607" y="243" text-anchor="middle" font-weight="600">Acceleration</text>
+        <text x="607" y="262" text-anchor="middle" font-size="12">per point, no layer</text>
+        <text x="797" y="243" text-anchor="middle" font-weight="600">Step, then fit each</text>
+        <text x="797" y="262" text-anchor="middle" font-size="12">object as one rigid body</text>
+        <text x="520" y="112" text-anchor="end" font-size="12" style="fill:var(--ink-3)">cloth</text>
+        <text x="520" y="208" text-anchor="end" font-size="12" style="fill:var(--ink-3)">rigid</text>
+        <g stroke="currentColor" stroke-width="1.3" fill="none">
+          <line x1="140" y1="155" x2="166" y2="155" marker-end="url(#a1)"/>
+          <line x1="320" y1="155" x2="346" y2="155" marker-end="url(#a1)"/>
+          <polyline points="490,155 510,155 510,62 531,62" marker-end="url(#a1)"/>
+          <polyline points="510,155 510,248 531,248"/>
+          <line x1="510" y1="248" x2="531" y2="248" marker-end="url(#a1)"/>
+          <line x1="680" y1="62" x2="701" y2="62" marker-end="url(#a1)"/>
+          <line x1="680" y1="248" x2="701" y2="248" marker-end="url(#a1)"/>
+          <polyline points="797,30 797,12 75,12 75,111" marker-end="url(#a1)"/>
+          <polyline points="797,280 797,298 75,298 75,199" marker-end="url(#a1)"/>
+        </g>
+        <text x="436" y="27" text-anchor="middle" font-size="12" style="fill:var(--ink-3)">the new frame joins the window; the oldest drops out</text>
+        <text x="436" y="293" text-anchor="middle" font-size="12" style="fill:var(--ink-3)">the new frame joins the window; the oldest drops out</text>
+      </g>
+    </svg>
+    </div>
+    <figcaption>One step of each network. Only the green box is hand-written physics, and only cloth has it. The
+    gripper, the table and anything held follow the recording; everything else is predicted.</figcaption>
+  </figure>
+</section>
+
+<section id="block">
+  <div class="col">
+    <div class="eyebrow">The block</div>
+    <h2>Attention across the scene within a frame, then along each point's own past</h2>
+    <p>Both networks stack the same block, borrowed from the Qwen3 language models: normalise, attend, add back;
+    grouped-query attention with normalised queries and keys; a SwiGLU feed-forward layer; no biases. Ours splits
+    attention in two. Space attention lets every point in one frame look at every other point in that frame. Time
+    attention lets each point look at its own earlier frames only. A cloth window has about 1,560 points in each of
+    16 frames, so each token attends to about 1,560 others plus at most 15, instead of all 25,000.</p>
+  </div>
+  <figure>
+    <div class="scroll">
+    <svg viewBox="0 0 900 250" role="img" aria-label="Tokens laid out as points by frames. Space attention connects every point within one frame. Time attention connects one point to its own earlier frames only. Each block applies space attention, then time attention, then a feed-forward layer, each after a normalisation and added back to its input.">
+      <g font-family="IBM Plex Sans, system-ui, sans-serif" font-size="12.5" fill="currentColor">
+        <rect x="282" y="32" width="32" height="186" rx="6" fill="none" style="stroke:var(--given)" stroke-width="2"/>
+        <rect x="44" y="126" width="270" height="28" rx="6" fill="none" style="stroke:var(--empty)" stroke-width="2"/>
+        <g style="fill:var(--ink-3)">
+          <circle cx="60" cy="50" r="4"/><circle cx="94" cy="50" r="4"/><circle cx="128" cy="50" r="4"/><circle cx="162" cy="50" r="4"/><circle cx="196" cy="50" r="4"/><circle cx="230" cy="50" r="4"/><circle cx="264" cy="50" r="4"/><circle cx="298" cy="50" r="4"/>
+          <circle cx="60" cy="80" r="4"/><circle cx="94" cy="80" r="4"/><circle cx="128" cy="80" r="4"/><circle cx="162" cy="80" r="4"/><circle cx="196" cy="80" r="4"/><circle cx="230" cy="80" r="4"/><circle cx="264" cy="80" r="4"/><circle cx="298" cy="80" r="4"/>
+          <circle cx="60" cy="110" r="4"/><circle cx="94" cy="110" r="4"/><circle cx="128" cy="110" r="4"/><circle cx="162" cy="110" r="4"/><circle cx="196" cy="110" r="4"/><circle cx="230" cy="110" r="4"/><circle cx="264" cy="110" r="4"/><circle cx="298" cy="110" r="4"/>
+          <circle cx="60" cy="140" r="4"/><circle cx="94" cy="140" r="4"/><circle cx="128" cy="140" r="4"/><circle cx="162" cy="140" r="4"/><circle cx="196" cy="140" r="4"/><circle cx="230" cy="140" r="4"/><circle cx="264" cy="140" r="4"/>
+          <circle cx="60" cy="170" r="4"/><circle cx="94" cy="170" r="4"/><circle cx="128" cy="170" r="4"/><circle cx="162" cy="170" r="4"/><circle cx="196" cy="170" r="4"/><circle cx="230" cy="170" r="4"/><circle cx="264" cy="170" r="4"/><circle cx="298" cy="170" r="4"/>
+          <circle cx="60" cy="200" r="4"/><circle cx="94" cy="200" r="4"/><circle cx="128" cy="200" r="4"/><circle cx="162" cy="200" r="4"/><circle cx="196" cy="200" r="4"/><circle cx="230" cy="200" r="4"/><circle cx="264" cy="200" r="4"/><circle cx="298" cy="200" r="4"/>
+        </g>
+        <circle cx="298" cy="140" r="6" fill="currentColor"/>
+        <text x="60" y="240" font-size="12" style="fill:var(--ink-3)">frames, oldest to newest →</text>
+        <text x="20" y="128" font-size="12" style="fill:var(--ink-3)" transform="rotate(-90 20 128)" text-anchor="middle">points</text>
+        <text x="298" y="24" text-anchor="middle" font-size="12" style="fill:var(--given)">space attention</text>
+        <text x="180" y="122" text-anchor="middle" font-size="12" style="fill:var(--empty)">time attention (earlier frames only)</text>
+        <g fill="none" stroke="currentColor" stroke-width="1.3">
+          <rect x="420" y="30" width="460" height="52" rx="4" style="stroke:var(--given)"/>
+          <rect x="420" y="96" width="460" height="52" rx="4" style="stroke:var(--empty)"/>
+          <rect x="420" y="162" width="460" height="52" rx="4"/>
+        </g>
+        <text x="436" y="52" font-weight="600">1 · Space attention</text>
+        <text x="436" y="71" font-size="12">all points of one frame; positions: cloth rest (u, v), rigid world position</text>
+        <text x="436" y="118" font-weight="600">2 · Time attention</text>
+        <text x="436" y="137" font-size="12">each point over its own earlier frames; position: the frame number</text>
+        <text x="436" y="184" font-weight="600">3 · Feed-forward (SwiGLU)</text>
+        <text x="436" y="203" font-size="12">each token alone; each step is normalised first and added back</text>
+        <text x="372" y="128" text-anchor="middle" font-size="12" style="fill:var(--ink-3)">one block</text>
+        <text x="372" y="144" text-anchor="middle" font-size="12" style="fill:var(--ink-3)">=</text>
+      </g>
+    </svg>
+    </div>
+    <figcaption>Tokens as a grid of points by frames. The highlighted token gathers from every point in its frame
+    (blue) and from its own earlier frames (purple). Positions enter as rotary encodings, so the network compares
+    places without ever reading them as numbers.</figcaption>
+  </figure>
+</section>
+
+<section id="cloth">
+  <div class="col">
+    <div class="eyebrow">Cloth network</div>
+    <h2>Each vertex reads its surroundings in its own axes, and outputs a force</h2>
+    <p>A cloth vertex's input describes everything around it as seen from that vertex: its velocity and
+    acceleration, the offsets and stretch of its eight grid neighbours, where the gripper will move next, gravity,
+    and the nearest contact and fold. All of these are written in the vertex's own axes, built every frame from its
+    neighbours. That makes a towel turned on the table the same example as before, which the network otherwise had to
+    learn one orientation at a time. The vertical part of every vector is added beside it in world axes, because
+    gravity makes "up" special.</p>
+  </div>
+  <figure>
+    <div class="scroll">
+    <svg viewBox="0 0 900 230" role="img" aria-label="A cloth vertex and its grid neighbours. Its first axis points toward its east neighbour, its second toward its north neighbour made square to the first, its third along the cloth's normal. World up is kept as a separate axis.">
+      <defs><marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+      <g font-family="IBM Plex Sans, system-ui, sans-serif" font-size="12.5" fill="currentColor">
+        <g stroke="currentColor" stroke-width="1" fill="none" opacity=".45">
+          <polyline points="160,70 240,50 320,30"/><polyline points="140,140 220,120 300,100"/><polyline points="120,210 200,190 280,170"/>
+          <polyline points="160,70 140,140 120,210"/><polyline points="240,50 220,120 200,190"/><polyline points="320,30 300,100 280,170"/>
+        </g>
+        <g style="fill:var(--ink-3)">
+          <circle cx="160" cy="70" r="4"/><circle cx="240" cy="50" r="4"/><circle cx="320" cy="30" r="4"/>
+          <circle cx="140" cy="140" r="4"/><circle cx="300" cy="100" r="4"/>
+          <circle cx="120" cy="210" r="4"/><circle cx="200" cy="190" r="4"/><circle cx="280" cy="170" r="4"/>
+        </g>
+        <circle cx="220" cy="120" r="6" fill="currentColor"/>
+        <g stroke-width="2" fill="none">
+          <line x1="220" y1="120" x2="284" y2="104" style="stroke:var(--given)" marker-end="url(#a3)"/>
+          <line x1="220" y1="120" x2="204" y2="56" style="stroke:var(--given)" marker-end="url(#a3)"/>
+        </g>
+        <circle cx="220" cy="120" r="11" fill="none" style="stroke:var(--given)" stroke-width="2"/>
+        <text x="314" y="96" font-size="12" style="fill:var(--given)">e1 → east neighbour</text>
+        <text x="96" y="44" font-size="12" style="fill:var(--given)">e2 → north, made square to e1</text>
+        <text x="150" y="104" font-size="12" style="fill:var(--given)" text-anchor="end">e3: normal ⊙</text>
+        <text x="306" y="22" font-size="12" style="fill:var(--ink-3)">NE</text>
+        <text x="306" y="186" font-size="12" style="fill:var(--ink-3)">SE</text>
+        <line x1="450" y1="200" x2="450" y2="50" stroke="currentColor" stroke-width="2" marker-end="url(#a3)"/>
+        <text x="462" y="58" font-size="12">world up, kept</text>
+        <text x="462" y="74" font-size="12">as it is</text>
+        <text x="560" y="40" font-weight="600">In the vertex's own axes</text>
+        <text x="560" y="62" font-size="12">velocity and acceleration</text>
+        <text x="560" y="80" font-size="12">offset, stretch, motion of 8 neighbours</text>
+        <text x="560" y="98" font-size="12">gripper's coming move, grasp force</text>
+        <text x="560" y="116" font-size="12">gravity; nearest contact and fold</text>
+        <text x="560" y="152" font-weight="600">Beside them, in world axes</text>
+        <text x="560" y="174" font-size="12">the vertical part of each vector (30 numbers)</text>
+        <text x="560" y="192" font-size="12">and a force head along world up</text>
+      </g>
+    </svg>
+    </div>
+    <figcaption>The vertex's own axes. Two vertices that see the same neighbourhood get the same input whichever
+    way the towel lies, so the network no longer has to learn each orientation separately.</figcaption>
+  </figure>
+  <div class="two">
+    <div>
+      <h3>What it outputs</h3>
+      <ul class="plain">
+        <li>An internal force and a contact force for every cloth vertex, in units of the vertex's weight. A third
+        output adds force along world up; all three start at zero. With nothing holding the cloth, the internal forces
+        are made to sum to zero.</li>
+        <li>The material (weight, stretch, bending, friction) as a mean and an uncertainty, from the whole cloth. It
+        matters only when the material is hidden; every input is given for now, so this output gets no training at
+        the moment.</li>
+        <li>How large its own one-step error is likely to be.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>What the exact layer does</h3>
+      <ul class="plain">
+        <li>Divides force by each vertex's mass, adds gravity and air drag, and steps the position forward.</li>
+        <li>Keeps the cloth out of the table, floor and plank, and applies friction against them and against scanned
+        objects, capped by the whole normal push, whoever supplies it.</li>
+        <li>Moves held vertices with the gripper.</li>
+        <li>Everything else is learned: how the cloth resists stretch and bending, how it touches itself, how the
+        gripper's fingers push it, and how scanned objects hold it up.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="rigid">
+  <div class="col">
+    <div class="eyebrow">Rigid network</div>
+    <h2>A plain transformer over surface points that predicts motion directly</h2>
+    <p>Each object is a cloud of 48–600 points on its surface; the gripper, drawers and lids are points too. A point
+    reads 54 numbers: its velocity, its place on its own object, the force the gripper applies there, and what kind
+    of thing it is. Points on moving objects also get 34 numbers about what is nearest within 10 cm: the closest
+    table point and its height and normal, and the closest point on another moving object or the gripper with its
+    relative velocity. Each object's material (mass, friction, bounciness, centre of mass, inertia, damping) is
+    added to all of its points.</p>
+    <p>The network outputs an acceleration for every point. Each point is stepped forward with it, then each object
+    is fitted as one rigid body to its points' new positions (in training each point is scored directly). There is no physics layer: the version with one
+    started worse than predicting constant velocity (see below).</p>
+  </div>
+  <div class="note"><b>Drawers and lids are not held to their rail or hinge.</b> In this network they are fitted as
+  free rigid bodies like any other object, which is consistent with shut drawers drifting open by 27 mm in its
+  replays. The physics layer kept them on their joints; the network without it does not yet.</div>
+</section>
+
+<section id="training">
+  <div class="col">
+    <div class="eyebrow">Training</div>
+    <h2>One physics step from a slightly wrong state, scored against the teacher</h2>
+    <p>Each training window holds 8 true past frames and 8 frames to predict. The frames to predict are first
+    pushed off the truth by a random walk, 1 mm per frame for cloth and 3 mm and 0.015 rad per frame for each rigid
+    object, each frame scaled by its own random level. The network then predicts every next frame from the
+    perturbed one before it and is scored against the teacher. It learns to pull a slightly wrong state back, which
+    is what running alone needs. Without this noise the rigid network learns nothing (0.98 of the simple guess's
+    error).</p>
+    <p>Pushforward: in every window the first 1–4 frames (cloth) or 1–6 frames (rigid), a random number each step,
+    are replaced by the network's own predictions, so it also practises correcting its own errors, not only random ones. A trial running now asks
+    whether letting it practise for up to half a second (cloth) or a second (rigid) stops the long-horizon
+    blow-ups and drift.</p>
+    <h3>Losses</h3>
+    <ul class="plain">
+      <li>Both: distance plus squared distance from the teacher's next frame, in centimetres, so small errors pull
+      linearly and large ones dominate.</li>
+      <li>Cloth also: the error of each mesh edge's length against the teacher's, relative to its rest length, and
+      the uncertainty output's error.</li>
+    </ul>
+    <h3>For now every input is given</h3>
+    <p>The material, the gripper's force and all eight past frames are always given. Hiding them is what the
+    material-from-motion claim needs, but it cost the rigid network a third of its fit (0.77 against 0.57), so it
+    waits until a forward simulator fits. Cloth windows are turned and shifted at random; for the rigid network that
+    is optional and acts as extra data.</p>
+    <h3>Running alone</h3>
+    <p>At test time the network starts from 8 true frames and then feeds itself: each step reads the latest 8
+    frames, its own predictions included, while the gripper and the table follow the recording.</p>
+  </div>
+</section>
+
+<section id="choices">
+  <div class="col">
+    <div class="eyebrow">Why each choice</div>
+    <h2>Each choice, and the measurement behind it</h2>
+    <p>"One frame" is the network's one-frame error divided by that of the simple guess, constant velocity, on
+    unseen episodes; lower is better. Details and dates are on the
+    <a href="https://claude.ai/artifact/FZbzJtpVHJWYpDXgYTGpzj">test results page</a> and in
+    <code>docs/DIRECTION.md</code>.</p>
+  </div>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Choice</th><th>What was measured</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>Cloth: each vertex reads in its own axes</td><td>One training episode, turned at random every step as
+      the trainer does; then all the data at equal training</td><td>World axes stall at 0.64 on the episode itself;
+      own axes reach 0.09. On all the data: 0.59 against 0.69, better in every family.</td></tr>
+      <tr><td>…but keep world up</td><td>Vertical error on unseen held cloth</td><td>Own axes alone left 5.1 mm
+      against 1.5 mm for world axes: the network could no longer cancel gravity. Adding the vertical parts back fixed
+      it.</td></tr>
+      <tr><td>Cloth keeps the physics layer</td><td>The same network trained without it, 2,000 episodes</td><td>Level
+      on one frame (0.747 against 0.753), but running alone 191 against 115 mm at 3.8 s and cloth area 4.9× against
+      2.2×.</td></tr>
+      <tr><td>Rigid drops the physics layer</td><td>The layer alone, network silent, on unseen moving objects; then
+      networks with and without it on 128 episodes</td><td>The layer alone is 1.74, worse than the simple guess: it
+      integrates the recorded gripper force, which is a reaction to the motion. With the layer 1.5–2.2; with it only
+      where it is exact 0.78; without it 0.57.</td></tr>
+      <tr><td>Rigid: attention over the scene, not a contact graph</td><td>Four fixed windows, memorised</td><td>A
+      graph with a 3 cm reach stalls at 0.34: objects arriving from farther have no edge. A 7 cm reach fits but needs
+      5× the memory. Attention fits them exactly at the graph's cost.</td></tr>
+      <tr><td>Size is not the lever</td><td>Cloth 509M against 64M at equal training; rigid 8.5M against
+      1.6M</td><td>Cloth level (0.686 against 0.672). Rigid worse (0.543 against 0.447): at equal steps the larger
+      network trains slower.</td></tr>
+      <tr><td>Training length is</td><td>Cloth 24k, 48k, 72k steps; rigid 12k, 36k, 108k</td><td>Cloth 0.59, 0.52,
+      0.49; rigid 0.57, 0.45, 0.37. At the last step running alone stopped improving on both (cloth blow-ups, rigid
+      creep).</td></tr>
+      <tr><td>Every input given</td><td>Hidden against given material and forces</td><td>Rigid 0.77 against 0.57.
+      Cloth level on one frame (0.764 against 0.753) and a fifth of the stretch running alone (12% against
+      61%).</td></tr>
+      <tr><td>Cloth reads micrometre strains</td><td>That input zeroed</td><td>One frame barely changes (+0.006), but
+      the stretch stiffness can no longer be read from motion (correlation 0.77 to 0.06) and cloths blow up running
+      alone (strain 73% against 28%).</td></tr>
+      <tr><td>Material output kept off the trunk</td><td>Its gradient stopped at the trunk</td><td>One frame 0.013–0.018
+      better. Without it, data with a single material let that output's gradient swamp the rest.</td></tr>
+      <tr><td>Rigid: random turns of each window</td><td>On and off, 12k and 36k steps</td><td>Free at 12k (0.55
+      against 0.57) and worth extra data at 36k (0.47 / 0.44 against 0.50 / 0.45 on two unseen sets, no gap to the
+      training episodes).</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="open">
+  <div class="col">
+    <div class="eyebrow">Open problems</div>
+    <h2>Where the architecture is known to fall short</h2>
+    <ul class="plain">
+      <li><b>Running alone.</b> Longer training still improves one frame but no longer the rollouts: more cloths
+      blow up after landing, and rigid objects keep sliding after the gripper lets go. The pushforward trial tests a
+      training fix; the next candidate is teacher labels for the states the network reaches on its own.</li>
+      <li><b>Rest without a physics layer.</b> The rigid network never slides on the real ramp (82 mm off, where the
+      friction law alone is 1 mm). Its data never shows an object let go on a slope.</li>
+      <li><b>Joints.</b> Drawers and lids are fitted as free bodies (above).</li>
+      <li><b>Where the gripper drives contact.</b> The cloth layer costs most on the push, where the gripper drives
+      the contact (without the layer 0.77 against 0.92 on that family). The rigid network does not follow objects the
+      gripper knocks over.</li>
+      <li><b>Material from motion.</b> The material output is idle while every input is given; claim 2 needs it
+      back.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="code">
+  <div class="col">
+    <div class="eyebrow">Code</div>
+    <h2>Where each part lives</h2>
+    <ul class="plain">
+      <li>Cloth network: <code>src/lsim/model/cloth_qwen.py</code> (block, own axes, heads); exact layer and force
+      decoding: <code>src/lsim/model/cloth_net.py</code> (<code>cloth_step</code>); windows:
+      <code>src/lsim/train/cloth_windows.py</code>; training and running alone:
+      <code>src/lsim/train/cloth_train.py</code>.</li>
+      <li>Rigid network: <code>src/lsim/model/net.py</code> (<code>Simulator(trunk="attn", direct=True)</code>,
+      <code>near_features</code>); the older physics layer: <code>src/lsim/model/physics.py</code>; windows:
+      <code>src/lsim/train/windows.py</code>; training step: <code>src/lsim/train/train.py</code>; trainer:
+      <code>scripts/l2_overfit.py</code>; running alone: <code>src/lsim/model/rollout.py</code>.</li>
+      <li>Current commands: cloth <code>cloth_train --arch qwen --d 512 --layers 16 --own_up --given</code> (full
+      command in <code>outputs/lsim/full_ownup_cont2_given.sh</code>); rigid <code>l2_overfit.py --plain --trunk attn
+      --d 128 --layers 6 --direct</code> (with <code>--aug 1</code> for the next long run).</li>
+    </ul>
+  </div>
+  <p class="foot">Part of <a href="https://claude.ai/artifact/5WR9dMDTujSfrNAyhjCEQJ">[SoG] Shoulder of Giants</a>.
+  See also <a href="https://claude.ai/artifact/FZbzJtpVHJWYpDXgYTGpzj">[SoG] Test Results</a> and
+  <a href="https://claude.ai/artifact/Bqgkb28DtrCtLMpWj1hLtt">[SoG] Making the Training Data</a>.</p>
+</section>
+</div>

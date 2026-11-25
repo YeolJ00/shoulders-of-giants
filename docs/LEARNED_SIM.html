@@ -1,0 +1,957 @@
+<title>Learned Household Simulator</title>
+<style>
+/* Layout: one 60rem column in this repo's doc style (paper and ink, serif heads, mono data);
+   prose held to 40rem, figures take the full column.
+   Slot language used in every figure: solid blue = given, dashed violet = empty (generated),
+   green = exact physics with no learned weights. */
+:root{
+  --paper:#fbfaf7; --ink:#16191c; --ink-2:#464c52; --ink-3:#767d85; --rule:#dcdad3;
+  --panel:#ffffff; --sunk:#f1efe9;
+  --given:#2b5f86; --empty:#6b3fa0; --exact:#1f5c46;
+  --s1:#6b3fa0; --s2:#a23a78; --s3:#4453b0; --s4:#b0608f; --s5:#7d55c8; --s6:#b4425f;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#111315; --ink:#e8e9e6; --ink-2:#a7aeb4; --ink-3:#798087; --rule:#292d31;
+  --panel:#171a1d; --sunk:#1d2124;
+  --given:#6ea9d2; --empty:#b79be6; --exact:#5fae8c;
+  --s1:#b79be6; --s2:#e08bbd; --s3:#9aa7f2; --s4:#e6a6cf; --s5:#c7adf7; --s6:#ef97ab;
+  color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --paper:#111315; --ink:#e8e9e6; --ink-2:#a7aeb4; --ink-3:#798087; --rule:#292d31;
+  --panel:#171a1d; --sunk:#1d2124;
+  --given:#6ea9d2; --empty:#b79be6; --exact:#5fae8c;
+  --s1:#b79be6; --s2:#e08bbd; --s3:#9aa7f2; --s4:#e6a6cf; --s5:#c7adf7; --s6:#ef97ab;
+  color-scheme:dark;}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;margin:0}
+.wrap{max-width:60rem;margin:0 auto;padding-inline:clamp(16px,4vw,28px);padding-block:0 90px}
+header{padding-block:56px 24px;border-bottom:2px solid var(--ink)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3)}
+h1{font-family:var(--serif);font-size:clamp(32px,5.5vw,50px);line-height:1.06;margin:.3em 0 .35em;font-weight:600;text-wrap:balance}
+.lede{font-size:19px;color:var(--ink-2);max-width:40rem;text-wrap:pretty;margin:0}
+.legend{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:22px;align-items:center;font-size:14px;color:var(--ink-2)}
+.legend > span{display:inline-flex;align-items:center;gap:8px}
+nav.toc{display:flex;flex-wrap:wrap;gap:6px 18px;padding-block:14px;border-bottom:1px solid var(--rule);
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase}
+nav.toc a{color:var(--ink-2);text-decoration:none}
+nav.toc a:hover,nav.toc a:focus-visible{color:var(--ink);text-decoration:underline}
+h2{font-family:var(--serif);font-size:clamp(23px,3.4vw,28px);line-height:1.2;margin:56px 0 12px;font-weight:600;
+  text-wrap:balance;max-width:42rem}
+h3{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
+  margin:30px 0 8px;font-weight:600}
+p{max-width:40rem;text-wrap:pretty}
+ul.tight,ol.tight{max-width:42rem;padding-left:1.25em;margin:10px 0}
+ul.tight li,ol.tight li{margin:7px 0;padding-left:.2em}
+a{color:var(--given)}
+code{font-family:var(--mono);font-size:.88em;background:var(--sunk);padding:1px 5px}
+
+/* slot chips */
+.chip{display:inline-flex;align-items:center;font-family:var(--mono);font-size:12px;line-height:1.5;
+  padding:1px 8px;border-radius:2px;border:1.5px solid;white-space:nowrap}
+.chip.given{color:var(--given);border-color:var(--given);background:color-mix(in srgb,var(--given) 9%,transparent)}
+.chip.empty{color:var(--empty);border-color:var(--empty);border-style:dashed;
+  background:repeating-linear-gradient(-45deg,transparent 0 5px,color-mix(in srgb,var(--empty) 15%,transparent) 5px 6px)}
+.chip.exact{color:var(--exact);border-color:var(--exact);background:color-mix(in srgb,var(--exact) 9%,transparent)}
+.chip.learned{color:var(--ink-2);border-color:var(--ink-3)}
+.chips{display:inline-flex;flex-wrap:wrap;gap:4px 6px}
+
+/* figures */
+figure{margin:22px 0 8px}
+.fig{background:var(--panel);border:1px solid var(--rule);border-radius:2px;padding:12px}
+.scroll{overflow-x:auto}
+.scroll > svg{display:block;width:100%;height:auto}
+#scene-svg{min-width:660px}
+#demo-svg{min-width:560px}
+#phys-svg{min-width:420px;max-width:560px}
+figcaption{font-size:13.5px;color:var(--ink-2);max-width:44rem;margin-top:10px;text-wrap:pretty}
+.figlegend{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:12.5px;color:var(--ink-2);margin-top:10px;
+  padding-top:8px;border-top:1px solid var(--rule)}
+.figlegend > span{display:inline-flex;align-items:center;gap:7px}
+svg text{font-family:var(--mono)}
+
+/* scene figure */
+.v-dyn{fill:var(--ink)} .v-kin{fill:var(--given)} .v-stat{fill:var(--ink-3)} .v-idle{fill:var(--rule)}
+.e-mesh{stroke:var(--ink-2);stroke-width:1;fill:none;opacity:.6}
+.e-mesh.kin{stroke:var(--given);opacity:.75}
+.e-mesh.stat{stroke:var(--ink-3);opacity:.45}
+.e-contact{stroke:var(--ink-3);stroke-width:1;stroke-dasharray:3 3;fill:none}
+.tag-bg{fill:var(--panel);stroke:var(--ink-3);stroke-width:1}
+.tag-title{fill:var(--ink);font-size:12.5px;font-weight:700}
+.tag-sub{fill:var(--ink-3);font-size:11px}
+.c-given{fill:color-mix(in srgb,var(--given) 10%,var(--panel));stroke:var(--given);stroke-width:1.2}
+.c-empty{fill:var(--panel);stroke:var(--empty);stroke-width:1.2;stroke-dasharray:4 3}
+.ct-given{fill:var(--given);font-size:11px}
+.ct-empty{fill:var(--empty);font-size:11px}
+.leader{stroke:var(--ink-3);stroke-width:1;fill:none}
+
+/* tables */
+.twocol{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr));gap:8px 26px}
+.twocol > div{min-width:0}
+.tbl{overflow-x:auto;margin:10px 0}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 10px 7px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);
+  font-weight:600;border-bottom:1px solid var(--ink-3)}
+td.m{font-family:var(--mono);font-size:13px;white-space:nowrap}
+td.d{color:var(--ink-2)}
+.note{background:var(--sunk);border-radius:2px;padding:13px 16px;margin:18px 0;font-size:14.5px;color:var(--ink-2);max-width:44rem}
+.note p{margin:0}
+.note p + p{margin-top:8px}
+
+/* network pipeline */
+.pipe{border-top:1px solid var(--ink-3);margin-top:14px}
+.stage{display:grid;grid-template-columns:2rem 10.5rem minmax(0,1fr);gap:4px 14px;padding:13px 0;
+  border-bottom:1px solid var(--rule);align-items:start}
+.stage .n{font-family:var(--mono);color:var(--ink-3);font-size:12px;padding-top:4px}
+.stage .name{font-family:var(--serif);font-size:18px;font-weight:600;line-height:1.3;display:flex;flex-direction:column;
+  align-items:flex-start;gap:5px}
+.stage .what{font-size:14.5px;color:var(--ink-2);min-width:0}
+.stage .what ul{margin:0;padding-left:1.1em}
+.stage .what li{margin:2px 0}
+@media (max-width:640px){
+  .stage{grid-template-columns:1.6rem minmax(0,1fr)}
+  .stage .what{grid-column:2}
+}
+.physrow{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px;align-items:center;margin-top:16px}
+@media (max-width:760px){.physrow{grid-template-columns:minmax(0,1fr)}}
+.mug{stroke:var(--ink);stroke-width:1.6;fill:none}
+.ground{stroke:var(--ink-3);stroke-width:1.4}
+.fv{stroke:var(--empty);stroke-width:2}
+.fg{stroke:var(--exact);stroke-width:2.2}
+.mk-v{fill:var(--empty)} .mk-g{fill:var(--exact)}
+.lbl{fill:var(--ink-2);font-size:11px}
+.lbl-v{fill:var(--empty);font-size:11px}
+.lbl-g{fill:var(--exact);font-size:11px}
+
+/* time demo */
+.controls{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin-bottom:10px}
+.ctl{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ctl-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.seg{display:inline-flex;border:1px solid var(--ink-3);border-radius:2px;overflow:hidden}
+.seg button{font:inherit;font-size:13px;background:transparent;color:var(--ink-2);border:0;padding:5px 10px;cursor:pointer}
+.seg button + button{border-left:1px solid var(--ink-3)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.btn{font:inherit;font-size:13.5px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);
+  padding:5px 12px;border-radius:2px;cursor:pointer}
+.btn.secondary{background:transparent;color:var(--ink)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+button:focus-visible{outline:2px solid var(--given);outline-offset:2px}
+.stepgrid{display:grid;grid-template-columns:minmax(0,1fr) 14.5rem;gap:14px;align-items:start}
+@media (max-width:780px){.stepgrid{grid-template-columns:minmax(0,1fr)}}
+.memory{border:1px solid var(--rule);border-radius:2px;padding:10px 12px;background:var(--sunk);font-size:13px}
+.memory h4{margin:0 0 6px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:600}
+.memrow{display:grid;grid-template-columns:14px 1fr auto;gap:8px;align-items:center;padding:2px 0;
+  font-family:var(--mono);font-size:12.5px;font-variant-numeric:tabular-nums}
+.memrow .sw{width:14px;height:3px;border-radius:1px}
+.memrow .out{color:var(--ink-3)}
+.memrow .tagged{color:var(--ink-3);font-size:11px}
+.memnote{margin:8px 0 0;font-size:12.5px;color:var(--ink-2)}
+.status{font-size:13.5px;color:var(--ink-2);min-height:2.8em;margin:10px 0 0;max-width:none}
+.ax{stroke:var(--rule);stroke-width:1}
+.axt{fill:var(--ink-3);font-size:10px}
+.axl{fill:var(--ink-3);font-size:10px;letter-spacing:.06em}
+.edge{stroke:var(--ink);stroke-width:1.2;stroke-dasharray:5 4}
+.edget{fill:var(--ink-2);font-size:10.5px}
+.band-push{fill:var(--given);opacity:.07}
+.band-hist{fill:var(--given);opacity:.08}
+.band-chunk{fill:var(--empty);opacity:.07}
+.obs{stroke:var(--ink);stroke-width:2.8;fill:none;stroke-linecap:round}
+.cell{fill:var(--panel);stroke:var(--rule);stroke-width:1}
+.cell.old{fill:var(--sunk);stroke:var(--sunk)}
+.cell.hist{fill:color-mix(in srgb,var(--given) 16%,var(--panel));stroke:var(--given)}
+.cell.chunk{fill:var(--panel);stroke:var(--empty);stroke-dasharray:2 2}
+.noise{fill:var(--empty);opacity:.6}
+.pushtick{stroke:var(--given);stroke-width:3}
+.stript{fill:var(--ink-3);font-size:10px}
+.striph{fill:var(--given);font-size:10px}
+.stripc{fill:var(--empty);font-size:10px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* status: the first model */
+.res td.v{font-family:var(--mono);font-size:13px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.res td.best{color:var(--ink);font-weight:700}
+.res td.na{color:var(--ink-3)}
+.verdict{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+  padding:0 6px;border:1px solid;border-radius:2px;margin-left:6px;vertical-align:1px}
+.verdict.pass{color:var(--exact);border-color:var(--exact)}
+.verdict.fail{color:var(--s6);border-color:var(--s6)}
+#rot-svg{min-width:560px}
+.r-grid{stroke:var(--rule);stroke-width:1}
+.r-axis{stroke:var(--ink-3);stroke-width:1}
+.r-tick{fill:var(--ink-3);font-size:11px}
+.r-lab{fill:var(--ink-2);font-size:12.5px;font-family:var(--sans)}
+.r-val{fill:var(--ink);font-size:11.5px}
+.r-bar.before{fill:var(--ink-3);opacity:.55}
+.r-bar.prior{fill:var(--exact)}
+.r-bar.final{fill:var(--ink)}
+footer{margin-top:70px;padding-top:18px;border-top:1px solid var(--rule);font-size:13px;color:var(--ink-3)}
+footer ul{padding-left:1.1em;margin:8px 0}
+footer li{margin:3px 0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">reify &middot; learned simulator &middot; status 22 Oct 2026</div>
+  <h1>Give it what you know. It simulates the rest.</h1>
+  <p class="lede">A learned simulator for household scenes. It reads and writes 3D meshes, never pixels.
+  Every input is a slot that is either given or empty, and the model generates the empty ones, such as the
+  next quarter second of motion, a friction nobody measured, or a push nobody saw.</p>
+  <div class="legend">
+    <span><span class="chip given">given</span> you provide it</span>
+    <span><span class="chip empty">empty</span> the model fills it in</span>
+    <span><span class="chip exact">exact</span> physics with no learned weights</span>
+  </div>
+</header>
+<nav class="toc" aria-label="Sections">
+  <a href="#v0">Where it stands</a><a href="#scene">Scene</a><a href="#network">Network</a><a href="#time">Time</a>
+  <a href="#training">Training</a><a href="#uses">Uses</a><a href="#choices">Open choices</a>
+</nav>
+
+<section id="v0">
+<h2>Where it stands: rigid objects slide like real ones; the first learned cloth holds still, then stretches like rubber.</h2>
+<p>Two kinds of objects so far, each distilled from its own Newton teacher: rigid and hinged objects (Kamino, 62,826
+episodes) and cloth (an explicit solver at 1,000+ substeps a frame, 20,032 episodes). Each model is compared with the
+same network giving motion directly, with no physics layer (B2), and with constant velocity. Errors are the mean
+distance of vertices from where the teacher put them, on objects and episodes the models never saw.</p>
+
+<h3>Rigid objects</h3>
+<div class="tbl res"><table>
+  <thead><tr><th></th><th>model v1</th><th>B2: no physics layer</th><th>B1: GNS</th><th>constant velocity</th></tr></thead>
+  <tbody>
+    <tr><td>Held-out objects after 1 s, 90th percentile</td><td class="v">56 mm</td><td class="v">42 mm</td><td class="v best">39 mm</td><td class="v">125 mm</td></tr>
+    <tr><td>Real cardboard sliding down a 20&deg; board, 93 Physics&nbsp;101 trials (teacher with fitted friction: 0.69 mm)</td><td class="v best">27 mm</td><td class="v">81 mm</td><td class="v">82 mm</td><td class="v na">&mdash;</td></tr>
+    <tr><td>Friction read from motion, every slot empty <span class="verdict fail">fail</span></td><td class="v">prior</td><td class="v">prior</td><td class="v">prior</td><td class="v na">&mdash;</td></tr>
+  </tbody></table></div>
+<p>The networks that output motion directly fit the teacher better. Only the model whose forces go through the physics
+layer slides like the real cardboard, and even it slides too slowly: training re-learned a brake that the untrained
+contact default (0.99&nbsp;mm on the same slides) did not have. The physics layer buys transfer to reality, not fit to
+the teacher. Rendered (<a href="https://claude.ai/artifact/XSWQDU6fTngBxg7zZGm2mQ">rollouts</a>), neither model follows
+the gripper when it opens a lid or a drawer.</p>
+
+<h3>Cloth</h3>
+<p>Rigid objects alone would miss the point of a learned simulator, so phase 3 moved to cloth. Of Newton's cloth solvers
+only the explicit one simulates the towel it is given (<a href="https://claude.ai/artifact/KAGAsw1Zp3biVMKWX26uBB">the cloth
+page</a>). Its episodes are towels and napkins lifted, dropped, dragged, folded, shaken, pushed and slid by a gripper,
+and each material property changes what the model sees (the motion and the gripper's force) in 68&ndash;92% of
+actions.</p>
+<figure>
+  <img src="media/cloth_laid_last.jpg" alt="A towel lowered onto a table and let go, two seconds later: on the left the teacher's towel lies spread out, on the right the learned model's towel is a heap" style="display:block;width:100%;height:auto;border:1px solid var(--rule);border-radius:2px">
+  <figcaption>A held-out episode two seconds after the model was given its last true frame: a towel lowered onto the
+  table and let go. Left, the teacher; right, the learned model. The teacher's towel spreads out; the model's piles
+  into a heap.</figcaption>
+</figure>
+<div class="tbl res"><table>
+  <thead><tr><th></th><th>cloth model v3</th><th>B2: no physics layer</th><th>constant velocity</th></tr></thead>
+  <tbody>
+    <tr><td>Resting cloth after 1 s, median <span class="verdict pass">holds</span></td><td class="v best">0.05 mm</td><td class="v">4.2 mm</td><td class="v best">0.00 mm</td></tr>
+    <tr><td>Moving cloth after 1 frame, median</td><td class="v">0.75 mm</td><td class="v best">0.69 mm</td><td class="v">0.80 mm</td></tr>
+    <tr><td>Moving cloth after 1 s, median</td><td class="v best">29 mm</td><td class="v">39 mm</td><td class="v">111 mm</td></tr>
+    <tr><td>Mesh-edge stretch after 10 frames, median (the teacher's: 0.014%) <span class="verdict fail">fail</span></td><td class="v">3.7%</td><td class="v">5.4%</td><td class="v na">&mdash;</td></tr>
+    <tr><td>Stretch modulus read from motion, every slot empty: correlation with the truth</td><td class="v best">0.73</td><td class="v">0.64</td><td class="v na">&mdash;</td></tr>
+  </tbody></table></div>
+<p>The learned towel holds still and keeps up for a second, and it has started to read a material from motion, which
+no rigid model did. Over two seconds, lifted and laid towels turn to rubber. B2 stretches as much, so the cause is in
+training, not in the physics layer. The likely culprit is the training noise: it jittered each cloth vertex by itself,
+stretching the inputs by 7%, where a rigid body's noise moves the body whole.</p>
+
+<h3>Rest had to be built in</h3>
+<p>A force model starts in free fall. To leave a cup on the table it has to cancel gravity exactly, and every recipe we
+trained first also turned resting objects by about 1.4&deg; per step, which a position-only metric hid. A default that
+holds a touching object up by its own weight, centred under its centre of mass, removed the rotation. A loss that weighs
+small errors linearly and large ones quadratically, plus training on the model's own six-frame rollouts, kept most of it
+through training.</p>
+<figure>
+  <div class="fig"><div class="scroll"><svg id="rot-svg" viewBox="0 0 640 248" role="img" aria-labelledby="rot-title rot-desc">
+<title id="rot-title">Spurious rotation of resting objects per step</title>
+<desc id="rot-desc">Median rotation error per step for bodies the teacher kept at rest, one step from the true history, log scale: about 1.4 degrees for every recipe before the support prior, 0.005 for the centred prior untrained, 0.048 and 0.069 for the trained recipe.</desc>
+<line x1="351.7" y1="16" x2="351.7" y2="202" class="r-grid"/>
+<text x="351.7" y="218" class="r-tick" text-anchor="middle">0.01&#176;</text>
+<line x1="455.0" y1="16" x2="455.0" y2="202" class="r-grid"/>
+<text x="455.0" y="218" class="r-tick" text-anchor="middle">0.1&#176;</text>
+<line x1="558.3" y1="16" x2="558.3" y2="202" class="r-grid"/>
+<text x="558.3" y="218" class="r-tick" text-anchor="middle">1&#176;</text>
+<line x1="300" y1="16" x2="300" y2="202" class="r-axis"/>
+<text x="290" y="40" class="r-lab" text-anchor="end">As built: forces scaled per vertex</text>
+<rect x="300" y="28" width="273.1" height="16" class="r-bar before"/>
+<text x="579.1" y="40" class="r-val">1.39&#176;</text>
+<text x="290" y="70" class="r-lab" text-anchor="end">+ forces per body pair, pushforward</text>
+<rect x="300" y="58" width="271.1" height="16" class="r-bar before"/>
+<text x="577.1" y="70" class="r-val">1.33&#176;</text>
+<text x="290" y="100" class="r-lab" text-anchor="end">+ support shared by closeness</text>
+<rect x="300" y="88" width="278.0" height="16" class="r-bar before"/>
+<text x="584.0" y="100" class="r-val">1.55&#176;</text>
+<text x="290" y="130" class="r-lab" text-anchor="end">Support centred under the CoM, untrained</text>
+<rect x="300" y="118" width="20.6" height="16" class="r-bar prior"/>
+<text x="326.6" y="130" class="r-val">0.005&#176;</text>
+<text x="290" y="160" class="r-lab" text-anchor="end">Full recipe, 100 episodes</text>
+<rect x="300" y="148" width="122.1" height="16" class="r-bar final"/>
+<text x="428.1" y="160" class="r-val">0.048&#176;</text>
+<text x="290" y="190" class="r-lab" text-anchor="end">Model v0, 63k episodes</text>
+<rect x="300" y="178" width="138.3" height="16" class="r-bar final"/>
+<text x="444.3" y="190" class="r-val">0.069&#176;</text>
+<text x="455" y="238" class="r-tick" text-anchor="middle">rotation per step at rest, median (log scale). The teacher&#8217;s resting bodies turn 0.001&#176;.</text>
+</svg></div></div>
+  <figcaption>Rotation per step of objects the teacher kept at rest, predicted from the true past (median; log scale).
+  Grey: recipes before the support default. Green: the default alone, with no learned weights. Black: trained with it.
+  Measured on 69 resting objects in 12 training episodes; every recipe but model v0 was trained on 100 episodes.</figcaption>
+</figure>
+
+<h3>Next</h3>
+<ul class="tight">
+  <li><b>Cloth that keeps its shape.</b> Running now: a fine-tune whose noise moves each towel as a body, against a control
+  with the old noise. If the stretch falls, the cloth model is retrained with it from the start.</li>
+  <li><b>Materials from motion.</b> The cloth model reads stretch; density, bending and friction not yet, and the rigid
+  models read nothing. This is claim 2.</li>
+  <li><b>Hinged parts.</b> Lids and drawers that follow the gripper.</li>
+  <li><b>Real data.</b> Cloth handled by hands and robots (PhysTwin, PGND); for rigid objects, hand-object recordings,
+  where only 2% of OakInk2 is hand-free motion.</li>
+</ul>
+</section>
+
+<section id="scene">
+<h2>A scene is meshes. Every number on them is a slot.</h2>
+<figure>
+  <div class="fig">
+    <div class="scroll"><svg id="scene-svg" viewBox="0 0 960 430" role="img"
+      aria-label="Side view of a kitchen counter. A gripper pushes a mug, a towel hangs over the counter edge, and a drawer is open below. Mesh vertices, mesh edges and contact edges are drawn, with a slot tag on each object."></svg></div>
+    <div class="figlegend">
+      <span><svg width="30" height="10" aria-hidden="true"><line x1="3" y1="5" x2="27" y2="5" class="e-mesh"/><circle cx="3" cy="5" r="2.4" class="v-dyn"/><circle cx="27" cy="5" r="2.4" class="v-dyn"/></svg>vertex and mesh neighbour</span>
+      <span><svg width="30" height="10" aria-hidden="true"><line x1="1" y1="5" x2="29" y2="5" class="e-contact"/></svg>contact neighbour: within 3 cm, re-found every frame</span>
+      <span><svg width="10" height="10" aria-hidden="true"><circle cx="5" cy="5" r="2.6" class="v-kin"/></svg>kinematic: its path is the action</span>
+      <span><svg width="10" height="10" aria-hidden="true"><circle cx="5" cy="5" r="2.2" class="v-idle"/></svg>static and away from motion: left out</span>
+    </div>
+  </div>
+  <figcaption>Every object is remeshed to even spacing (about 1.5 cm, 1 cm for cloth), so vertex density
+  follows geometry. Artist meshes are dense wherever the modelling was detailed, which this repo found biasing
+  centres of mass. Static surfaces join only near something that moves, so a whole kitchen stays cheap.</figcaption>
+</figure>
+
+<div class="twocol">
+  <div>
+    <h3>Role: who moves it</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>role</th><th>moved by</th><th>e.g.</th></tr></thead>
+      <tbody>
+        <tr><td class="m">static</td><td class="d">nothing</td><td class="d">counter, cabinet</td></tr>
+        <tr><td class="m">kinematic</td><td class="d">its given path, the action</td><td class="d">gripper, tracked hand</td></tr>
+        <tr><td class="m">dynamic</td><td class="d">the model</td><td class="d">mug, drawer, towel</td></tr>
+      </tbody></table></div>
+  </div>
+  <div>
+    <h3>Type: how its vertices move</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>type</th><th>vertices move</th><th>e.g.</th></tr></thead>
+      <tbody>
+        <tr><td class="m">rigid</td><td class="d">as one rigid body</td><td class="d">mug, box</td></tr>
+        <tr><td class="m">hinged</td><td class="d">rigidly, along the joint only</td><td class="d">drawer, door</td></tr>
+        <tr><td class="m">cloth, soft</td><td class="d">each on its own, held by mesh edges</td><td class="d">towel, plush toy</td></tr>
+      </tbody></table></div>
+  </div>
+</div>
+
+<h3>The slots</h3>
+<div class="tbl"><table>
+  <thead><tr><th>on</th><th>slot</th><th>state</th></tr></thead>
+  <tbody>
+    <tr><td class="m">scene</td><td>gravity, frame interval (1/30 s)</td><td><span class="chip given">given</span></td></tr>
+    <tr><td class="m">object</td><td>role, type, rest mesh</td><td><span class="chip given">given</span></td></tr>
+    <tr><td class="m">object</td><td>material class, mass, friction, restitution, stiffness</td><td><span class="chips"><span class="chip given">given</span><span class="chip empty">or empty</span></span></td></tr>
+    <tr><td class="m">hinged</td><td>joint axis and limits</td><td><span class="chip given">given</span></td></tr>
+    <tr><td class="m">hinged</td><td>joint damping</td><td><span class="chips"><span class="chip given">given</span><span class="chip empty">or empty</span></span></td></tr>
+    <tr><td class="m">vertex</td><td>position now</td><td><span class="chip given">given</span></td></tr>
+    <tr><td class="m">vertex</td><td>position, up to 8 past frames</td><td><span class="chip given">given, optional</span></td></tr>
+    <tr><td class="m">vertex</td><td>position, next 8 frames</td><td><span class="chip empty">generated</span></td></tr>
+    <tr><td class="m">vertex</td><td>external force, every frame</td><td><span class="chips"><span class="chip given">given or zero</span><span class="chip empty">or empty</span></span></td></tr>
+    <tr><td class="m">gripper</td><td>position, next 8 frames</td><td><span class="chip given">given: the action</span></td></tr>
+  </tbody></table></div>
+
+<div class="note">
+  <p><b>No camera anywhere.</b> The simulator reads and writes 3D state. Video matters only upstream, when real
+  recordings are turned into mesh motion for training, and that tracking step sits outside the model.</p>
+  <p><b>Parameters are physical quantities in fixed units</b> (kg, friction coefficient, restitution, Pa), so they mean
+  the same thing in Isaac, in Newton and in a real kitchen. Solver settings do not transfer: this repo measured one
+  damping value giving different bounces at different masses and contact stiffnesses.</p>
+</div>
+</section>
+
+<section id="network">
+<h2>The network predicts forces. Physics moves the vertices.</h2>
+<p style="font-size:14.5px;color:var(--ink-2)">The full design as it runs in the code, with shapes, formulas and the measurement behind each choice: <a href="https://claude.ai/artifact/V9igykQBwXqTLSYbZzn5YS">Household Simulator Architecture</a>.</p>
+<div class="pipe">
+  <div class="stage">
+    <div class="n">1</div>
+    <div class="name">Tokens <span class="chip learned">learned</span></div>
+    <div class="what">One per vertex per frame in the window: rest position, normal, position, velocity, force slot,
+    noise level. One per object: role, type, and each parameter slot with its own noise level.</div>
+  </div>
+  <div class="stage">
+    <div class="n">2</div>
+    <div class="name">Processor &times;6 <span class="chip learned">learned</span></div>
+    <div class="what"><ul>
+      <li><b>Time.</b> Each vertex attends to its own earlier frames in the window.</li>
+      <li><b>Space.</b> Each vertex attends to its mesh neighbours and contact neighbours at that frame. Edges carry the
+      offset now, the offset at rest, both normals and the relative velocity.</li>
+      <li><b>Object.</b> Vertices write to their object token and read it back. This is where a material gets worked out
+      from motion.</li>
+    </ul>Contact neighbours are re-found from the current positions at every frame.</div>
+  </div>
+  <div class="stage">
+    <div class="n">3</div>
+    <div class="name">Heads <span class="chip learned">learned</span></div>
+    <div class="what"><ul>
+      <li>A force on every contact edge, applied equal and opposite to its two ends.</li>
+      <li>An internal force on every cloth vertex, summing to zero over a cloth that nobody holds.</li>
+      <li>A force on any vertex whose force slot is empty.</li>
+      <li>A value for every empty parameter slot, read from the object token.</li>
+    </ul></div>
+  </div>
+  <div class="stage">
+    <div class="n">4</div>
+    <div class="name">Physics layer <span class="chip exact">exact</span></div>
+    <div class="what"><ul>
+      <li>Add gravity and the given forces.</li>
+      <li><b>Rigid:</b> sum into one force and one torque, divide by mass and inertia.</li>
+      <li><b>Hinged:</b> the same, then keep only motion along the joint.</li>
+      <li><b>Cloth and soft:</b> each vertex by its own share of the mass.</li>
+      <li><b>Contact with fixed surfaces</b> by default: the surface pushes back and grips with friction up to
+      &mu; times the push; the network adds everything else.</li>
+      <li>Step one frame; the next frame starts from the result.</li>
+    </ul></div>
+  </div>
+  <div class="stage">
+    <div class="n">5</div>
+    <div class="name">Output <span class="chip empty">generated</span></div>
+    <div class="what">Positions for the next frame and values for the empty slots. Repeat frame by frame for as long as
+    the rollout should run.</div>
+  </div>
+</div>
+
+<div class="physrow">
+  <figure style="margin:0">
+    <div class="fig"><div class="scroll"><svg id="phys-svg" viewBox="0 0 520 230" role="img"
+      aria-label="A mug on a counter. Violet arrows are learned contact forces at the contact points. Green arrows are gravity and the summed force and torque computed exactly.">
+      <defs>
+        <marker id="mkv" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-v"/></marker>
+        <marker id="mkg" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-g"/></marker>
+      </defs>
+      <line x1="30" y1="184" x2="490" y2="184" class="ground"/>
+      <text x="34" y="204" class="lbl">counter (static)</text>
+      <path d="M200 74 H300 L296 170 Q294 182 282 182 H218 Q206 182 204 170 Z" class="mug"/>
+      <path d="M300 96 Q330 98 330 124 Q330 150 298 150" class="mug"/>
+      <line x1="216" y1="214" x2="216" y2="187" class="fv" marker-end="url(#mkv)"/>
+      <line x1="238" y1="210" x2="238" y2="187" class="fv" marker-end="url(#mkv)"/>
+      <line x1="262" y1="206" x2="262" y2="187" class="fv" marker-end="url(#mkv)"/>
+      <line x1="284" y1="202" x2="284" y2="187" class="fv" marker-end="url(#mkv)"/>
+      <line x1="150" y1="120" x2="197" y2="120" class="fv" marker-end="url(#mkv)"/>
+      <line x1="150" y1="146" x2="198" y2="146" class="fv" marker-end="url(#mkv)"/>
+      <text x="96" y="104" class="lbl-v">from gripper</text>
+      <line x1="250" y1="128" x2="250" y2="160" class="fg" marker-end="url(#mkg)"/>
+      <text x="256" y="156" class="lbl-g">m&middot;g</text>
+      <line x1="250" y1="128" x2="292" y2="112" class="fg" marker-end="url(#mkg)"/>
+      <path d="M232 104 A26 26 0 0 1 268 102" class="fg" fill="none" marker-end="url(#mkg)"/>
+      <circle cx="250" cy="128" r="3" class="mk-g"/>
+      <text x="352" y="96" class="lbl-g">&Sigma;f &rarr; force</text>
+      <text x="352" y="114" class="lbl-g">&Sigma;r&times;f &rarr; torque</text>
+      <text x="352" y="132" class="lbl-g">&divide; mass, inertia</text>
+      <text x="352" y="150" class="lbl-g">integrate</text>
+    </svg></div>
+    <div class="figlegend">
+      <span><svg width="24" height="10" aria-hidden="true"><line x1="0" y1="5" x2="24" y2="5" class="fv"/></svg>learned: one force per contact edge</span>
+      <span><svg width="24" height="10" aria-hidden="true"><line x1="0" y1="5" x2="24" y2="5" class="fg"/></svg>exact: gravity, sums, mass, integration</span>
+    </div></div>
+  </figure>
+  <div>
+    <h3 style="margin-top:0">Why predict forces</h3>
+    <ul class="tight">
+      <li>A given mass or a given push has its exact effect, even outside the training range.</li>
+      <li>Contact forces are equal and opposite, so momentum is conserved by construction.</li>
+      <li>Rigid objects stay rigid by construction. The network learns only what physics leaves empirical: contact,
+      friction, deformation.</li>
+    </ul>
+    <p style="font-size:14px;color:var(--ink-2)">This is a bet, tested against the same network outputting positions
+    directly. GNS and MeshGraphNets predict accelerations and integrate them; Neural Gaussian Force Fields (2026)
+    predicts force fields.</p>
+  </div>
+</div>
+<p style="font-size:14.5px;color:var(--ink-2)">Cost follows moving vertices, not scene size: attention is local, static
+surfaces join only near motion, and objects at rest sleep until something touches them. Starting sizes: about 200
+vertices per mug, 1,000 per towel, 16 neighbours per vertex.</p>
+</section>
+
+<section id="time">
+<h2>Past motion is optional, and length is unlimited.</h2>
+<ul class="tight">
+  <li><b>Give 0 to 8 past frames.</b> Training cuts windows anywhere in long episodes, so starting from rest and joining
+  mid-motion are both ordinary cases.</li>
+  <li><b>Predict one frame, append it, slide the window one frame, repeat.</b> The network only ever sees one window, so
+  any length works. (The first design denoised 8 frames at once; stepping one frame at a time was 5 mm off after 8
+  frames where denoising was 26 mm, overfitting one episode.)</li>
+  <li><b>Only parameters outlive the window.</b> Physics continues from positions, velocities and parameters.
+  Velocities come from the frames in the window; parameters live in the object token and are carried forward.
+  Training sometimes puts a little noise on past frames so the model never trusts its own output exactly, the same
+  job GNS's noise injection did.</li>
+</ul>
+
+<figure id="demo">
+  <div class="fig">
+    <div class="controls">
+      <div class="ctl"><span class="ctl-label">Start</span><span class="seg" role="group" aria-label="Start">
+        <button type="button" id="m-rest" aria-pressed="true">From rest</button><button type="button" id="m-mid" aria-pressed="false">Mid-motion, 8 tracked frames</button></span></div>
+      <div class="ctl"><span class="ctl-label">Friction slot</span><span class="seg" role="group" aria-label="Friction slot">
+        <button type="button" id="f-empty" aria-pressed="true">Empty</button><button type="button" id="f-given" aria-pressed="false">Given: 0.25</button></span></div>
+    </div>
+    <div class="controls">
+      <button type="button" class="btn" id="b-gen">Generate chunk</button>
+      <button type="button" class="btn secondary" id="b-slide">Slide window</button>
+      <button type="button" class="btn secondary" id="b-reset">Reset</button>
+    </div>
+    <div class="stepgrid">
+      <div class="scroll"><svg id="demo-svg" viewBox="0 0 680 372" role="img"
+        aria-label="Timeline of 64 frames with the current window marked, above a chart of mug position against frame for six sampled rollouts."></svg></div>
+      <div class="memory">
+        <h4>Object memory &middot; mug friction</h4>
+        <div id="memrows"></div>
+        <p id="memnote" class="memnote"></p>
+      </div>
+    </div>
+    <p class="status" id="status"></p>
+    <p class="sr-only" id="announce" aria-live="polite"></p>
+  </div>
+  <figcaption>A hand-written toy, a mug sliding with constant friction, not model output. Six rollouts. With
+  friction empty and no past, rollouts disagree and keep disagreeing; each one is a consistent world and the spread is
+  the real uncertainty. With past motion given, its deceleration pins friction down and they agree. With friction
+  given, they agree from the start. Rollouts converge on observed frames only, never on the model's own output.</figcaption>
+</figure>
+</section>
+
+<section id="training">
+<h2>Train by hiding things and filling them back in.</h2>
+<ol class="tight">
+  <li><b>Teacher episodes in Newton</b>, with the Kamino solver: random tabletop scenes, objects and materials, a scripted
+  force-capped gripper, occasional pokes at random vertices, planks to slide on, drawers and lids. (Isaac Sim waits for a
+  driver update.)</li>
+  <li><b>Cut windows anywhere</b> in those episodes and give 0 to 8 past frames.</li>
+  <li><b>Hide slots at random.</b> Each parameter half the time. Some of the pokes too, so the model learns to find
+  unseen pushes and learns that they are rare and local.</li>
+  <li><b>Perturb, then take one physics step.</b> Each later frame of the window gets its own level of rigid noise; the
+  model steps each frame once and is scored on the true next frame, so it learns to pull a wrong state back. Some
+  frames are the model's own rollout of up to six frames, scored the same way. Hidden parameters and hidden forces are
+  scored against their true values.</li>
+  <li><b>Fine-tune on real recordings</b> turned into mesh motion: motion-capture poses for rigid and hinged objects,
+  tracked cloth. Parameters and unseen forces stay empty, so real data corrects only the shared physics.</li>
+</ol>
+</section>
+
+<section id="uses">
+<h2>Leave different slots empty, get a different tool.</h2>
+<div class="tbl"><table>
+  <thead><tr><th>given</th><th>empty</th><th>result</th></tr></thead>
+  <tbody>
+    <tr><td>scene, parameters, current state, gripper path</td><td><span class="chip empty">next chunk</span></td><td>simulation, replacing Isaac</td></tr>
+    <tr><td>the same without friction</td><td><span class="chips"><span class="chip empty">next chunk</span><span class="chip empty">friction</span></span></td><td>simulation of an object nobody measured</td></tr>
+    <tr><td>an object's 3D motion</td><td><span class="chip empty">its parameters</span></td><td>measurement: the &theta; problem this repo started from</td></tr>
+    <tr><td>a box's motion with no visible pusher</td><td><span class="chip empty">its force slots</span></td><td>the push nobody saw</td></tr>
+    <tr><td>start state and goal state</td><td><span class="chip empty">gripper path</span></td><td>a plan (later)</td></tr>
+  </tbody></table></div>
+</section>
+
+<section id="choices">
+<h2>What the first experiments decide.</h2>
+<ul class="tight">
+  <li><b>Forces or positions.</b> The physics layer against a network that outputs motion directly. So far: on the
+  teacher's own scenes the direct networks fit rigid objects better, including masses three times heavier and pokes
+  twice as hard; on real slides only the physics layer works (27 against 81&ndash;82&nbsp;mm); for cloth it holds a
+  resting towel (0.05 against 4.2&nbsp;mm over a second).</li>
+  <li><b>Vertex or face contact.</b> FIGNet needed faces for flat-on-flat rigid contact on coarse meshes.</li>
+  <li><b>Contact at 30 fps.</b> A dropped mug lands within one frame, so contact acts as an impulse. Settled so far:
+  velocities averaged over the frame match the teacher's impulses, and no substeps were needed.</li>
+  <li><b>Memory.</b> One friction sample per rollout, as in the toy, or a distribution refined as observed frames
+  arrive. The cloth model predicts a distribution per empty slot; rollouts sampled from it spread 1.2&ndash;1.7 times
+  their error over one frame.</li>
+  <li><b>Unknown forces can explain any motion.</b> If real fine-tuning leans on them, allow them only near hands.</li>
+</ul>
+</section>
+
+<footer>
+  <div>Architecture as built: <a href="https://claude.ai/artifact/V9igykQBwXqTLSYbZzn5YS">Household Simulator Architecture</a>.</div>
+  <div>Rigid models trained 17&ndash;20 Oct 2026 on 62,826 Kamino episodes, cloth models 21 Oct 2026 on 20,032 episodes of Newton's explicit cloth solver; the time figure is still a hand-written illustration, not model output.</div>
+  <ul>
+    <li><a href="https://arxiv.org/abs/2010.03409">MeshGraphNets</a>: mesh edges plus world-space contact edges</li>
+    <li><a href="https://arxiv.org/abs/2002.09405">GNS</a>: local message passing, noise injection for long rollouts</li>
+    <li><a href="https://arxiv.org/abs/2212.03574">FIGNet</a>: face-to-face contact for rigid bodies</li>
+    <li><a href="https://arxiv.org/abs/2407.01392">Diffusion Forcing</a>: per-frame noise levels, rollouts past the training horizon</li>
+    <li><a href="https://arxiv.org/abs/2404.09636">Simformer</a>: one diffusion transformer, any slot observed or latent</li>
+    <li><a href="https://arxiv.org/abs/2504.02792">Unified World Models</a>: separate noise levels give policy, forward and inverse models</li>
+    <li><a href="https://arxiv.org/abs/2602.00148">Neural Gaussian Force Fields</a>: dynamics as learned force fields plus integration</li>
+    <li><a href="https://arxiv.org/abs/2606.27364">PhysiFormer</a>: whole-trajectory generation over mesh vertices</li>
+  </ul>
+</footer>
+</div>
+
+<script>
+(function(){
+  var NS = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs, parent, text){
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+
+  /* ---------- Figure 1: the scene ---------- */
+  (function(){
+    var svg = document.getElementById('scene-svg');
+    var R = 22; // contact radius in px, about 3 cm
+    var objs = [
+      {id:'counter', role:'static', parts:[{pts:[[40,250],[720,250],[720,270],[40,270]], closed:true, sp:12}]},
+      {id:'cabinet', role:'static', parts:[{pts:[[90,344],[90,420],[700,420],[700,270]], closed:false, sp:14}]},
+      {id:'drawer', role:'dynamic', parts:[{pts:[[50,288],[330,288],[330,336],[50,336]], closed:true, sp:12}]},
+      {id:'mug', role:'dynamic', parts:[
+        {pts:[[442,182],[508,182],[505,238],[499,248],[449,248],[444,238]], closed:true, sp:10},
+        {pts:[[508,196],[524,199],[528,214],[523,230],[506,233]], closed:false, sp:9}]},
+      {id:'gripper', role:'kinematic', parts:[
+        {pts:[[322,138],[352,138],[352,226],[322,226]], closed:true, sp:12},
+        {pts:[[352,160],[431,160],[431,170],[352,170]], closed:true, sp:10},
+        {pts:[[352,200],[431,200],[431,210],[352,210]], closed:true, sp:10}]},
+      {id:'towel', role:'dynamic', parts:[{pts:[[572,247],[712,247],[722,252],[728,263],[731,290],[727,320],[732,350],[728,386]], closed:false, sp:8}]}
+    ];
+    function resample(pts, closed, sp){
+      var P = closed ? pts.concat([pts[0]]) : pts.slice();
+      var out = [[P[0][0], P[0][1]]], acc = 0;
+      for (var i = 0; i < P.length - 1; i++){
+        var x0 = P[i][0], y0 = P[i][1], x1 = P[i+1][0], y1 = P[i+1][1];
+        var L = Math.hypot(x1 - x0, y1 - y0), d = sp - acc;
+        while (d <= L){ out.push([x0 + (x1 - x0) * d / L, y0 + (y1 - y0) * d / L]); d += sp; }
+        acc = L - (d - sp);
+      }
+      var a = out[out.length - 1];
+      if (closed){
+        if (Math.hypot(a[0] - out[0][0], a[1] - out[0][1]) < sp * 0.5) out.pop();
+      } else {
+        var e = P[P.length - 1];
+        if (Math.hypot(a[0] - e[0], a[1] - e[1]) > sp * 0.3) out.push([e[0], e[1]]);
+      }
+      return out;
+    }
+    var verts = []; // {x,y,obj,role}
+    objs.forEach(function(o){
+      o.polys = o.parts.map(function(p){
+        var v = resample(p.pts, p.closed, p.sp);
+        v.forEach(function(q){ verts.push({x:q[0], y:q[1], obj:o.id, role:o.role}); });
+        return {v:v, closed:p.closed};
+      });
+    });
+    var contacts = [], active = {};
+    for (var i = 0; i < verts.length; i++){
+      for (var j = i + 1; j < verts.length; j++){
+        var a = verts[i], b = verts[j];
+        if (a.obj === b.obj) continue;
+        if (a.role === 'static' && b.role === 'static') continue;
+        if (Math.hypot(a.x - b.x, a.y - b.y) <= R){
+          contacts.push([a, b]);
+          if (a.role === 'static') active[i] = true;
+          if (b.role === 'static') active[j] = true;
+        }
+      }
+    }
+    var gMesh = el('g', {}, svg), gCon = el('g', {}, svg), gV = el('g', {}, svg), gTag = el('g', {}, svg);
+    objs.forEach(function(o){
+      var cls = o.role === 'kinematic' ? 'e-mesh kin' : (o.role === 'static' ? 'e-mesh stat' : 'e-mesh');
+      o.polys.forEach(function(p){
+        var s = p.v.map(function(q){ return q[0].toFixed(1) + ',' + q[1].toFixed(1); }).join(' ');
+        el(p.closed ? 'polygon' : 'polyline', {points:s, 'class':cls}, gMesh);
+      });
+    });
+    contacts.forEach(function(c){
+      el('line', {x1:c[0].x.toFixed(1), y1:c[0].y.toFixed(1), x2:c[1].x.toFixed(1), y2:c[1].y.toFixed(1), 'class':'e-contact'}, gCon);
+    });
+    verts.forEach(function(v, idx){
+      var cls = v.role === 'kinematic' ? 'v-kin' : (v.role === 'dynamic' ? 'v-dyn' : (active[idx] ? 'v-stat' : 'v-idle'));
+      el('circle', {cx:v.x.toFixed(1), cy:v.y.toFixed(1), r: v.role === 'static' ? 2 : 2.5, 'class':cls}, gV);
+    });
+    var tags = [
+      {x:16,  y:14,  title:'gripper', sub:'kinematic',        chips:[['path, next 8 frames','given']], anchor:[337,138]},
+      {x:300, y:14,  title:'mug',     sub:'dynamic · rigid',  chips:[['mass 0.32 kg','given'],['friction ?','empty'],['restitution 0.5','given']], anchor:[475,182]},
+      {x:640, y:14,  title:'towel',   sub:'dynamic · cloth',  chips:[['mass 0.08 kg','given'],['stretch ?','empty'],['bend ?','empty']], anchor:[650,247]},
+      {x:104, y:358, title:'drawer',  sub:'dynamic · hinged', chips:[['slides 0–40 cm','given'],['mass 1.2 kg','given'],['damping ?','empty']], anchor:[200,336]},
+      {x:452, y:358, title:'counter', sub:'static',           chips:[['friction 0.45','given']], anchor:[560,270]}
+    ];
+    var CW = 6.7; // approx width of one 11px mono character
+    tags.forEach(function(t){
+      var widths = t.chips.map(function(c){ return c[0].length * CW + 14; });
+      var w = Math.max(widths.reduce(function(s, x){ return s + x; }, 0) + 6 * (widths.length - 1) + 16,
+                       (t.title.length + t.sub.length + 3) * 7.2 + 16);
+      var h = 50;
+      var below = t.anchor[1] > t.y + h;
+      var lx = Math.min(Math.max(t.anchor[0], t.x + 12), t.x + w - 12);
+      el('line', {x1:lx, y1: below ? t.y + h : t.y, x2:t.anchor[0], y2:t.anchor[1], 'class':'leader'}, gTag);
+      el('rect', {x:t.x, y:t.y, width:w.toFixed(1), height:h, rx:2, 'class':'tag-bg'}, gTag);
+      var tt = el('text', {x:t.x + 8, y:t.y + 17}, gTag);
+      el('tspan', {'class':'tag-title'}, tt, t.title);
+      el('tspan', {'class':'tag-sub', dx:6}, tt, t.sub);
+      var cx = t.x + 8;
+      t.chips.forEach(function(c, k){
+        var cw = widths[k];
+        el('rect', {x:cx, y:t.y + 25, width:cw.toFixed(1), height:18, rx:2, 'class': c[1] === 'given' ? 'c-given' : 'c-empty'}, gTag);
+        el('text', {x:cx + 7, y:t.y + 38, 'class': c[1] === 'given' ? 'ct-given' : 'ct-empty'}, gTag, c[0]);
+        cx += cw + 6;
+      });
+    });
+  })();
+
+  /* ---------- Figure 3: the time window toy ---------- */
+  (function(){
+    var svg = document.getElementById('demo-svg');
+    var H = 8, K = 8, F = 64, S = 8, LAG = 3, STEPS = S + LAG, EDGE = 42, X0 = 11, VP = 3, FREL = 4, MU_TRUE = 0.25, AMP = 7;
+    var SAMPLES = {rest:[0.14, 0.19, 0.26, 0.33, 0.42, 0.55], mid:[0.237, 0.243, 0.248, 0.252, 0.257, 0.263]};
+    var W = 680, ML = 46, MR = 14, STRIP_Y = 22, STRIP_H = 22, CH_TOP = 88, CH_BOT = 336, YMIN = 5, YMAX = 46;
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function xs(f){ return ML + f * (W - ML - MR) / F; }
+    function xc(f){ return xs(f + 0.5); }
+    function ys(y){ return CH_BOT - (y - YMIN) * (CH_BOT - CH_TOP) / (YMAX - YMIN); }
+    function accel(mu){ return mu * 981 / 900; } // cm per frame^2 at 30 fps
+    function posDecel(x0, v0, a, s){ var t = Math.min(s, v0 / a); return x0 + v0 * t - 0.5 * a * t * t; }
+    function traj(mu, mode){
+      var out = [], fell = null, aT = accel(MU_TRUE), a = accel(mu);
+      var x7 = posDecel(23, VP, aT, 3), v7 = Math.max(0, VP - aT * 3);
+      for (var f = 0; f < F; f++){
+        var x;
+        if (f <= FREL) x = X0 + VP * f;
+        else if (mode === 'mid' && f <= 7) x = posDecel(23, VP, aT, f - FREL);
+        else if (mode === 'mid') x = posDecel(x7, v7, a, f - 7);
+        else x = posDecel(23, VP, a, f - FREL);
+        if (x >= EDGE){ out[f] = EDGE; fell = f; break; }
+        out[f] = x;
+      }
+      for (var g = out.length; g < F; g++) out[g] = null;
+      return {x:out, fell:fell};
+    }
+    function rnd(i){ var s = Math.sin(i * 12.9898 + 78.233) * 43758.5453; return (s - Math.floor(s)) * 2 - 1; }
+    function tau(k, s){ return Math.min(1, Math.max(0, 1 - (s - LAG * k / (K - 1)) / S)); }
+
+    var st = {mode:'rest', given:false, t0:0, step:0, phase:'idle', chunk:0, mus:[], trajs:[], timer:null};
+    var bGen = document.getElementById('b-gen'), bSlide = document.getElementById('b-slide'), bReset = document.getElementById('b-reset');
+    var statusEl = document.getElementById('status'), announceEl = document.getElementById('announce');
+    var memRows = document.getElementById('memrows'), memNote = document.getElementById('memnote');
+
+    function stopTimer(){ if (st.timer){ clearInterval(st.timer); st.timer = null; } }
+    function reset(){
+      stopTimer();
+      st.t0 = st.mode === 'mid' ? 8 : 0;
+      st.step = 0; st.phase = 'idle'; st.chunk = 0;
+      st.mus = st.given ? [MU_TRUE, MU_TRUE, MU_TRUE, MU_TRUE, MU_TRUE, MU_TRUE] : SAMPLES[st.mode].slice();
+      st.trajs = st.mus.map(function(m){ return traj(m, st.mode); });
+    }
+    function finishChunk(){ st.step = STEPS; st.phase = 'clean'; }
+    function slide(){ st.t0 += K; st.chunk += 1; st.phase = 'idle'; st.step = 0; }
+
+    function revealedUpTo(){ return st.phase === 'clean' ? st.t0 + K - 1 : st.t0 - 1; }
+
+    function outcomeText(){
+      var last = Math.min(revealedUpTo(), F - 1);
+      if (last < FREL + 1) return '';
+      var fellN = 0, pos = [], rest = 0;
+      st.trajs.forEach(function(tr){
+        if (tr.fell !== null && tr.fell <= last){ fellN++; return; }
+        var x = tr.x[last], xp = tr.x[last - 1];
+        pos.push(x);
+        if (xp !== null && Math.abs(x - xp) < 1e-6) rest++;
+      });
+      var parts = [];
+      if (fellN) parts.push(fellN + ' of 6 rollouts slid off the edge');
+      if (pos.length){
+        var lo = Math.min.apply(null, pos), hi = Math.max.apply(null, pos);
+        var where = (hi - lo < 0.05) ? lo.toFixed(1) + ' cm' : lo.toFixed(1) + ' to ' + hi.toFixed(1) + ' cm';
+        parts.push((fellN ? 'the other ' + pos.length + ' are at ' : 'all 6 are at ') + where);
+      }
+      var s = parts.join('; ') + '.';
+      if (pos.length && rest === pos.length) s += ' Everything left on the counter is at rest, so the mug would sleep until something touches it.';
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    function setStatus(){
+      var msg = '';
+      if (st.t0 >= F){
+        msg = 'End of this 64-frame timeline. A real rollout keeps sliding the window. ' + outcomeText();
+      } else if (st.phase === 'denoising'){
+        msg = 'Denoising frames ' + st.t0 + '–' + (st.t0 + K - 1) + ': step ' + st.step + ' of ' + STEPS + '. Nearer frames clear first.';
+      } else if (st.phase === 'clean'){
+        msg = 'Frames ' + st.t0 + '–' + (st.t0 + K - 1) + ' generated. ' + outcomeText() + ' Press Slide window to keep them and move on.';
+      } else if (st.t0 === 0){
+        msg = 'No past frames: the mug starts at rest and only the gripper’s path is given. Press Generate chunk.';
+      } else {
+        var src = (st.mode === 'mid' && st.chunk === 0) ? 'tracked' : 'kept from the model’s own output';
+        msg = 'Window: frames ' + Math.max(0, st.t0 - H) + '–' + (st.t0 - 1) + ' given (' + src + '), frames ' + st.t0 + '–' + (st.t0 + K - 1) + ' to generate.' +
+          (st.t0 - H > 0 ? ' Older frames have left the window; only the friction in the object memory carries them.' : '') +
+          ' Press Generate chunk.';
+      }
+      statusEl.textContent = msg;
+      bGen.disabled = !(st.phase === 'idle' && st.t0 < F);
+      bSlide.disabled = st.phase !== 'clean';
+    }
+    function announce(){ announceEl.textContent = statusEl.textContent; }
+
+    function renderMemory(){
+      memRows.textContent = '';
+      var last = revealedUpTo();
+      st.mus.forEach(function(mu, r){
+        var row = document.createElement('div'); row.className = 'memrow';
+        var sw = document.createElement('span'); sw.className = 'sw'; sw.style.background = 'var(--s' + (r + 1) + ')';
+        var val = document.createElement('span');
+        var out = document.createElement('span'); out.className = 'out';
+        if (st.given){
+          val.textContent = mu.toFixed(2) + ' given';
+        } else if (st.chunk === 0 && st.phase === 'idle'){
+          val.textContent = '?  empty';
+        } else if (st.chunk === 0 && st.phase === 'denoising'){
+          var noisy = Math.min(0.9, Math.max(0.05, mu + tau(0, st.step) * 0.22 * rnd(500 + r * 11 + st.step)));
+          val.textContent = noisy.toFixed(st.mode === 'mid' ? 3 : 2) + ' …';
+        } else {
+          val.textContent = mu.toFixed(st.mode === 'mid' ? 3 : 2) + (st.chunk > 0 ? ' carried' : '');
+        }
+        var tr = st.trajs[r];
+        if (last >= FREL + 1){
+          if (tr.fell !== null && tr.fell <= last) out.textContent = 'fell';
+          else if (tr.x[last] !== null) out.textContent = tr.x[last].toFixed(1) + ' cm';
+        }
+        row.appendChild(sw); row.appendChild(val); row.appendChild(out);
+        memRows.appendChild(row);
+      });
+      if (st.given) memNote.textContent = 'Given, so every rollout uses it and they coincide.';
+      else if (st.mode === 'mid') memNote.textContent = 'Inferred from the deceleration in the 8 tracked frames, then carried with the window.';
+      else memNote.textContent = 'Sampled once per rollout in the first chunk, then carried with the window. Nothing observed narrows it.';
+    }
+
+    function render(){
+      svg.textContent = '';
+      var t0 = st.t0, s = st.step;
+      // ---- window strip
+      var cw = (W - ML - MR) / F;
+      for (var f = 0; f < F; f++){
+        var cls = 'cell';
+        if (f < t0 - H) cls = 'cell old';
+        else if (f < t0) cls = 'cell hist';
+        else if (f < t0 + K) cls = 'cell chunk';
+        el('rect', {x:(xs(f) + 0.5).toFixed(1), y:STRIP_Y, width:(cw - 1).toFixed(1), height:STRIP_H, 'class':cls}, svg);
+        if (f >= t0 && f < t0 + K && t0 < F){
+          var tk = st.phase === 'idle' ? 1 : (st.phase === 'clean' ? 0 : tau(f - t0, s));
+          if (tk > 0.001) el('rect', {x:(xs(f) + 2).toFixed(1), y:(STRIP_Y + STRIP_H * (1 - tk)).toFixed(1), width:(cw - 4).toFixed(1), height:(STRIP_H * tk).toFixed(1), 'class':'noise'}, svg);
+        }
+      }
+      if (t0 - H > 0) el('text', {x:xs(0), y:STRIP_Y - 7, 'class':'stript'}, svg, 'earlier');
+      if (t0 > 0) el('text', {x:xs(Math.max(0, t0 - H)), y:STRIP_Y - 7, 'class':'striph'}, svg, 'past (given)');
+      if (t0 < F) el('text', {x:Math.min(xs(t0), W - MR - 118), y:STRIP_Y - 7, 'class':'stripc'}, svg, st.phase === 'clean' ? 'chunk (done)' : 'chunk (noise level)');
+      el('line', {x1:xs(0) + 1, y1:STRIP_Y + STRIP_H + 6, x2:xs(FREL), y2:STRIP_Y + STRIP_H + 6, 'class':'pushtick'}, svg);
+      el('text', {x:xs(0), y:STRIP_Y + STRIP_H + 20, 'class':'striph'}, svg, 'gripper path (given)');
+
+      // ---- chart frame
+      el('rect', {x:xs(0), y:CH_TOP, width:(xs(FREL) - xs(0)).toFixed(1), height:CH_BOT - CH_TOP, 'class':'band-push'}, svg);
+      if (t0 > 0) el('rect', {x:xs(Math.max(0, t0 - H)), y:CH_TOP, width:(xs(t0) - xs(Math.max(0, t0 - H))).toFixed(1), height:CH_BOT - CH_TOP, 'class':'band-hist'}, svg);
+      if (t0 < F) el('rect', {x:xs(t0), y:CH_TOP, width:(xs(Math.min(F, t0 + K)) - xs(t0)).toFixed(1), height:CH_BOT - CH_TOP, 'class':'band-chunk'}, svg);
+      [10, 20, 30, 40].forEach(function(v){
+        el('line', {x1:ML, y1:ys(v), x2:W - MR, y2:ys(v), 'class':'ax'}, svg);
+        el('text', {x:ML - 6, y:ys(v) + 3.5, 'text-anchor':'end', 'class':'axt'}, svg, String(v));
+      });
+      el('line', {x1:ML, y1:CH_BOT, x2:W - MR, y2:CH_BOT, 'class':'ax'}, svg);
+      for (var tick = 0; tick <= F; tick += 8){
+        el('line', {x1:xs(tick), y1:CH_BOT, x2:xs(tick), y2:CH_BOT + 4, 'class':'ax'}, svg);
+        el('text', {x:xs(tick), y:CH_BOT + 15, 'text-anchor':'middle', 'class':'axt'}, svg, String(tick));
+      }
+      el('text', {x:W - MR, y:CH_BOT + 30, 'text-anchor':'end', 'class':'axl'}, svg, 'frame (30 per second)');
+      el('text', {x:ML - 34, y:CH_TOP - 8, 'class':'axl'}, svg, 'mug position along the counter (cm)');
+      el('line', {x1:ML, y1:ys(EDGE), x2:W - MR, y2:ys(EDGE), 'class':'edge'}, svg);
+      el('text', {x:W - MR, y:ys(EDGE) - 5, 'text-anchor':'end', 'class':'edget'}, svg, 'counter edge');
+      el('text', {x:xs(0) + 3, y:CH_BOT - 6, 'class':'axt'}, svg, 'push');
+
+      // ---- tracked past (mid-motion mode)
+      if (st.mode === 'mid'){
+        var obs = [];
+        for (var o = 0; o <= 7; o++) obs.push(xc(o).toFixed(1) + ',' + ys(st.trajs[0].x[o]).toFixed(1));
+        el('polyline', {points:obs.join(' '), 'class':'obs'}, svg);
+        el('text', {x:xc(1), y:ys(st.trajs[0].x[7]) - 10, 'class':'edget'}, svg, 'tracked');
+      }
+
+      // ---- rollouts
+      st.trajs.forEach(function(tr, r){
+        var color = 'var(--s' + (r + 1) + ')';
+        var start = st.mode === 'mid' ? 7 : 0;
+        var pts = [];
+        for (var f2 = start; f2 < Math.min(t0, F); f2++){
+          if (tr.x[f2] === null) break;
+          pts.push(xc(f2).toFixed(1) + ',' + ys(tr.x[f2]).toFixed(1));
+        }
+        if (pts.length > 1) el('polyline', {points:pts.join(' '), fill:'none', style:'stroke:' + color + ';stroke-width:1.8;opacity:.9'}, svg);
+        // current chunk
+        if (st.phase !== 'idle' && t0 < F){
+          var cp = [], mean = 0, n = 0;
+          if (t0 - 1 >= start && tr.x[t0 - 1] !== null) cp.push(xc(t0 - 1).toFixed(1) + ',' + ys(tr.x[t0 - 1]).toFixed(1));
+          for (var k = 0; k < K && t0 + k < F; k++){
+            var x = tr.x[t0 + k];
+            if (x === null) break;
+            var tk2 = st.phase === 'clean' ? 0 : tau(k, s);
+            var y = x + tk2 * AMP * rnd(st.chunk * 1000 + r * 37 + k * 7 + 1);
+            y = Math.max(YMIN, Math.min(YMAX, y));
+            cp.push(xc(t0 + k).toFixed(1) + ',' + ys(y).toFixed(1));
+            el('circle', {cx:xc(t0 + k).toFixed(1), cy:ys(y).toFixed(1), r:1.9, style:'fill:' + color}, svg);
+            mean += tk2; n++;
+          }
+          if (cp.length > 1){
+            var op = 0.3 + 0.65 * (1 - (n ? mean / n : 0));
+            el('polyline', {points:cp.join(' '), fill:'none', style:'stroke:' + color + ';stroke-width:1.6;opacity:' + op.toFixed(2)}, svg);
+          }
+        }
+        // fell marker
+        var shownTo = st.phase === 'clean' ? t0 + K : t0;
+        if (tr.fell !== null && tr.fell < shownTo){
+          var fx = xc(tr.fell), fy = ys(EDGE), d = 4.5;
+          el('path', {d:'M' + (fx - d) + ',' + (fy - d) + ' L' + (fx + d) + ',' + (fy + d) + ' M' + (fx - d) + ',' + (fy + d) + ' L' + (fx + d) + ',' + (fy - d), style:'stroke:' + color + ';stroke-width:2;fill:none'}, svg);
+        }
+      });
+      renderMemory();
+      setStatus();
+    }
+
+    function generate(){
+      if (st.phase !== 'idle' || st.t0 >= F) return;
+      st.phase = 'denoising'; st.step = 0;
+      if (reduce){ finishChunk(); render(); announce(); return; }
+      render();
+      st.timer = setInterval(function(){
+        st.step += 1;
+        if (st.step >= STEPS){ stopTimer(); finishChunk(); render(); announce(); }
+        else render();
+      }, 95);
+    }
+    function setMode(mode){
+      st.mode = mode;
+      document.getElementById('m-rest').setAttribute('aria-pressed', String(mode === 'rest'));
+      document.getElementById('m-mid').setAttribute('aria-pressed', String(mode === 'mid'));
+      reset(); render(); announce();
+    }
+    function setGiven(g){
+      st.given = g;
+      document.getElementById('f-empty').setAttribute('aria-pressed', String(!g));
+      document.getElementById('f-given').setAttribute('aria-pressed', String(g));
+      reset(); render(); announce();
+    }
+    bGen.addEventListener('click', generate);
+    bSlide.addEventListener('click', function(){ if (st.phase === 'clean'){ slide(); render(); announce(); } });
+    bReset.addEventListener('click', function(){ reset(); render(); announce(); });
+    document.getElementById('m-rest').addEventListener('click', function(){ setMode('rest'); });
+    document.getElementById('m-mid').addEventListener('click', function(){ setMode('mid'); });
+    document.getElementById('f-empty').addEventListener('click', function(){ setGiven(false); });
+    document.getElementById('f-given').addEventListener('click', function(){ setGiven(true); });
+
+    // open in a working state: two chunks generated, the second one not yet kept
+    reset(); finishChunk(); slide(); finishChunk();
+    render();
+  })();
+})();
+</script>

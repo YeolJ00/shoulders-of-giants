@@ -1,0 +1,861 @@
+{
+ "_versions": {
+  "newton": "1.7.0",
+  "mujoco_warp": "3.15.0",
+  "warp": "1.18.0+cu12"
+ },
+ "_note": "round1 = every solver at its first settings; mujoco_tuned = ke 2.5e4, joint-limit gains, restitution map at that ke; followups = targeted checks run after round1",
+ "round1": {
+  "mujoco": {
+   "slide": {
+    "rows": [
+     {
+      "tilt": 20.0,
+      "mu": 0.1,
+      "a": 2.430569979511674,
+      "law": 2.433379145033834,
+      "rel": -0.0011544298503144423
+     },
+     {
+      "tilt": 20.0,
+      "mu": 0.2,
+      "a": 1.5160290721982896,
+      "law": 1.5115406840428576,
+      "rel": 0.002969412734182608
+     },
+     {
+      "tilt": 20.0,
+      "mu": 0.3,
+      "a": 0.5833074497501264,
+      "law": 0.5897022230518818,
+      "rel": -0.01084407189218417
+     },
+     {
+      "tilt": 30.0,
+      "mu": 0.1,
+      "a": 4.053313809917864,
+      "law": 4.055429078887465,
+      "rel": -0.0005215894368891805
+     },
+     {
+      "tilt": 30.0,
+      "mu": 0.2,
+      "a": 3.1970571862466155,
+      "law": 3.205858157774931,
+      "rel": -0.0027452778929009103
+     },
+     {
+      "tilt": 30.0,
+      "mu": 0.3,
+      "a": 2.365039720827386,
+      "law": 2.3562872366623964,
+      "rel": 0.003714523437043926
+     }
+    ],
+    "worst_rel": 0.01084407189218417,
+    "pass": true,
+    "seconds": 8.2
+   },
+   "rest": {
+    "drift_mm_s": 0.08800376526618475,
+    "penetration_mm": 0.15513279988920575,
+    "pass": true,
+    "seconds": 3.4
+   },
+   "bounce": {
+    "rows": [
+     {
+      "target": 0.2,
+      "e": 0.19829452462697472
+     },
+     {
+      "target": 0.5,
+      "e": 0.5064905823858683
+     },
+     {
+      "target": 0.8,
+      "e": 0.8087170179826038
+     }
+    ],
+    "worst_abs": 0.008717017982603714,
+    "pass": true,
+    "seconds": 9.1
+   },
+   "momentum": {
+    "rel_change": 5.213234430812008e-07,
+    "vA": 0.5722988247871399,
+    "vB": 0.4277016520500183,
+    "pass": true,
+    "seconds": 0.6
+   },
+   "stack": {
+    "top_moved_mm": 2.046823501586914,
+    "pass": false,
+    "seconds": 7.4
+   },
+   "concave": {
+    "ball_z_m": 0.11963283270597458,
+    "inside": false,
+    "pass": false,
+    "seconds": 3.1
+   },
+   "topple_com": {
+    "tilt_deg_centred": 0.16521874145205742,
+    "tilt_deg_offset": 90.0029258170276,
+    "pass": true,
+    "seconds": 6.1
+   },
+   "drawer": {
+    "v_at_0.6s": 0.37946176528930664,
+    "law": 0.38008517265285446,
+    "rel": -0.0016401780663967136,
+    "x_end_m": 0.3072405755519867,
+    "pass": false,
+    "seconds": 1.7
+   },
+   "pusher": {
+    "F_accel_N": 3.84017001837492,
+    "law_accel_N": 3.943,
+    "F_const_N": 3.0210712753236293,
+    "law_const_N": 2.943,
+    "box_speed_end": 0.20709913969039917,
+    "pass": true,
+    "seconds": 2.8
+   },
+   "determinism": {
+    "max_abs_diff_m": 0.0,
+    "bit_identical": true,
+    "seconds": 6.4
+   },
+   "throughput": {
+    "worlds": 256,
+    "sim_s_per_wall_s": 87.75697145054981,
+    "episodes_6s_per_hour": 52654.18287032989,
+    "lowest_z": 0.029828766360878944,
+    "seconds": 18.0
+   }
+  },
+  "mujoco_ncd": {
+   "slide": {
+    "rows": [
+     {
+      "tilt": 20.0,
+      "mu": 0.1,
+      "a": 2.432667776680747,
+      "law": 2.433379145033834,
+      "rel": -0.0002923376550416634
+     },
+     {
+      "tilt": 20.0,
+      "mu": 0.2,
+      "a": 1.51479998405279,
+      "law": 1.5115406840428576,
+      "rel": 0.0021562767342886424
+     },
+     {
+      "tilt": 20.0,
+      "mu": 0.3,
+      "a": 0.5871229451887413,
+      "law": 0.5897022230518818,
+      "rel": -0.004373864914044234
+     },
+     {
+      "tilt": 30.0,
+      "mu": 0.1,
+      "a": 4.0544286735891735,
+      "law": 4.055429078887465,
+      "rel": -0.0002466829720927377
+     },
+     {
+      "tilt": 30.0,
+      "mu": 0.2,
+      "a": 3.1994513866278362,
+      "law": 3.205858157774931,
+      "rel": -0.0019984574587483817
+     },
+     {
+      "tilt": 30.0,
+      "mu": 0.3,
+      "a": 2.3536672004893027,
+      "law": 2.3562872366623964,
+      "rel": -0.0011119341192056265
+     }
+    ],
+    "worst_rel": 0.004373864914044234,
+    "pass": true,
+    "seconds": 4.9
+   },
+   "rest": {
+    "drift_mm_s": 0.038065462042333804,
+    "penetration_mm": 0.1552384623113301,
+    "pass": true,
+    "seconds": 2.1
+   },
+   "bounce": {
+    "rows": [
+     {
+      "target": 0.2,
+      "e": 0.19829452462697472
+     },
+     {
+      "target": 0.5,
+      "e": 0.5064905823858683
+     },
+     {
+      "target": 0.8,
+      "e": 0.8087170179826038
+     }
+    ],
+    "worst_abs": 0.008717017982603714,
+    "pass": true,
+    "seconds": 7.8
+   },
+   "momentum": {
+    "rel_change": 6.950979241082678e-07,
+    "vA": 0.5414454340934753,
+    "vB": 0.45855388045310974,
+    "pass": true,
+    "seconds": 0.5
+   },
+   "stack": {
+    "top_moved_mm": 2.0468831062316895,
+    "pass": false,
+    "seconds": 5.0
+   },
+   "concave": {
+    "ball_z_m": 0.02445930801331997,
+    "inside": true,
+    "pass": true,
+    "seconds": 18.2
+   },
+   "topple_com": {
+    "tilt_deg_centred": 0.10448261374568281,
+    "tilt_deg_offset": 90.00293493179649,
+    "pass": true,
+    "seconds": 4.1
+   },
+   "drawer": {
+    "v_at_0.6s": 0.37946176528930664,
+    "law": 0.38008517265285446,
+    "rel": -0.0016401780663967136,
+    "x_end_m": 0.3072405755519867,
+    "pass": false,
+    "seconds": 1.5
+   },
+   "pusher": {
+    "F_accel_N": 4.115565001964569,
+    "law_accel_N": 3.943,
+    "F_const_N": 3.03225565534085,
+    "law_const_N": 2.943,
+    "box_speed_end": 0.21908137202262878,
+    "pass": true,
+    "seconds": 1.2
+   },
+   "determinism": {
+    "max_abs_diff_m": 1.5156697941165476e-07,
+    "bit_identical": false,
+    "seconds": 4.2
+   },
+   "throughput": {
+    "worlds": 256,
+    "sim_s_per_wall_s": 4.972242848986862,
+    "episodes_6s_per_hour": 2983.345709392117,
+    "lowest_z": -46.732139587402344,
+    "seconds": 109.6
+   }
+  },
+  "kamino": {
+   "slide": {
+    "rows": [
+     {
+      "tilt": 20.0,
+      "mu": 0.1,
+      "a": 2.433396283557491,
+      "law": 2.433379145033834,
+      "rel": 7.043096301728724e-06
+     },
+     {
+      "tilt": 20.0,
+      "mu": 0.2,
+      "a": 1.5115696060329358,
+      "law": 1.5115406840428576,
+      "rel": 1.913411288456679e-05
+     },
+     {
+      "tilt": 20.0,
+      "mu": 0.3,
+      "a": 0.589710897667108,
+      "law": 0.5897022230518818,
+      "rel": 1.4710161988729098e-05
+     },
+     {
+      "tilt": 30.0,
+      "mu": 0.1,
+      "a": 4.055437713526184,
+      "law": 4.055429078887465,
+      "rel": 2.1291553993219026e-06
+     },
+     {
+      "tilt": 30.0,
+      "mu": 0.2,
+      "a": 3.205871216706384,
+      "law": 3.205858157774931,
+      "rel": 4.073458902631444e-06
+     },
+     {
+      "tilt": 30.0,
+      "mu": 0.3,
+      "a": 2.3562941614577673,
+      "law": 2.3562872366623964,
+      "rel": 2.9388587534651123e-06
+     }
+    ],
+    "worst_rel": 1.913411288456679e-05,
+    "pass": true,
+    "seconds": 7.8
+   },
+   "rest": {
+    "drift_mm_s": 0.0,
+    "penetration_mm": 0.00020950389043733475,
+    "pass": true,
+    "seconds": 1.9
+   },
+   "bounce": {
+    "rows": [
+     {
+      "target": 0.2,
+      "e": 0.18467179793206076
+     },
+     {
+      "target": 0.5,
+      "e": 0.5022353963141042
+     },
+     {
+      "target": 0.8,
+      "e": 0.8055214495582317
+     }
+    ],
+    "worst_abs": 0.01532820206793925,
+    "pass": true,
+    "seconds": 8.0
+   },
+   "momentum": {
+    "rel_change": 0.0,
+    "vA": 0.5,
+    "vB": 0.5,
+    "pass": true,
+    "note": "rerun after fixing the test: reset() had restored the model's zero velocity"
+   },
+   "stack": {
+    "top_moved_mm": 0.0005070976385468384,
+    "pass": true,
+    "seconds": 6.3
+   },
+   "concave": {
+    "ball_z_m": 0.030072985216975212,
+    "inside": true,
+    "pass": true,
+    "seconds": 19.0
+   },
+   "topple_com": {
+    "tilt_deg_centred": 0.1558610176507021,
+    "tilt_deg_offset": 90.02961884399082,
+    "pass": true,
+    "seconds": 13.4
+   },
+   "drawer": {
+    "v_at_0.6s": 0.37946176528930664,
+    "law": 0.38008517265285446,
+    "rel": -0.0016401780663967136,
+    "x_end_m": 0.30019283294677734,
+    "pass": true,
+    "seconds": 3.0
+   },
+   "pusher": {
+    "F_accel_N": 3.9533616105715432,
+    "law_accel_N": 3.943,
+    "F_const_N": 3.0699888557195663,
+    "law_const_N": 2.943,
+    "box_speed_end": 0.20017103850841522,
+    "pass": true,
+    "seconds": 2.7
+   },
+   "determinism": {
+    "max_abs_diff_m": 1.0392462002073444e-07,
+    "bit_identical": false,
+    "seconds": 4.7
+   },
+   "throughput": {
+    "worlds": 256,
+    "sim_s_per_wall_s": 3.74,
+    "episodes_6s_per_hour": 2243,
+    "note": "measured while another job shared the GPU; contact capacity bounded at 512 per world (the default overflowed int32)"
+   }
+  },
+  "xpbd": {
+   "slide": {
+    "rows": [
+     {
+      "tilt": 20.0,
+      "mu": 0.1,
+      "a": 2.43340540973158,
+      "law": 2.433379145033834,
+      "rel": 1.079350819610525e-05
+     },
+     {
+      "tilt": 20.0,
+      "mu": 0.2,
+      "a": 1.511527275639828,
+      "law": 1.5115406840428576,
+      "rel": -8.87068616228781e-06
+     },
+     {
+      "tilt": 20.0,
+      "mu": 0.3,
+      "a": 0.5897102690392877,
+      "law": 0.5897022230518818,
+      "rel": 1.3644153084912958e-05
+     },
+     {
+      "tilt": 30.0,
+      "mu": 0.1,
+      "a": 4.055424966408191,
+      "law": 4.055429078887465,
+      "rel": -1.0140676099945622e-06
+     },
+     {
+      "tilt": 30.0,
+      "mu": 0.2,
+      "a": 3.2058496435169643,
+      "law": 3.205858157774931,
+      "rel": -2.6558436299062294e-06
+     },
+     {
+      "tilt": 30.0,
+      "mu": 0.3,
+      "a": 2.3563344830686472,
+      "law": 2.3562872366623964,
+      "rel": 2.0051208322824365e-05
+     }
+    ],
+    "worst_rel": 2.0051208322824365e-05,
+    "pass": true,
+    "seconds": 11.3
+   },
+   "rest": {
+    "drift_mm_s": 1.6638677167914206,
+    "penetration_mm": 0.0008263872748465184,
+    "pass": false,
+    "seconds": 5.6
+   },
+   "bounce": {
+    "rows": [
+     {
+      "target": 0.2,
+      "e": 0.19391278342737345
+     },
+     {
+      "target": 0.5,
+      "e": 0.49889714458816975
+     },
+     {
+      "target": 0.8,
+      "e": 0.7991744878450512
+     }
+    ],
+    "worst_abs": 0.006087216572626564,
+    "pass": true,
+    "seconds": 23.9
+   },
+   "momentum": {
+    "rel_change": 2.0852937723248033e-06,
+    "vA": 0.49999919533729553,
+    "vB": 0.4999987781047821,
+    "pass": true,
+    "seconds": 1.0
+   },
+   "stack": {
+    "top_moved_mm": 0.414043664932251,
+    "pass": true,
+    "seconds": 13.2
+   },
+   "concave": {
+    "ball_z_m": 0.03009914793074131,
+    "inside": true,
+    "pass": true,
+    "seconds": 5.8
+   },
+   "topple_com": {
+    "tilt_deg_centred": 0.036978012111031064,
+    "tilt_deg_offset": 90.00000198703869,
+    "pass": true,
+    "seconds": 11.6
+   },
+   "drawer": {
+    "v_at_0.6s": 0.0,
+    "law": 0.38008517265285446,
+    "rel": -1.0,
+    "x_end_m": 0.30000001192092896,
+    "pass": false,
+    "seconds": 4.0
+   },
+   "pusher": {
+    "F_accel_N": 5.035406082868576,
+    "law_accel_N": 3.943,
+    "F_const_N": 3.758201849460602,
+    "law_const_N": 2.943,
+    "box_speed_end": 0.20000720024108887,
+    "pass": false,
+    "seconds": 2.8
+   },
+   "determinism": {
+    "max_abs_diff_m": 0.0,
+    "bit_identical": true,
+    "seconds": 10.9
+   },
+   "throughput": {
+    "worlds": 256,
+    "sim_s_per_wall_s": 2.142154011662065,
+    "episodes_6s_per_hour": 1285.2924069972391,
+    "lowest_z": 0.031898222863674164,
+    "seconds": 240.9
+   }
+  },
+  "vbd": {
+   "slide": {
+    "rows": [
+     {
+      "tilt": 20.0,
+      "mu": 0.1,
+      "a": 2.432668920003481,
+      "law": 2.433379145033834,
+      "rel": -0.00029186780522971745
+     },
+     {
+      "tilt": 20.0,
+      "mu": 0.2,
+      "a": 1.509923688885305,
+      "law": 1.5115406840428576,
+      "rel": -0.0010697662157711507
+     },
+     {
+      "tilt": 20.0,
+      "mu": 0.3,
+      "a": 0.5874234366842466,
+      "law": 0.5897022230518818,
+      "rel": -0.003864300113779251
+     },
+     {
+      "tilt": 30.0,
+      "mu": 0.1,
+      "a": 4.05467888342447,
+      "law": 4.055429078887465,
+      "rel": -0.00018498547216638794
+     },
+     {
+      "tilt": 30.0,
+      "mu": 0.2,
+      "a": 3.204366865493999,
+      "law": 3.205858157774931,
+      "rel": -0.00046517724975303487
+     },
+     {
+      "tilt": 30.0,
+      "mu": 0.3,
+      "a": 2.354118219864609,
+      "law": 2.3562872366623964,
+      "rel": -0.0009205230856573765
+     }
+    ],
+    "worst_rel": 0.003864300113779251,
+    "pass": true,
+    "seconds": 10.5
+   },
+   "rest": {
+    "drift_mm_s": 0.10776980050576834,
+    "penetration_mm": 0.0017925324327719427,
+    "pass": true,
+    "seconds": 5.0
+   },
+   "bounce": {
+    "rows": [
+     {
+      "target": 0.2,
+      "e": 0.0
+     },
+     {
+      "target": 0.5,
+      "e": 0.0
+     },
+     {
+      "target": 0.8,
+      "e": 0.0
+     }
+    ],
+    "worst_abs": 0.8,
+    "pass": false,
+    "seconds": 19.2
+   },
+   "momentum": {
+    "rel_change": 3.475489620541339e-06,
+    "vA": 0.5020782351493835,
+    "vB": 0.4979252815246582,
+    "pass": true,
+    "seconds": 0.9
+   },
+   "stack": {
+    "top_moved_mm": 0.05849556328030303,
+    "pass": true,
+    "seconds": 12.0
+   },
+   "concave": {
+    "ball_z_m": 0.024651627987623215,
+    "inside": true,
+    "pass": true,
+    "seconds": 5.5
+   },
+   "topple_com": {
+    "tilt_deg_centred": 0.0,
+    "tilt_deg_offset": 89.99999535973534,
+    "pass": true,
+    "seconds": 10.1
+   },
+   "drawer": {
+    "v_at_0.6s": -0.6706953048706055,
+    "law": 0.38008517265285446,
+    "rel": -2.76459213125679,
+    "x_end_m": 0.250040739774704,
+    "pass": false,
+    "seconds": 3.7
+   },
+   "pusher": {
+    "F_accel_N": 3.947727743784587,
+    "law_accel_N": 3.943,
+    "F_const_N": 2.947285087108612,
+    "law_const_N": 2.943,
+    "box_speed_end": 0.20000338554382324,
+    "pass": true,
+    "seconds": 2.6
+   },
+   "determinism": {
+    "max_abs_diff_m": 0.047326259315013885,
+    "bit_identical": false,
+    "seconds": 10.7
+   },
+   "throughput": {
+    "error": "stopped after 13 min: per-body contact buffer overflow (134 > 64), 26k contact candidates dropped on 256 mesh worlds; VBD is out for rigid bodies on bounce, drawer and determinism anyway",
+    "pass": false
+   }
+  }
+ },
+ "mujoco_tuned": {
+  "slide": {
+   "rows": [
+    {
+     "tilt": 20.0,
+     "mu": 0.1,
+     "a": 2.4341047145917543,
+     "law": 2.433379145033834,
+     "rel": 0.0002981736567444493
+    },
+    {
+     "tilt": 20.0,
+     "mu": 0.2,
+     "a": 1.5232145681254672,
+     "law": 1.5115406840428576,
+     "rel": 0.007723168953273518
+    },
+    {
+     "tilt": 20.0,
+     "mu": 0.3,
+     "a": 0.5949272033805865,
+     "law": 0.5897022230518818,
+     "rel": 0.008860370750620294
+    },
+    {
+     "tilt": 30.0,
+     "mu": 0.1,
+     "a": 4.063264725228941,
+     "law": 4.055429078887465,
+     "rel": 0.001932137435781689
+    },
+    {
+     "tilt": 30.0,
+     "mu": 0.2,
+     "a": 3.205508422994335,
+     "law": 3.205858157774931,
+     "rel": -0.00010909240627121619
+    },
+    {
+     "tilt": 30.0,
+     "mu": 0.3,
+     "a": 2.3622706294243923,
+     "law": 2.3562872366623964,
+     "rel": 0.002539330803519091
+    }
+   ],
+   "worst_rel": 0.008860370750620294,
+   "pass": true,
+   "seconds": 8.4
+  },
+  "rest": {
+   "drift_mm_s": 6.812075603597108,
+   "penetration_mm": 0.10355971452560148,
+   "pass": false,
+   "seconds": 4.0
+  },
+  "bounce": {
+   "rows": [
+    {
+     "target": 0.2,
+     "e": 0.2091304856536825,
+     "kd": 187.05088668294508
+    },
+    {
+     "target": 0.5,
+     "e": 0.5030669423185746,
+     "kd": 75.47112435842095
+    },
+    {
+     "target": 0.8,
+     "e": 0.8030070563370914,
+     "kd": 22.351607573751778
+    }
+   ],
+   "worst_abs": 0.00913048565368249,
+   "pass": true,
+   "seconds": 34.6
+  },
+  "momentum": {
+   "rel_change": 3.649264044724987e-06,
+   "vA": 0.7770705819129944,
+   "vB": 0.22293315827846527,
+   "pass": true,
+   "seconds": 0.6
+  },
+  "stack": {
+   "top_moved_mm": 0.39130449295043945,
+   "pass": true,
+   "seconds": 8.8
+  },
+  "concave": {
+   "ball_z_m": 0.119956374168396,
+   "inside": false,
+   "pass": false,
+   "seconds": 3.2
+  },
+  "topple_com": {
+   "tilt_deg_centred": 0.0,
+   "tilt_deg_offset": 89.99891279105594,
+   "pass": true,
+   "seconds": 6.9
+  },
+  "drawer": {
+   "v_at_0.6s": 0.37946176528930664,
+   "law": 0.38008517265285446,
+   "rel": -0.0016401780663967136,
+   "x_end_m": 0.300044447183609,
+   "pass": true,
+   "seconds": 1.8
+  },
+  "pusher": {
+   "F_accel_N": 4.306116014719009,
+   "law_accel_N": 3.943,
+   "F_const_N": 2.7666837219148874,
+   "law_const_N": 2.943,
+   "box_speed_end": 0.21104323863983154,
+   "pass": true,
+   "seconds": 1.7
+  },
+  "determinism": {
+   "max_abs_diff_m": 0.0,
+   "bit_identical": true,
+   "seconds": 6.7
+  },
+  "throughput": {
+   "worlds": 256,
+   "sim_s_per_wall_s": 77.90321079031713,
+   "episodes_6s_per_hour": 46741.92647419028,
+   "lowest_z": 0.03020477294921875,
+   "seconds": 8.1
+  }
+ },
+ "followups": {
+  "mujoco_rest_creep_vs_damping_mm_s": {
+   "note": "cube on 20 deg, mu 0.6, drift over the second second; kd is MuJoCo's contact damping, which also sets restitution",
+   "ke2.5e3_imp10": {
+    "kd5": 139.8,
+    "kd20": 9.73,
+    "kd80": 0.107,
+    "kd320": 0.038
+   },
+   "ke2.5e3_imp100": {
+    "kd5": 153.1,
+    "kd20": 9.38,
+    "kd80": 0.01,
+    "kd320": 0.001
+   },
+   "ke1e4_imp10": {
+    "kd5": 462.1,
+    "kd20": 73.8,
+    "kd80": 4.6,
+    "kd320": 0.038
+   },
+   "ke2.5e4_imp10": {
+    "kd5": 1758.2,
+    "kd20": 287.1,
+    "kd80": 8.72,
+    "kd320": 0.038
+   },
+   "ke2.5e4_imp100": {
+    "kd5": 1550.6,
+    "kd20": 151.7,
+    "kd80": 8.59,
+    "kd320": 0.0
+   }
+  },
+  "mujoco_stack_compression_mm": {
+   "ke2.5e3": 2.05,
+   "ke2.5e4": 0.39,
+   "ke1e5": "unstable (collapse)"
+  },
+  "mujoco_drawer_limit_overshoot_mm": {
+   "default": 7.24,
+   "limit_ke1e5_kd1e3": 0.04,
+   "limit_ke1e6_kd1e4": 0.02
+  },
+  "mujoco_heterogeneous_worlds": "refused: SolverMuJoCo requires homogeneous worlds",
+  "kamino_rest_drift_mm_s_by_restitution": {
+   "0.0": 0.0,
+   "0.5": 0.0,
+   "0.8": 0.0
+  },
+  "kamino_throughput_alone_256_worlds": {
+   "box_episodes_6s_per_hour": 19000,
+   "mesh_episodes_6s_per_hour": 11158,
+   "1024_worlds": "int32 overflow in a capacity computed over all worlds"
+  },
+  "kamino_heterogeneous_worlds": "accepted (different objects per world)",
+  "kamino_phys101_93_real_slides": {
+   "median_rms_mm": 0.69,
+   "p90_rms_mm": 1.67,
+   "mu_per_cube": [
+    0.28,
+    0.26,
+    0.28,
+    0.22,
+    0.23,
+    0.25,
+    0.21,
+    0.21,
+    0.22
+   ]
+  },
+  "kamino_momentum_after_test_fix": {
+   "rel_change": 0.0,
+   "vA": 0.5,
+   "vB": 0.5
+  }
+ },
+ "decision": "Kamino teaches rigid and hinged objects; VBD stays the cloth solver (phase 3); MuJoCo-Warp is not used because its soft contacts couple restitution to static friction"
+}

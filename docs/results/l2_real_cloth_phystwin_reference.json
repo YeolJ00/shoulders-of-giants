@@ -1,0 +1,42 @@
+{
+ "single_clift_cloth_1": {
+  "train_mm": 3.2716186059498735,
+  "test_mm": 10.426523009187544,
+  "frames": 80
+ },
+ "single_clift_cloth_3": {
+  "train_mm": 5.610874602151941,
+  "test_mm": 13.651232506294726,
+  "frames": 97
+ },
+ "double_lift_cloth_1": {
+  "train_mm": 3.1965517474023555,
+  "test_mm": 14.38284523274443,
+  "frames": 116
+ },
+ "double_lift_cloth_3": {
+  "train_mm": 3.0367822132502926,
+  "test_mm": 8.971167886567887,
+  "frames": 118
+ },
+ "single_lift_cloth_1": {
+  "train_mm": 8.735359335056987,
+  "test_mm": 28.61139701583838,
+  "frames": 110
+ },
+ "single_lift_cloth_3": {
+  "train_mm": 8.346407003781083,
+  "test_mm": 42.666649671279295,
+  "frames": 156
+ },
+ "single_lift_cloth_4": {
+  "train_mm": 16.263015243350083,
+  "test_mm": 33.97214088107595,
+  "frames": 172
+ },
+ "single_lift_cloth": {
+  "train_mm": 30.432566611797007,
+  "test_mm": 59.716814672285025,
+  "frames": 173
+ }
+}

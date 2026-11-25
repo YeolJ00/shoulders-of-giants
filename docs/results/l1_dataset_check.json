@@ -1,0 +1,83 @@
+{
+ "data": "data/datasets/v0",
+ "shards": 391,
+ "invariants": [
+  {
+   "shard": "shard_00000.npz",
+   "finite": true,
+   "max_speed_m_s": 3.928123950958252,
+   "lowest_z_m": -0.7361316084861755,
+   "max_xy_m": 3.779616117477417
+  },
+  {
+   "shard": "shard_00055.npz",
+   "finite": true,
+   "max_speed_m_s": 3.8469207286834717,
+   "lowest_z_m": -0.7266641855239868,
+   "max_xy_m": 1.3612526655197144
+  },
+  {
+   "shard": "shard_00111.npz",
+   "finite": true,
+   "max_speed_m_s": 4.0045881271362305,
+   "lowest_z_m": -0.7271742820739746,
+   "max_xy_m": 0.99928879737854
+  },
+  {
+   "shard": "shard_00167.npz",
+   "finite": true,
+   "max_speed_m_s": 4.006172180175781,
+   "lowest_z_m": -0.7437888979911804,
+   "max_xy_m": 1.685296893119812
+  },
+  {
+   "shard": "shard_00222.npz",
+   "finite": true,
+   "max_speed_m_s": 3.832401752471924,
+   "lowest_z_m": -0.7261483073234558,
+   "max_xy_m": 1.5096979141235352
+  },
+  {
+   "shard": "shard_00278.npz",
+   "finite": true,
+   "max_speed_m_s": 3.8506360054016113,
+   "lowest_z_m": -0.742314875125885,
+   "max_xy_m": 1.3514087200164795
+  },
+  {
+   "shard": "shard_00334.npz",
+   "finite": true,
+   "max_speed_m_s": 3.791966676712036,
+   "lowest_z_m": -0.7241237759590149,
+   "max_xy_m": 1.6021063327789307
+  },
+  {
+   "shard": "shard_00390.npz",
+   "finite": true,
+   "max_speed_m_s": 3.800041437149048,
+   "lowest_z_m": -0.7405968904495239,
+   "max_xy_m": 2.0378355979919434
+  }
+ ],
+ "invariants_ok": true,
+ "family_fractions": {
+  "collision": 0.312,
+  "hinge": 0.087,
+  "off_centre": 0.457,
+  "push": 0.706,
+  "random": 0.187,
+  "strike": 0.33,
+  "sweep": 0.165,
+  "tilt_release": 0.35
+ },
+ "per_object": {
+  "grip": 0.659,
+  "drop": 0.649
+ },
+ "reproducibility": {
+  "shard": 0,
+  "median_mm": 0.29661424923688173,
+  "p99_mm": 620.8773851394653,
+  "max_mm": 1257.1953535079956
+ }
+}

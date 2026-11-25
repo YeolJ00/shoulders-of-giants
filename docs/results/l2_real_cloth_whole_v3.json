@@ -1,0 +1,466 @@
+{
+ "double_lift_cloth_1": {
+  "model": {
+   "track_moving": {
+    "train_mm": 19.66929961165079,
+    "test_mm": 79.66932724669721
+   },
+   "gt_all": {
+    "train_mm": 13.418650673789289,
+    "test_mm": 67.17960083848565
+   },
+   "gt_moving": {
+    "train_mm": 29.936213017050882,
+    "test_mm": 65.80027361469756
+   }
+  },
+  "default": {
+   "track_moving": {
+    "train_mm": 26.338100885534452,
+    "test_mm": 38.26757366861843
+   },
+   "gt_all": {
+    "train_mm": 5.093489260365123,
+    "test_mm": 36.851171375184784
+   },
+   "gt_moving": {
+    "train_mm": 18.06858537522274,
+    "test_mm": 40.983766691524515
+   }
+  },
+  "constvel": {
+   "track_moving": {
+    "train_mm": 31.120979992873238,
+    "test_mm": 48.711667131662246
+   },
+   "gt_all": {
+    "train_mm": 8.57579136229305,
+    "test_mm": 51.087370894019344
+   },
+   "gt_moving": {
+    "train_mm": 27.53415177414647,
+    "test_mm": 55.92158747510375
+   }
+  },
+  "floor": {
+   "track_moving": {
+    "train_mm": 9.414774590915702,
+    "test_mm": 5.50671732190377
+   },
+   "gt_all": {
+    "train_mm": 3.8874837375850126,
+    "test_mm": 8.207754399560192
+   },
+   "gt_moving": {
+    "train_mm": 11.504422174536963,
+    "test_mm": 9.53758117238825
+   }
+  }
+ },
+ "double_lift_cloth_3": {
+  "model": {
+   "track_moving": {
+    "train_mm": 30.854981373842577,
+    "test_mm": 71.88389303578185
+   },
+   "gt_all": {
+    "train_mm": 12.528852537629257,
+    "test_mm": 53.46158269289769
+   },
+   "gt_moving": {
+    "train_mm": 28.04471522676191,
+    "test_mm": 67.77592500686356
+   }
+  },
+  "default": {
+   "track_moving": {
+    "train_mm": 34.62257991792555,
+    "test_mm": 74.96082248350541
+   },
+   "gt_all": {
+    "train_mm": 4.780117215123559,
+    "test_mm": 20.01355954105683
+   },
+   "gt_moving": {
+    "train_mm": 19.95256369280265,
+    "test_mm": 89.06740572718608
+   }
+  },
+  "constvel": {
+   "track_moving": {
+    "train_mm": 41.1217910579165,
+    "test_mm": 95.20984302369601
+   },
+   "gt_all": {
+    "train_mm": 15.687016276196362,
+    "test_mm": 48.17386849313628
+   },
+   "gt_moving": {
+    "train_mm": 36.38280178838008,
+    "test_mm": 104.84097013510791
+   }
+  },
+  "floor": {
+   "track_moving": {
+    "train_mm": 27.1792984236116,
+    "test_mm": 57.96962467569222
+   },
+   "gt_all": {
+    "train_mm": 3.67606004022371,
+    "test_mm": 15.635824875552915
+   },
+   "gt_moving": {
+    "train_mm": 17.158136479334736,
+    "test_mm": 69.80622548629377
+   }
+  }
+ },
+ "single_clift_cloth_1": {
+  "model": {
+   "track_moving": {
+    "train_mm": 35.79582674443342,
+    "test_mm": 41.419482528036305
+   },
+   "gt_all": {
+    "train_mm": 8.673002560979747,
+    "test_mm": 28.639836100165148
+   },
+   "gt_moving": {
+    "train_mm": 11.954224293990366,
+    "test_mm": 24.353121149888775
+   }
+  },
+  "default": {
+   "track_moving": {
+    "train_mm": 41.0374255824088,
+    "test_mm": 41.232291200102594
+   },
+   "gt_all": {
+    "train_mm": 4.160063646904438,
+    "test_mm": 14.010300373833411
+   },
+   "gt_moving": {
+    "train_mm": 17.81841155591493,
+    "test_mm": 31.832004586770505
+   }
+  },
+  "constvel": {
+   "track_moving": {
+    "train_mm": 79.43769018176488,
+    "test_mm": 120.32538517066526
+   },
+   "gt_all": {
+    "train_mm": 33.52891280932998,
+    "test_mm": 85.99835801063574
+   },
+   "gt_moving": {
+    "train_mm": 68.01296545306987,
+    "test_mm": 104.92104115284577
+   }
+  },
+  "floor": {
+   "track_moving": {
+    "train_mm": 24.969787463077413,
+    "test_mm": 16.706806974511657
+   },
+   "gt_all": {
+    "train_mm": 3.501748340383743,
+    "test_mm": 7.975427146269293
+   },
+   "gt_moving": {
+    "train_mm": 10.949175560651462,
+    "test_mm": 13.692484306189678
+   }
+  }
+ },
+ "single_clift_cloth_3": {
+  "model": {
+   "track_moving": {
+    "train_mm": 36.75813281682435,
+    "test_mm": 53.91611531727639
+   },
+   "gt_all": {
+    "train_mm": 12.78568796029482,
+    "test_mm": 53.460849028115646
+   },
+   "gt_moving": {
+    "train_mm": 29.429364560895017,
+    "test_mm": 68.2029292365635
+   }
+  },
+  "default": {
+   "track_moving": {
+    "train_mm": 42.135346769340856,
+    "test_mm": 57.518615681454094
+   },
+   "gt_all": {
+    "train_mm": 10.10476951165684,
+    "test_mm": 51.39530428984551
+   },
+   "gt_moving": {
+    "train_mm": 25.917874022507817,
+    "test_mm": 75.2001488813343
+   }
+  },
+  "constvel": {
+   "track_moving": {
+    "train_mm": 42.93487100966082,
+    "test_mm": 50.64580210421176
+   },
+   "gt_all": {
+    "train_mm": 24.091465993119414,
+    "test_mm": 36.39492137205138
+   },
+   "gt_moving": {
+    "train_mm": 34.695280056310594,
+    "test_mm": 41.51826973008368
+   }
+  },
+  "floor": {
+   "track_moving": {
+    "train_mm": 31.41030639152826,
+    "test_mm": 35.87456775030507
+   },
+   "gt_all": {
+    "train_mm": 8.2044314139814,
+    "test_mm": 27.676801360111522
+   },
+   "gt_moving": {
+    "train_mm": 20.58621719726804,
+    "test_mm": 39.945087021375755
+   }
+  }
+ },
+ "single_lift_cloth": {
+  "model": {
+   "track_moving": {
+    "train_mm": 38.644287966621214,
+    "test_mm": null
+   },
+   "gt_all": {
+    "train_mm": 29.699724723480696,
+    "test_mm": null
+   },
+   "gt_moving": {
+    "train_mm": 36.82860923880085,
+    "test_mm": null
+   }
+  },
+  "default": {
+   "track_moving": {
+    "train_mm": 31.055744359430143,
+    "test_mm": null
+   },
+   "gt_all": {
+    "train_mm": 27.576139752573102,
+    "test_mm": null
+   },
+   "gt_moving": {
+    "train_mm": 36.10810010390962,
+    "test_mm": null
+   }
+  },
+  "constvel": {
+   "track_moving": {
+    "train_mm": 77.35238789251699,
+    "test_mm": null
+   },
+   "gt_all": {
+    "train_mm": 68.66752241643331,
+    "test_mm": null
+   },
+   "gt_moving": {
+    "train_mm": 79.4249642496532,
+    "test_mm": null
+   }
+  },
+  "floor": {
+   "track_moving": {
+    "train_mm": 4.94054328151866,
+    "test_mm": null
+   },
+   "gt_all": {
+    "train_mm": 10.611430908794853,
+    "test_mm": null
+   },
+   "gt_moving": {
+    "train_mm": 11.431948041457042,
+    "test_mm": null
+   }
+  }
+ },
+ "single_lift_cloth_1": {
+  "model": {
+   "track_moving": {
+    "train_mm": 15.237687024110935,
+    "test_mm": null
+   },
+   "gt_all": {
+    "train_mm": 5.925861046573889,
+    "test_mm": null
+   },
+   "gt_moving": {
+    "train_mm": 11.965318400075738,
+    "test_mm": null
+   }
+  },
+  "default": {
+   "track_moving": {
+    "train_mm": 17.037218921163856,
+    "test_mm": null
+   },
+   "gt_all": {
+    "train_mm": 5.5256767644072005,
+    "test_mm": null
+   },
+   "gt_moving": {
+    "train_mm": 12.251830367281235,
+    "test_mm": null
+   }
+  },
+  "constvel": {
+   "track_moving": {
+    "train_mm": 11.596205178263846,
+    "test_mm": null
+   },
+   "gt_all": {
+    "train_mm": 6.235710247701455,
+    "test_mm": null
+   },
+   "gt_moving": {
+    "train_mm": 10.415776421508488,
+    "test_mm": null
+   }
+  },
+  "floor": {
+   "track_moving": {
+    "train_mm": 7.761775319704359,
+    "test_mm": null
+   },
+   "gt_all": {
+    "train_mm": 4.487712157184913,
+    "test_mm": null
+   },
+   "gt_moving": {
+    "train_mm": 6.839257783901473,
+    "test_mm": null
+   }
+  }
+ },
+ "single_lift_cloth_3": {
+  "model": {
+   "track_moving": {
+    "train_mm": 14.156067498026093,
+    "test_mm": null
+   },
+   "gt_all": {
+    "train_mm": 6.892961971503986,
+    "test_mm": null
+   },
+   "gt_moving": {
+    "train_mm": 13.269368115355281,
+    "test_mm": null
+   }
+  },
+  "default": {
+   "track_moving": {
+    "train_mm": 15.554343090422181,
+    "test_mm": null
+   },
+   "gt_all": {
+    "train_mm": 6.243185019662961,
+    "test_mm": null
+   },
+   "gt_moving": {
+    "train_mm": 17.12492616933486,
+    "test_mm": null
+   }
+  },
+  "constvel": {
+   "track_moving": {
+    "train_mm": 22.335793377725015,
+    "test_mm": null
+   },
+   "gt_all": {
+    "train_mm": 11.530190577506016,
+    "test_mm": null
+   },
+   "gt_moving": {
+    "train_mm": 24.50303291815799,
+    "test_mm": null
+   }
+  },
+  "floor": {
+   "track_moving": {
+    "train_mm": 8.41716410865973,
+    "test_mm": null
+   },
+   "gt_all": {
+    "train_mm": 4.035589645859393,
+    "test_mm": null
+   },
+   "gt_moving": {
+    "train_mm": 7.450698598584455,
+    "test_mm": null
+   }
+  }
+ },
+ "single_lift_cloth_4": {
+  "model": {
+   "track_moving": {
+    "train_mm": 15.322537106077142,
+    "test_mm": null
+   },
+   "gt_all": {
+    "train_mm": 5.495666894893093,
+    "test_mm": null
+   },
+   "gt_moving": {
+    "train_mm": 13.333947648070856,
+    "test_mm": null
+   }
+  },
+  "default": {
+   "track_moving": {
+    "train_mm": 17.017697356242355,
+    "test_mm": null
+   },
+   "gt_all": {
+    "train_mm": 5.43003402122443,
+    "test_mm": null
+   },
+   "gt_moving": {
+    "train_mm": 14.682471238269537,
+    "test_mm": null
+   }
+  },
+  "constvel": {
+   "track_moving": {
+    "train_mm": 16.53177364491686,
+    "test_mm": null
+   },
+   "gt_all": {
+    "train_mm": 7.014726367573205,
+    "test_mm": null
+   },
+   "gt_moving": {
+    "train_mm": 12.517695877362149,
+    "test_mm": null
+   }
+  },
+  "floor": {
+   "track_moving": {
+    "train_mm": 8.374013889942272,
+    "test_mm": null
+   },
+   "gt_all": {
+    "train_mm": 4.8845287873727585,
+    "test_mm": null
+   },
+   "gt_moving": {
+    "train_mm": 6.984762616028711,
+    "test_mm": null
+   }
+  }
+ }
+}

@@ -1,0 +1,38 @@
+{
+ "cv_mm": 4.253043793141842,
+ "n_test": 280514,
+ "rows": [
+  {
+   "shards": 64,
+   "episodes": 2828,
+   "samples": "all",
+   "n_train": 1152156,
+   "ratio": 0.7158185908290744,
+   "best_step": 4000
+  },
+  {
+   "shards": 64,
+   "episodes": 2828,
+   "samples": "a third",
+   "n_train": 384052,
+   "ratio": 0.7440194947260269,
+   "best_step": 4000
+  },
+  {
+   "shards": 308,
+   "episodes": 13683,
+   "samples": "all",
+   "n_train": 5507320,
+   "ratio": 0.6623083861307285,
+   "best_step": 32000
+  },
+  {
+   "shards": 308,
+   "episodes": 13683,
+   "samples": "a third",
+   "n_train": 1835774,
+   "ratio": 0.6830856109406611,
+   "best_step": 6000
+  }
+ ]
+}

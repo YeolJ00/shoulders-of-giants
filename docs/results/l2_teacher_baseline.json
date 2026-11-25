@@ -1,0 +1,24 @@
+{
+ "data": "data/datasets/v0_test",
+ "shard": 0,
+ "episodes": 64,
+ "bodies": 205,
+ "horizons_frames": [
+  1,
+  8,
+  30,
+  172
+ ],
+ "median_mm": [
+  1.41,
+  0.18,
+  0.23,
+  8.62
+ ],
+ "p90_mm": [
+  30.4,
+  9.8,
+  49.8,
+  149.4
+ ]
+}

@@ -1,0 +1,71 @@
+{
+ "train": "c1m",
+ "test": "c1m_test",
+ "rows": [
+  {
+   "frame": "world",
+   "R": 1,
+   "model": "linear",
+   "ratio": 0.8792515612095904
+  },
+  {
+   "frame": "world",
+   "R": 2,
+   "model": "linear",
+   "ratio": 0.8427098245572417
+  },
+  {
+   "frame": "world",
+   "R": 3,
+   "model": "linear",
+   "ratio": 0.8287670622444975
+  },
+  {
+   "frame": "world",
+   "R": 4,
+   "model": "linear",
+   "ratio": 0.8237422940716077
+  },
+  {
+   "frame": "world",
+   "R": 4,
+   "model": "mlp",
+   "ratio": 0.8456161365800607,
+   "train_ratio": 0.5445848664526706
+  },
+  {
+   "frame": "local",
+   "R": 1,
+   "model": "linear",
+   "ratio": 0.8554271102149625
+  },
+  {
+   "frame": "local",
+   "R": 2,
+   "model": "linear",
+   "ratio": 0.8200710716731626
+  },
+  {
+   "frame": "local",
+   "R": 3,
+   "model": "linear",
+   "ratio": 0.8066510158731093
+  },
+  {
+   "frame": "local",
+   "R": 4,
+   "model": "linear",
+   "ratio": 0.802819771610633
+  },
+  {
+   "frame": "local",
+   "R": 4,
+   "model": "mlp",
+   "ratio": 0.7296145025176527,
+   "train_ratio": 0.526796851961453
+  }
+ ],
+ "n_train": 149767,
+ "n_test": 80006,
+ "cv_mm": 4.314094157670779
+}

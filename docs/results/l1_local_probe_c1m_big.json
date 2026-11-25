@@ -1,0 +1,35 @@
+{
+ "train": "c1m",
+ "test": "c1m_test",
+ "rows": [
+  {
+   "frame": "world",
+   "R": 4,
+   "model": "linear",
+   "ratio": 0.8209858645433509
+  },
+  {
+   "frame": "world",
+   "R": 4,
+   "model": "mlp",
+   "ratio": 0.8025820696331507,
+   "train_ratio": 0.5201496036349178
+  },
+  {
+   "frame": "local",
+   "R": 4,
+   "model": "linear",
+   "ratio": 0.8005791547595763
+  },
+  {
+   "frame": "local",
+   "R": 4,
+   "model": "mlp",
+   "ratio": 0.7127831288654701,
+   "train_ratio": 0.5182477856542672
+  }
+ ],
+ "n_train": 727259,
+ "n_test": 193599,
+ "cv_mm": 4.273252449666645
+}

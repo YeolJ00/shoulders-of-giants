@@ -1,0 +1,55 @@
+{
+ "n": 64,
+ "ckpt": "outputs/lsim/cloth_pilot/step2000.pt",
+ "moving_fraction": 0.296875,
+ "slots": {
+  "density": {
+   "model_abs_err": 1.256585992872715,
+   "prior_abs_err": 1.2559338212013245,
+   "model_moving": 1.4518113695085049,
+   "prior_moving": 1.5082135200500488,
+   "model_still": 1.1990401186048985,
+   "corr": 0.19857016497628396,
+   "factor_model": 2.1253821588860187,
+   "factor_prior": 2.124550653127995,
+   "within_1sd": 0.390625,
+   "within_2sd": 1.0
+  },
+  "stretch": {
+   "model_abs_err": 1.2287615463137627,
+   "prior_abs_err": 1.26788729429245,
+   "model_moving": 0.45395196974277496,
+   "prior_moving": 0.5742102861404419,
+   "model_still": 1.3204815536737442,
+   "corr": -0.14240592202195607,
+   "factor_model": 4.368911590680531,
+   "factor_prior": 4.578927560488767,
+   "within_1sd": 0.453125,
+   "within_2sd": 0.984375
+  },
+  "bend": {
+   "model_abs_err": 1.0571752935647964,
+   "prior_abs_err": 1.0304362773895264,
+   "model_moving": 1.1661608219146729,
+   "prior_moving": 1.1072818040847778,
+   "model_still": 0.9962025806307793,
+   "corr": 0.17684285526096294,
+   "factor_model": 1.373212109027869,
+   "factor_prior": 1.3622406700083256,
+   "within_1sd": 0.5,
+   "within_2sd": 1.0
+  },
+  "mu": {
+   "model_abs_err": 0.7790798675268888,
+   "prior_abs_err": 0.8337594270706177,
+   "model_moving": 0.6901212334632874,
+   "prior_moving": 0.741359293460846,
+   "model_still": 0.8356884084641933,
+   "corr": 0.1676427251928683,
+   "factor_model": 1.7252222762538594,
+   "factor_prior": 1.7925363800862784,
+   "within_1sd": 0.640625,
+   "within_2sd": 1.0
+  }
+ }
+}

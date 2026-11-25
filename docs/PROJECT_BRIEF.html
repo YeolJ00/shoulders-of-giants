@@ -1,0 +1,631 @@
+<title>[SoG] Shoulder of Giants</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap">
+<style>
+/* Layout: one reading column (~68ch) with figures allowed wider; the project's own palette from its other pages
+   (paper and ink; blue = given inputs, purple = slots the model fills, green = the exact physics layer). */
+:root{
+  --paper:#fbfaf7; --panel:#ffffff; --sunk:#f2f0ea; --ink:#16191c; --ink-2:#454b52; --ink-3:#737a82; --rule:#dcd9d1;
+  --given:#2b5f86; --empty:#6b3fa0; --exact:#1f6b4f; --net:#2b5f86; --ref:#9aa0a6; --warn:#a4561a;
+  --serif:"Source Serif 4","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#111315; --panel:#171a1d; --sunk:#1d2124; --ink:#e8e9e6; --ink-2:#b0b6bc; --ink-3:#848b92; --rule:#2c3034;
+  --given:#79b0d8; --empty:#b99ce8; --exact:#63b48f; --net:#79b0d8; --ref:#6b7178; --warn:#e0955a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#111315; --panel:#171a1d; --sunk:#1d2124; --ink:#e8e9e6; --ink-2:#b0b6bc; --ink-3:#848b92; --rule:#2c3034;
+  --given:#79b0d8; --empty:#b99ce8; --exact:#63b48f; --net:#79b0d8; --ref:#6b7178; --warn:#e0955a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.62;margin:0}
+.wrap{max-width:1000px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 72px}
+.col{max-width:70ch}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(31px,5vw,46px);line-height:1.08;margin:.35em 0 .4em;
+  text-wrap:balance;max-width:22ch}
+h2{font-family:var(--serif);font-weight:600;font-size:clamp(23px,3.2vw,29px);line-height:1.2;margin:0 0 .5em;
+  text-wrap:balance}
+h3{font-family:var(--sans);font-weight:600;font-size:16.5px;margin:0 0 .3em}
+p{margin:0 0 .9em}
+.lede{font-size:clamp(17.5px,2.1vw,19.5px);line-height:1.55;color:var(--ink-2);max-width:62ch}
+a{color:var(--given);text-underline-offset:2px}
+a:focus-visible{outline:2px solid var(--given);outline-offset:2px;border-radius:2px}
+section{padding-block:44px 8px;border-top:1px solid var(--rule);margin-top:40px}
+.toc{display:flex;flex-wrap:wrap;gap:6px 18px;margin:28px 0 0;padding:0;list-style:none;font-size:14.5px}
+.toc a{color:var(--ink-2);text-decoration:none;border-bottom:1px solid var(--rule)}
+.toc a:hover{color:var(--ink);border-bottom-color:var(--ink-3)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;background:var(--rule);
+  border:1px solid var(--rule);margin:30px 0 0}
+.facts div{background:var(--panel);padding:12px 14px;min-width:0}
+.facts b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:500;margin-bottom:2px}
+.facts span{font-size:15px}
+.claims{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px;margin:22px 0 8px}
+.claims div{min-width:0;border-top:2px solid var(--ink);padding-top:10px}
+.claims .n{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+.uses{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:18px 0 12px}
+.uses div{min-width:0;background:var(--sunk);padding:14px 16px;border-radius:3px}
+.uses p{font-size:15px;margin:0;color:var(--ink-2)}
+figure{margin:26px 0 14px}
+.scroll{overflow-x:auto}
+figure svg{display:block;width:100%;height:auto;color:var(--ink)}
+.wide svg{min-width:660px}
+figcaption{font-size:14px;color:var(--ink-3);margin-top:8px;max-width:78ch;line-height:1.5}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;vertical-align:baseline;margin:0 3px 0 6px}
+.prior{display:grid;gap:0;margin:20px 0 6px;border-top:1px solid var(--rule)}
+.prior > div{display:grid;grid-template-columns:minmax(0,15em) minmax(0,1fr) minmax(0,1fr);gap:4px 22px;
+  padding:14px 0;border-bottom:1px solid var(--rule)}
+.prior .k{font-weight:600}
+.prior .k small{display:block;font-weight:400;color:var(--ink-3);font-size:13.5px;margin-top:2px}
+.prior .g,.prior .l{font-size:15px;color:var(--ink-2)}
+.prior .g::before{content:"Good at";display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--exact)}
+.prior .l::before{content:"Falls short";display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--warn)}
+.delta{background:var(--sunk);padding:16px 18px;border-radius:3px;margin:18px 0 6px;font-size:15.5px}
+.delta ol{margin:.4em 0 0;padding-left:1.3em}
+.timeline{list-style:none;margin:20px 0 6px;padding:0;border-left:2px solid var(--rule)}
+.timeline li{position:relative;padding:0 0 18px 20px}
+.timeline li::before{content:"";position:absolute;left:-6px;top:.5em;width:10px;height:10px;border-radius:50%;
+  background:var(--paper);border:2px solid var(--ink-3)}
+.timeline li.now::before{background:var(--given);border-color:var(--given)}
+.timeline .d{font-family:var(--mono);font-size:12.5px;color:var(--ink-3);display:block;font-variant-numeric:tabular-nums}
+.timeline p{margin:2px 0 0;font-size:15.5px;max-width:68ch}
+.enable{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px 28px;margin:18px 0 6px}
+.enable div{min-width:0}
+.enable p{font-size:15.5px;color:var(--ink-2);margin:0}
+.glance{margin:22px 0 10px;border-bottom:1px solid var(--rule);max-width:92ch}
+.glance .row{display:grid;grid-template-columns:13.5rem 5.6rem minmax(0,1fr);gap:4px 18px;padding:11px 0;
+  border-top:1px solid var(--rule);align-items:baseline}
+.glance .what{font-weight:600;font-size:15.5px}
+.glance p{font-size:15px;margin:0;color:var(--ink-2)}
+.tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  padding:2px 6px;border-radius:2px;display:inline-block;justify-self:start}
+.tag.ok{color:var(--exact);border:1px solid var(--exact)}
+.tag.open{color:var(--warn);border:1px solid var(--warn)}
+.tag.parked{color:var(--ink-3);border:1px solid var(--ink-3)}
+.next{counter-reset:n;list-style:none;padding:0;margin:18px 0 6px}
+.next li{counter-increment:n;display:grid;grid-template-columns:2.2em minmax(0,1fr);gap:0 8px;padding:10px 0;
+  border-bottom:1px solid var(--rule)}
+.next li::before{content:counter(n);font-family:var(--serif);font-size:24px;line-height:1.1;color:var(--ink-3)}
+.next p{margin:0;font-size:15.5px}
+.next .cur{color:var(--given);font-weight:600}
+.rules{columns:2 300px;column-gap:32px;margin:16px 0 6px;padding:0;list-style:none}
+.rules li{break-inside:avoid;margin:0 0 14px;font-size:15px;color:var(--ink-2)}
+.rules b{color:var(--ink);display:block;font-size:15.5px}
+.links{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px 28px;margin:16px 0 6px;
+  font-size:15px}
+.links div{min-width:0}
+.links span{display:block;color:var(--ink-3);font-size:14px}
+code{font-family:var(--mono);font-size:.88em;background:var(--sunk);padding:1px 4px;border-radius:2px;
+  overflow-wrap:anywhere}
+.foot{margin-top:48px;font-size:13.5px;color:var(--ink-3)}
+@media (max-width:640px){
+  .glance .row{grid-template-columns:minmax(0,1fr) auto}
+  .glance .row p{grid-column:1 / -1}
+  .prior > div{grid-template-columns:minmax(0,1fr)}
+  section{margin-top:28px;padding-top:32px}
+}
+.vid{margin:26px 0 14px}
+.vid .frame{overflow-x:auto;border-radius:3px;background:var(--sunk)}
+.vid video{display:block;width:100%;height:auto;min-width:560px}
+.more{font-size:15.5px}
+.pages{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;margin:20px 0 0;padding:12px 0 0;
+  border-top:1px solid var(--rule);font-size:15px}
+.pages b{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);
+  font-weight:500}
+.pages a{font-weight:500}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">[SoG] Shoulder of Giants · project briefing · kept current · last updated 2026-11-25</div>
+  <h1>Learn a simulator from a simulator, then correct it with reality</h1>
+  <p class="lede">We are training one neural network to simulate household scenes: rigid objects, hinged parts such as
+  drawers and doors, and cloth, with ropes and soft objects next. The scene is explicit 3D meshes, not video. The
+  network first learns by copying a classical physics simulator across many objects and materials. Then it learns from
+  real recorded motion, so that it ends up more accurate than the simulator it copied.</p>
+  <div class="facts">
+    <div><b>Started</b><span>2026-10-16</span></div>
+    <div><b>Teacher</b><span>NVIDIA Newton 1.7, run on GPUs, gated before use</span></div>
+    <div><b>Model</b><span>Transformers over mesh vertices: 64M with an exact physics layer for cloth, 1.6M without one for rigid</span></div>
+    <div><b>Data</b><span>~63k rigid and 20k cloth teacher episodes (<a href="https://claude.ai/artifact/Bqgkb28DtrCtLMpWj1hLtt">how they are made</a>); real tracked cloth and ramp slides</span></div>
+  </div>
+  <ul class="toc" aria-label="Contents">
+    <li><a href="#why">Why</a></li>
+    <li><a href="#bet">The bet</a></li>
+    <li><a href="#uses">What it is for</a></li>
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#before">What came before</a></li>
+    <li><a href="#path">How we got here</a></li>
+    <li><a href="#enables">What makes it possible</a></li>
+    <li><a href="#now">Where it stands</a></li>
+    <li><a href="#next">What's next</a></li>
+    <li><a href="#rules">How we work</a></li>
+    <li><a href="#more">Further reading</a></li>
+  </ul>
+  <nav class="pages" aria-label="Pages in this project"><b>Pages</b>
+    <a href="https://claude.ai/artifact/FZbzJtpVHJWYpDXgYTGpzj">[SoG] Test Results</a>
+    <a href="https://claude.ai/artifact/QDsKHiZi79nEwTZ7wvUh31">[SoG] Architecture</a>
+    <a href="https://claude.ai/artifact/Bqgkb28DtrCtLMpWj1hLtt">[SoG] Making the Training Data</a>
+  </nav>
+</header>
+
+<section id="why">
+  <div class="col">
+    <div class="eyebrow">Why</div>
+    <h2>Robots are short of data, and simulators are not real enough to fill the gap</h2>
+    <p>Real robot data is slow and expensive to collect. Simulated data is cheap, but policies trained in simulation
+    often fail on the real thing. The simulators are wrong in ways nobody can fix by hand. Friction and contact laws
+    are approximations. Cloth and soft objects are the least accurate part of any engine. Above all, the physical
+    parameters of real objects (mass, friction, stiffness, how a towel bends) are never known for the object in
+    front of the robot.</p>
+    <p>If simulators were real enough, robotics would not have a data problem. A hand-written simulator can only be
+    as real as the equations and numbers someone types into it. A learned simulator can take its realism from data
+    and keep improving as real recordings arrive.</p>
+  </div>
+</section>
+
+<section id="bet">
+  <div class="col">
+    <div class="eyebrow">The bet</div>
+    <h2>Chemistry already did this: pretrain on a cheap approximate solver, fine-tune on a little accurate data</h2>
+    <p>Machine-learned interatomic potentials are trained on millions of cheap, approximate quantum calculations
+    (DFT), then fine-tuned on a few hundred thousand accurate ones (CCSD(T)). The result is more accurate than DFT,
+    the method it learned from (ANI-1ccx; MACE-MP-0 and UMA follow the same recipe). We bet the same recipe works for
+    the physics a robot meets in a home.</p>
+  </div>
+  <figure class="scroll wide">
+    <svg viewBox="0 0 840 250" role="img" aria-label="Two parallel pipelines. Chemistry: DFT calculations distilled into a neural potential, fine-tuned on CCSD(T) data, which beats DFT. This project: the Newton simulator distilled into a learned simulator, fine-tuned on real recorded motion, which should beat Newton; that last step is open.">
+      <defs>
+        <marker id="ar1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+        </marker>
+      </defs>
+      <g font-family="IBM Plex Sans, system-ui, sans-serif" fill="currentColor">
+        <text x="0" y="18" font-size="12" font-family="IBM Plex Mono, monospace" letter-spacing="1.5" opacity=".65">CHEMISTRY (DONE)</text>
+        <text x="0" y="146" font-size="12" font-family="IBM Plex Mono, monospace" letter-spacing="1.5" opacity=".65">THIS PROJECT</text>
+      </g>
+      <g fill="none" stroke="currentColor" stroke-width="1.3">
+        <rect x="0" y="30" width="180" height="70" rx="3"/>
+        <rect x="220" y="30" width="180" height="70" rx="3"/>
+        <rect x="440" y="30" width="180" height="70" rx="3"/>
+        <rect x="660" y="30" width="180" height="70" rx="3" stroke-width="2"/>
+        <rect x="0" y="158" width="180" height="70" rx="3"/>
+        <rect x="220" y="158" width="180" height="70" rx="3" stroke="var(--empty)" stroke-width="2"/>
+        <rect x="440" y="158" width="180" height="70" rx="3"/>
+        <rect x="660" y="158" width="180" height="70" rx="3" stroke="var(--warn)" stroke-width="2" stroke-dasharray="6 4"/>
+        <line x1="182" y1="65" x2="217" y2="65" marker-end="url(#ar1)"/>
+        <line x1="402" y1="65" x2="437" y2="65" marker-end="url(#ar1)"/>
+        <line x1="622" y1="65" x2="657" y2="65" marker-end="url(#ar1)"/>
+        <line x1="182" y1="193" x2="217" y2="193" marker-end="url(#ar1)"/>
+        <line x1="402" y1="193" x2="437" y2="193" marker-end="url(#ar1)"/>
+        <line x1="622" y1="193" x2="657" y2="193" marker-end="url(#ar1)"/>
+      </g>
+      <g font-family="IBM Plex Sans, system-ui, sans-serif" fill="currentColor" text-anchor="middle">
+        <text x="90" y="60" font-size="14" font-weight="600">DFT</text>
+        <text x="90" y="80" font-size="12" opacity=".7">millions of cheap calculations</text>
+        <text x="310" y="60" font-size="14" font-weight="600">Neural potential</text>
+        <text x="310" y="80" font-size="12" opacity=".7">learns to copy DFT</text>
+        <text x="530" y="60" font-size="14" font-weight="600">CCSD(T)</text>
+        <text x="530" y="80" font-size="12" opacity=".7">~500k accurate points</text>
+        <text x="750" y="60" font-size="14" font-weight="600">Beats DFT</text>
+        <text x="750" y="80" font-size="12" opacity=".7">shown (ANI-1ccx, MACE)</text>
+        <text x="90" y="188" font-size="14" font-weight="600">Newton simulator</text>
+        <text x="90" y="208" font-size="12" opacity=".7">~80k episodes, many materials</text>
+        <text x="310" y="188" font-size="14" font-weight="600">Learned simulator</text>
+        <text x="310" y="208" font-size="12" opacity=".7">copies Newton (distillation)</text>
+        <text x="530" y="188" font-size="14" font-weight="600">Real recorded motion</text>
+        <text x="530" y="208" font-size="12" opacity=".7">tracked cloth, real slides</text>
+        <text x="750" y="188" font-size="14" font-weight="600">Beats Newton?</text>
+        <text x="750" y="208" font-size="12" opacity=".7">open: our claim 3</text>
+        <text x="200" y="120" font-size="11.5" opacity=".6">distil</text>
+        <text x="420" y="120" font-size="11.5" opacity=".6">fine-tune</text>
+        <text x="640" y="120" font-size="11.5" opacity=".6">compare on held-out data</text>
+      </g>
+    </svg>
+    <figcaption>The same three steps in both rows. Chemistry has shown the last box; for household physics it is the
+    open question this project tests.</figcaption>
+  </figure>
+  <div class="col">
+    <p>The bet comes as three claims we can test and measure as scaling behaviour:</p>
+  </div>
+  <div class="claims">
+    <div><span class="n">Claim 1</span><h3>Coverage, not composition</h3><p>Learned simulators already generalise to
+    more objects than they were trained on. Generalising to new kinds of interaction and material should follow the
+    variety of local interactions seen in training, not the number of trajectories.</p></div>
+    <div><span class="n">Claim 2</span><h3>Material read from motion</h3><p>Leave the material unknown and the model
+    should infer it from how things move, getting better the longer it watches. This ability should appear only when
+    training covers many materials.</p></div>
+    <div><span class="n">Claim 3</span><h3>The student beats its teacher</h3><p>A modest amount of real motion makes
+    the model more accurate than its teacher simulator on held-out real interactions, and the real data needed falls
+    as pretraining gets more varied.</p></div>
+  </div>
+</section>
+
+<section id="uses">
+  <div class="col">
+    <div class="eyebrow">What it is for</div>
+    <h2>One model; leave different inputs empty and it becomes a different tool</h2>
+    <p>Every input is a slot that is either given or empty: past frames, material parameters, forces. The model fills
+    in whatever is empty. This is what makes one learned simulator useful for more than prediction.</p>
+  </div>
+  <div class="uses">
+    <div><h3>Simulate</h3><p>Give the scene, its materials and the gripper's path; get the future motion.</p></div>
+    <div><h3>Identify</h3><p>Leave the material empty and give past motion; get the friction, stiffness or weight
+    that explains it.</p></div>
+    <div><h3>Explain</h3><p>Leave the force slot empty; get the push nobody measured, such as a hand the cameras
+    missed.</p></div>
+    <div><h3>Generate data</h3><p>Produce training data for robot policies from a simulator that keeps getting more
+    real as recordings arrive.</p></div>
+  </div>
+  <div class="col">
+    <p>As research, the outcome would be measured scaling laws for learned physics (what kind of data buys
+    generalisation), and evidence that a student model can exceed its simulator on real motion.</p>
+    <p>For now every input is given (decided 2026-11-24): rigid networks fit better that way, and cloth keeps its
+    shape far better running alone. The first job is a simulator that predicts well;
+    identifying and explaining come back once it does.</p>
+  </div>
+</section>
+
+<section id="how">
+  <div class="col">
+    <div class="eyebrow">How it works</div>
+    <h2>The network predicts forces; exact physics moves the vertices</h2>
+    <p>Each object is a mesh. Every frame, a transformer looks at every vertex: its recent positions, its neighbours,
+    the material slots and the gripper's next move. It outputs a force on each vertex. A small exact layer then does
+    what we can write down with certainty and what the network has shown it cannot learn precisely: gravity,
+    F&nbsp;=&nbsp;ma, air drag, vertices held by the gripper, and contact with fixed surfaces such as the table. The
+    new positions join the history and the loop repeats.</p>
+  </div>
+  <figure class="scroll wide">
+    <svg viewBox="0 0 840 312" role="img" aria-label="One simulation step. Given inputs (the gripper's next move, past frames) and slots that may be empty (material, unknown push) enter the network. The network outputs forces on every vertex, and fills in any empty slots. The exact physics layer turns the forces into next-frame positions, which become history for the following step.">
+      <defs>
+        <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+        </marker>
+      </defs>
+      <g fill="none" stroke-width="1.6">
+        <rect x="0" y="40" width="190" height="44" rx="3" stroke="var(--empty)" stroke-dasharray="5 4"/>
+        <rect x="0" y="100" width="190" height="44" rx="3" stroke="var(--empty)" stroke-dasharray="5 4"/>
+        <rect x="0" y="160" width="190" height="44" rx="3" stroke="var(--given)"/>
+        <rect x="0" y="220" width="190" height="44" rx="3" stroke="var(--given)"/>
+        <rect x="250" y="110" width="170" height="104" rx="3" stroke="currentColor" stroke-width="2"/>
+        <rect x="250" y="0" width="170" height="52" rx="3" stroke="var(--empty)"/>
+        <rect x="490" y="96" width="190" height="132" rx="3" stroke="var(--exact)" stroke-width="2"/>
+        <rect x="720" y="134" width="120" height="56" rx="3" stroke="currentColor"/>
+      </g>
+      <g fill="none" stroke="currentColor" stroke-width="1.3">
+        <path d="M192 62 C222 62 222 140 247 140" marker-end="url(#ar2)"/>
+        <path d="M192 122 C222 122 222 152 247 152" marker-end="url(#ar2)"/>
+        <path d="M192 182 C222 182 222 172 247 172" marker-end="url(#ar2)"/>
+        <path d="M192 242 C222 242 222 186 247 186" marker-end="url(#ar2)"/>
+        <line x1="335" y1="108" x2="335" y2="55" marker-end="url(#ar2)"/>
+        <line x1="422" y1="162" x2="487" y2="162" marker-end="url(#ar2)"/>
+        <line x1="682" y1="162" x2="717" y2="162" marker-end="url(#ar2)"/>
+        <path d="M780 192 L780 296 L95 296 L95 267" marker-end="url(#ar2)"/>
+      </g>
+      <g font-family="IBM Plex Sans, system-ui, sans-serif" fill="currentColor" text-anchor="middle">
+        <text x="95" y="60" font-size="13" font-weight="600">Material</text>
+        <text x="95" y="76" font-size="11.5" opacity=".7">given or empty</text>
+        <text x="95" y="120" font-size="13" font-weight="600">Unknown push</text>
+        <text x="95" y="136" font-size="11.5" opacity=".7">given or empty</text>
+        <text x="95" y="180" font-size="13" font-weight="600">Gripper's next move</text>
+        <text x="95" y="196" font-size="11.5" opacity=".7">given</text>
+        <text x="95" y="240" font-size="13" font-weight="600">Past frames</text>
+        <text x="95" y="256" font-size="11.5" opacity=".7">optional history</text>
+        <text x="335" y="152" font-size="14" font-weight="600">Network</text>
+        <text x="335" y="170" font-size="11.5" opacity=".7">transformer over</text>
+        <text x="335" y="185" font-size="11.5" opacity=".7">mesh vertices</text>
+        <text x="335" y="22" font-size="13" font-weight="600">Filled-in slots</text>
+        <text x="335" y="39" font-size="11.5" opacity=".7">material read from motion</text>
+        <text x="585" y="122" font-size="14" font-weight="600">Exact physics layer</text>
+        <text x="585" y="144" font-size="11.5" opacity=".7">gravity, F = ma, air drag</text>
+        <text x="585" y="160" font-size="11.5" opacity=".7">held vertices</text>
+        <text x="585" y="176" font-size="11.5" opacity=".7">contact with table, floor</text>
+        <text x="585" y="210" font-size="11.5" opacity=".7">nothing learned here</text>
+        <text x="780" y="158" font-size="13" font-weight="600">Next frame</text>
+        <text x="780" y="174" font-size="11.5" opacity=".7">vertex positions</text>
+        <text x="455" y="152" font-size="11.5" opacity=".7">force on</text>
+        <text x="455" y="182" font-size="11.5" opacity=".7">every vertex</text>
+        <text x="350" y="78" font-size="11.5" opacity=".7" text-anchor="start">fills empty slots</text>
+        <text x="440" y="289" font-size="11.5" opacity=".7">becomes history for the next step</text>
+      </g>
+    </svg>
+    <figcaption>One simulation step. <span class="sw" style="background:var(--given)"></span>given inputs,
+    <span class="sw" style="background:var(--empty)"></span>slots that may be empty (the model fills them),
+    <span class="sw" style="background:var(--exact)"></span>exact physics with nothing learned. Sequences are trained
+    in windows of 8 past and 8 future frames, so history is optional and rollouts can run for any length.</figcaption>
+  </figure>
+  <div class="col">
+    <p>Why forces and not positions directly? With an exact layer underneath, a model that outputs nothing still
+    obeys gravity and still rests on the table, and the physics carries over to real objects: on 93 real ramp slides
+    (Physics 101), the physics layer alone matches the real motion to 1 mm, while purely learned models never slide
+    at all on the real ramp (82 mm off). Training then taught our own model to brake (26 mm), one of the open
+    problems. Both networks as built today, and the measurement behind each choice, are on the
+    <a href="https://claude.ai/artifact/QDsKHiZi79nEwTZ7wvUh31">architecture page</a>.</p>
+    <p>As of 2026-11-24 this design holds for cloth. For rigid objects the best network so far predicts motion
+    directly, with no physics layer, and where the layer comes back is an open question (see
+    <a href="#now">Where it stands</a>).</p>
+  </div>
+</section>
+
+<section id="before">
+  <div class="col">
+    <div class="eyebrow">What came before</div>
+    <h2>Four ways people get physics for robots, and where each runs out</h2>
+  </div>
+  <div class="prior">
+    <div>
+      <div class="k">Hand-written simulators, tuned to reality<small>MuJoCo, Isaac / PhysX, Newton; system
+      identification; per-object digital twins such as PhysTwin</small></div>
+      <div class="g">Exact when the equations and parameters are right. Our teacher reproduces real ramp slides to
+      0.7 mm.</div>
+      <div class="l">Parameters are unknown for a new object, and the equations themselves are approximate. Two of
+      Newton's three cloth solvers simulate a different cloth from the one they are given.</div>
+    </div>
+    <div>
+      <div class="k">Learned simulators<small>GNS (2020), MeshGraphNets (2021), FIGNet, SDF-Sim, WorldParticle, RiCo and
+      PhysiFormer (2026)</small></div>
+      <div class="g">Copy a simulator well and compose: RiCo runs 270 objects after training on 10 or fewer.</div>
+      <div class="l">Almost all stop at their teacher. Most cover one kind of object, take no actions, are told the
+      material rather than inferring it, and are never fine-tuned on real motion. The broadest, WorldParticle
+      (SIGGRAPH Asia 2026), covers cloth, elastic solids, fluids and sand with one design but a separate network
+      for each, no robot actions and no rigid objects, and shows real cloth only by eye.</div>
+    </div>
+    <div>
+      <div class="k">Particle models learned from real video<small>PGND, AdaptiGraph, DPI-Net</small></div>
+      <div class="g">Learn from real data directly, including cloth and rope.</div>
+      <div class="l">Small data, usually one object or scene at a time; no shared physics prior to start from.</div>
+    </div>
+    <div>
+      <div class="k">Video world models<small>Cosmos, Wan, V-JEPA</small></div>
+      <div class="g">Trained on internet-scale video; look plausible.</div>
+      <div class="l">No explicit 3D state and no physical parameters to set or read, so nothing to correct when the
+      motion is wrong.</div>
+    </div>
+  </div>
+  <div class="delta col">
+    <b>What is new here.</b> The backbone (attention over mesh vertices) is shared with recent learned simulators and
+    is not the contribution. The differences are:
+    <ol>
+      <li>Inputs that are each given or empty, so one model simulates, identifies materials and infers unseen forces.</li>
+      <li>One action-conditioned model across rigid, hinged and cloth objects, with the gripper in the scene.</li>
+      <li>Distil first, then fine-tune on real motion, and measure whether the student passes its teacher.</li>
+      <li>Claims 1 and 2 measured as scaling behaviour, not as architecture features.</li>
+    </ol>
+  </div>
+</section>
+
+<section id="path">
+  <div class="col">
+    <div class="eyebrow">How we got here</div>
+    <h2>Rigid objects, then cloth, then small tests that found the causes</h2>
+  </div>
+  <ol class="timeline">
+    <li><span class="d">2026-10-16 to 10-20</span><h3>Rigid objects first</h3><p>The rigid teacher was chosen by a
+    bake-off of Newton's solvers and checked against closed forms before any data was made. The first models beat
+    constant velocity where things move, and the physics layer is what lets them slide on a real ramp at all. A
+    graph-network baseline copies the teacher more closely, though, and rigid-only misses the point of a learned
+    simulator, so the project moved to cloth.</p></li>
+    <li><span class="d">2026-10-20 to 10-29</span><h3>Cloth, and the first real comparison</h3><p>Two of Newton's
+    cloth solvers failed the teacher gate; the explicit integrator passed, and generated 20k cloth episodes. On real
+    tracked cloth (PGND), the 64M network fine-tuned on real recordings comes within 2 mm of a teacher whose material
+    was fitted to each recording.</p></li>
+    <li><span class="d">2026-10-30</span><h3>Ropes and soft objects gated</h3><p>The same explicit integrator passes
+    rope and soft-body teacher gates, ready for the next data.</p></li>
+    <li><span class="d">2026-11-06 to 11-21</span><h3>Fit first</h3><p>Before scaling anything, find out
+    why the network does not fit its own teacher data well. Every suspect but training length was ruled out, and
+    training and held-out errors stayed equal, so more episodes of the same kind were not the answer.</p></li>
+    <li class="now"><span class="d">2026-11-22 to now</span><h3>Small tests find the causes</h3><p>A one-episode
+    test showed the cloth network could not fit even one episode: in fixed world directions every orientation is a
+    new example. Describing each vertex's surroundings in its own directions fixed that and took the full-data
+    fit from 0.69 to 0.59 of the simple guess's error. The same approach on rigid objects showed that the physics
+    layer's own answer was the obstacle wherever the gripper pushes. A plain transformer without the layer,
+    trained on 128 episodes, then matched baselines trained on 50,000. On 2026-11-24 we decided to train with
+    every input given first.</p></li>
+  </ol>
+</section>
+
+<section id="enables">
+  <div class="col">
+    <div class="eyebrow">What makes it possible</div>
+    <h2>Five things that were not all true two years ago</h2>
+  </div>
+  <div class="enable">
+    <div><h3>GPU simulators make teacher data cheap</h3><p>Newton runs thousands of worlds in parallel: our 20k cloth
+    episodes took 6.8 hours on one GPU. Variety is now a choice, not a budget.</p></div>
+    <div><h3>Real 3D motion with ground truth exists</h3><p>Hands and objects with motion capture (HOT3D, ARCTIC,
+    OakInk2) and tracked real cloth (PhysTwin, PGND) give the real data that fine-tuning needs.</p></div>
+    <div><h3>Learned simulators compose</h3><p>Local, relative encodings let a model trained on a few objects run
+    hundreds (SDF-Sim, RiCo). Composition is largely solved, which leaves coverage as the open question.</p></div>
+    <div><h3>Sequence models that condition on anything</h3><p>Diffusion forcing and related work let one model take
+    any subset of frames and quantities as given and generate the rest, which is what the given-or-empty slots
+    need.</p></div>
+    <div><h3>A recipe that already worked elsewhere</h3><p>Atomistic machine learning showed that pretraining on a
+    cheap solver and fine-tuning on a little accurate data beats the solver. Robotics has the same structure, with
+    Newton playing DFT.</p></div>
+  </div>
+</section>
+
+<section id="now">
+  <div class="col">
+    <div class="eyebrow">Where it stands · November 2026</div>
+    <h2>Rigid scenes now fit from 128 episodes without the physics layer; cloth still fits its teacher loosely</h2>
+  </div>
+  <div class="glance" role="table" aria-label="Status at a glance">
+    <div class="row" role="row"><span class="what" role="cell">Rigid objects, copying the teacher</span><span class="tag open" role="cell">Open</span>
+      <p role="cell">A plain transformer with no physics layer, trained on 1,024 episodes, is ahead of baselines trained on
+      50,000, one frame ahead and over seconds. In busy scenes it still misses rare events such as a topple.</p></div>
+    <div class="row" role="row"><span class="what" role="cell">Rigid objects, things at rest</span><span class="tag open" role="cell">Open</span>
+      <p role="cell">Without the physics layer nothing slides on the real ramp (82 mm off; the layer alone is within 1 mm),
+      and shut drawers drift open by 27 mm.</p></div>
+    <div class="row" role="row"><span class="what" role="cell">Cloth, one frame ahead</span><span class="tag open" role="cell">Open</span>
+      <p role="cell">The best network removes about half of the simple guess's error (0.49). More data does not help;
+      longer training and the local frame do.</p></div>
+    <div class="row" role="row"><span class="what" role="cell">Cloth over seconds</span><span class="tag ok" role="cell">Works</span>
+      <p role="cell">15, 57 and 85 mm from the teacher after 1, 2 and 3.8 seconds on unseen episodes, with the cloth
+      stretched by 1% at the median. Not yet a usable simulator.</p></div>
+    <div class="row" role="row"><span class="what" role="cell">Real cloth</span><span class="tag ok" role="cell">Works</span>
+      <p role="cell">After fine-tuning on real recordings, 17.6 mm from the observed cloth at 2 seconds, against 15.8 mm for
+      the teacher with fitted material. The third claim (beating the teacher) is not shown. The same fine-tuning went
+      unstable on the longer-trained network (26 mm).</p></div>
+    <div class="row" role="row"><span class="what" role="cell">Reading material from motion</span><span class="tag parked" role="cell">Deferred</span>
+      <p role="cell">Has not appeared. From 2026-11-24 networks train with every input given, and hidden inputs come back
+      once the simulator itself works.</p></div>
+    <div class="row" role="row"><span class="what" role="cell">Ropes and soft objects</span><span class="tag ok" role="cell">Ready</span>
+      <p role="cell">The teacher passes both gates against closed forms; Newton's other solvers fail them. No training data
+      generated yet.</p></div>
+  </div>
+  <div class="col">
+    <p style="margin-top:22px"><b>Rigid objects.</b> The network that works is the simplest one we tried: a small
+    transformer with no physics layer and every input given. Trained on 1,024 episodes it predicts unseen scenes
+    better than baselines trained on 50,000, both one frame ahead and running alone for seconds. Longer training
+    improves single frames (nine times the training: 0.37), though no longer how it runs alone; more episodes
+    improve how it runs alone. Running alone it ranges from near-exact to
+    wrong. In its best unseen scene it stays within 3 mm of the teacher for six seconds (first clip). In the median
+    one it ends 39 mm off. In its busiest it follows for two seconds, then leaves standing a book that the gripper
+    knocks over (second clip). Our original design, a network that predicts forces for an exact physics layer,
+    loses wherever the gripper or a second object is involved. The layer still holds things at rest better: a
+    shut drawer, an object on the real ramp.</p>
+  </div>
+  <figure class="vid">
+    <div class="frame"><video data-auto src="media/rigid_unseen_best.mp4" poster="media/rigid_unseen_best.jpg" controls loop muted playsinline preload="metadata"></video></div>
+    <figcaption><b>Where it works.</b> The best of 32 unseen rigid scenes. Left: the teacher. Middle: a graph-network baseline trained on 50,000 episodes. Right: the plain transformer trained on 1,024. Each runs alone after the first eight frames; pale shapes are the teacher's objects, so any offset is error. The gripper pushes a cartridge between two shoes. The transformer stays within 3.3 mm for all six seconds; the baseline's boot drifts to 26 mm.</figcaption>
+  </figure>
+  <figure class="vid">
+    <div class="frame"><video data-auto src="media/rigid_unseen_3.mp4" poster="media/rigid_unseen_3.jpg" controls loop muted playsinline preload="metadata"></video></div>
+    <figcaption><b>Where it does not yet.</b> The busiest of the 32 scenes, same layout. The transformer matches the teacher for two seconds. Then the gripper knocks a standing book over onto a plate, and both networks leave it standing. At the end the transformer is 84 mm off and the baseline 168 mm.</figcaption>
+  </figure>
+  <div class="col">
+    <p><b>Cloth.</b> The best network describes each vertex's surroundings in the vertex's own directions. It keeps
+    the cloth's size and shape over seconds, on teacher data and on real cloth, and after fine-tuning on real
+    recordings it comes within 2 mm of a teacher fitted to each recording. One frame ahead it still leaves half
+    of the simple guess's error. More data does not change that; longer training does: training for as long
+    again took it from 0.59 to 0.52, brought its rollouts 12 mm closer at 3.8 seconds, and also brought it 6 mm
+    closer to real cloth before any real data, a lead the same real fine-tuning then lost (it went unstable). A third
+    stretch took it to 0.49, closer again over seconds, but with more cloths blowing up (21 of 336 against 6). An
+    earlier checkpoint confirms the blow-ups are real (27 against 12), and they show on real cloth too. It now
+    follows an unseen fold (first clip) but not yet a shake (second clip).</p>
+  </div>
+  <figure class="vid">
+    <div class="frame"><video data-auto src="media/cloth_cont_fold.mp4" poster="media/cloth_cont_fold.jpg" controls loop muted playsinline preload="metadata"></video></div>
+    <figcaption><b>Where it works.</b> An unseen fold, both networks trained on all 20,000 cloth episodes and running alone after eight frames. Top: the teacher beside the original network, whose cloth shrinks to half its true area (84 mm off at the end). Bottom: the teacher beside the local-frame network trained twice as long, which follows the fold and keeps the cloth's size (41 mm off).</figcaption>
+  </figure>
+  <figure class="vid">
+    <div class="frame"><video data-auto src="media/cloth_cont_shake.mp4" poster="media/cloth_cont_shake.jpg" controls loop muted playsinline preload="metadata"></video></div>
+    <figcaption><b>Where it does not yet.</b> An unseen shake, same layout. The original network's cloth shrinks to half its area (121 mm off). The local-frame network keeps the cloth's size but ends further from the teacher (156 mm).</figcaption>
+  </figure>
+  <div class="col">
+    <p class="more">Every chart, table and video behind these statements is on the
+    <a href="https://claude.ai/artifact/FZbzJtpVHJWYpDXgYTGpzj">test results page</a>.</p>
+  </div>
+</section>
+
+<section id="next">
+  <div class="col">
+    <div class="eyebrow">What's next</div>
+    <h2>Fit, then decide on data, then which data, then real-data training</h2>
+  </div>
+  <ol class="next col">
+    <li><p><span class="cur">Now:</span> <b>Fit the teacher data, with every input given.</b> One frame ahead,
+    cloth is at 0.49 of the simple guess's error and rigid objects at 0.37. For both, longer training still
+    improves single frames but no longer how the network runs alone: more cloths blow up, and rigid replays end
+    farther off. Dropping the physics layer, which made rigid objects fit, does not help cloth: it ends
+    level on one frame and rolls out much worse, so cloth keeps it. Giving cloth every input fits one frame as
+    well, and running alone its cloth stretches a fifth as much (12% against 61%); cloth now trains that way.
+    Running: cloth's third stretch again with every input given, which tests whether that removes the blow-ups;
+    and short trials on both tracks in which the network practises running alone for longer during training (up to
+    half a second for cloth and a second for rigid objects, instead of a sixth), to see whether that stops the
+    blow-ups and the creep.</p></li>
+    <li><p><b>Rigid objects: scale up the plain transformer.</b> Longer training improves single frames and more
+    episodes improve the rollouts; a network five times larger is worse at both training lengths tried. Three
+    times longer again took one frame from 0.45 to 0.37, but its replays end a few millimetres farther off. Open: holding things at rest without the physics layer. On the real ramp it
+    probably needs data that shows an object being let go on a slope, which the current episodes never do.</p></li>
+    <li><p><b>Scale data beyond 20,000 episodes? Not for now.</b> For cloth, ten times the data is worth 0.015 at
+    full training, and the full-data network does as well on unseen episodes as on its own. The question returns
+    when a network does better on its own episodes than on unseen ones. The rigid network did so on 128 episodes,
+    and eight times the episodes closed that gap and made its rollouts closer.</p></li>
+    <li><p><b>Which data: the coverage test.</b> Claim 1 says variety of interactions matters more than trajectory
+    count. A first test on 2026-11-22 could not tell them apart, because none of its networks fitted even what
+    it trained on. We repeat it when one does.</p></li>
+    <li><p><b>Post-train on real motion.</b> Real cloth is within 2 mm of the teacher fitted to each recording but
+    not past it, which claim 3 needs, and the fine-tune must first be made stable for the better network. Then hands
+    and objects from HOT3D, ARCTIC and OakInk2.</p></li>
+  </ol>
+  <div class="col">
+    <p class="more" style="margin-top:14px">What has already been ruled out, and the numbers for each item above, are on the
+    <a href="https://claude.ai/artifact/FZbzJtpVHJWYpDXgYTGpzj">test results page</a>.</p>
+  </div>
+</section>
+
+<section id="rules">
+  <div class="col">
+    <div class="eyebrow">How we work</div>
+    <h2>Rules we learned by getting them wrong first</h2>
+  </div>
+  <ul class="rules">
+    <li><b>Gate the teacher before generating data.</b>A dataset inherits every defect of its teacher. The first 16k
+    cloth episodes bounced, crossed themselves and exploded in piles, none of which the original gate tested.</li>
+    <li><b>Judge a solver by closed forms, not by whether it settles.</b>Two of Newton's cloth solvers were stable,
+    settled nicely, and simulated a different material from the one they were given.</li>
+    <li><b>Compare paired, with an interval.</b>Score two models on the same windows and bootstrap the difference.
+    Adjacent checkpoints can differ by 10 mm over 2 s, and two sets of 300 test windows by 0.1.</li>
+    <li><b>Learn, don't build.</b>The exact layer holds only what the network demonstrably cannot learn. Fix a model
+    failure with data, losses or architecture, not with more solver parts.</li>
+    <li><b>Check a score used as a loss on its blind side.</b>Trained on a one-sided distance to real cloth, a model
+    "won" by inflating the cloth 17,500 times its area. Report both directions, and strain, beside any score.</li>
+    <li><b>Run, don't assume.</b>Print the trajectory before theorising. Five plausible explanations of one bug failed
+    in a row; looking at the numbers found it.</li>
+    <li><b>Match the comparison to the claim.</b>The latest lesson: a short-training network made the fit look worse
+    than it is. State how long a model trained beside any claim about what it can learn.</li>
+  </ul>
+</section>
+
+<section id="more">
+  <div class="col">
+    <div class="eyebrow">Further reading</div>
+    <h2>Where to look next</h2>
+  </div>
+  <div class="links">
+    <div><a href="https://claude.ai/artifact/FZbzJtpVHJWYpDXgYTGpzj">[SoG] Test Results</a><span>Every chart, table and video behind this briefing, with the runs in
+    progress</span></div>
+    <div><a href="https://claude.ai/artifact/QDsKHiZi79nEwTZ7wvUh31">[SoG] Architecture</a><span>The cloth and rigid networks as
+    built today: what each reads and outputs, and the measurement behind each choice</span></div>
+    <div><a href="https://claude.ai/artifact/Bqgkb28DtrCtLMpWj1hLtt">[SoG] Making the Training Data</a><span>How the rigid and
+    cloth episodes are simulated, recorded and checked, with the teacher's own videos</span></div>
+    <div><span style="color:var(--ink)">In the repository</span><span><code>CLAUDE.md</code> (state and rules),
+    <code>docs/DIRECTION.md</code> (every experiment, dated), <code>src/lsim/</code> (the package)</span></div>
+  </div>
+  <div class="col" style="margin-top:22px">
+    <p style="font-size:15px;color:var(--ink-2)">Key papers: learned simulators GNS
+    (<a href="https://arxiv.org/abs/2002.09405">2002.09405</a>), MeshGraphNets
+    (<a href="https://arxiv.org/abs/2010.03409">2010.03409</a>), RiCo (<a href="https://arxiv.org/abs/2610.12333">2610.12333</a>),
+    PhysiFormer (<a href="https://arxiv.org/abs/2606.27364">2606.27364</a>); real cloth PhysTwin
+    (<a href="https://arxiv.org/abs/2503.17973">2503.17973</a>), PGND (<a href="https://arxiv.org/abs/2506.15680">2506.15680</a>);
+    the precedent ANI-1ccx (<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6602931/">PMC6602931</a>), MACE-MP-0
+    (<a href="https://arxiv.org/abs/2401.00096">2401.00096</a>); sequence models Diffusion Forcing
+    (<a href="https://arxiv.org/abs/2407.01392">2407.01392</a>); the coverage evidence, data scaling laws in imitation
+    learning (<a href="https://arxiv.org/abs/2410.18647">2410.18647</a>).</p>
+  </div>
+  <p class="foot">This page is updated as results come in. Numbers come from the experiment log in
+  <code>docs/DIRECTION.md</code>, where each one has its date, test set and script.</p>
+</section>
+</div>
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce || !('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      var v = e.target;
+      if (e.isIntersecting) { var p = v.play(); if (p && p.catch) p.catch(function(){}); } else { v.pause(); }
+    });
+  }, {threshold: 0.4});
+  document.querySelectorAll('video[data-auto]').forEach(function(v){ io.observe(v); });
+})();
+</script>

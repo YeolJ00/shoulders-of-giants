@@ -1,0 +1,62 @@
+{
+ "ckpt": "../outputs/lsim/cloth_q64_cont/step23999.pt",
+ "batches": 8,
+ "batch": 4,
+ "moving_frac": 0.459037896245718,
+ "clean_moving_frac": 0.05807217536494136,
+ "err_mm": {
+  "moving": {
+   "median": 2.0148420333862305,
+   "mean": 3.485532522201538
+  },
+  "rest": {
+   "median": 0.3117389380931854,
+   "mean": 0.516196608543396
+  }
+ },
+ "parts": {
+  "dist_moving": {
+   "norm": 1.4750030152499676,
+   "consistency": -0.07499193686193653,
+   "norm_of_mean": 0.3096384108066559,
+   "cos_with_dist_moving": 1.0000000521540642,
+   "cos_with_sq_moving": 0.9292128309607506
+  },
+  "dist_rest": {
+   "norm": 0.7710377611219883,
+   "consistency": -0.04703172695423875,
+   "norm_of_mean": 0.17722007632255554,
+   "cos_with_dist_moving": 0.24249808257445693,
+   "cos_with_sq_moving": 0.1450965204858221
+  },
+  "sq_moving": {
+   "norm": 1.3174759466201067,
+   "consistency": -0.09512634788240705,
+   "norm_of_mean": 0.2519628405570984,
+   "cos_with_dist_moving": 0.9292128309607506,
+   "cos_with_sq_moving": 0.999999888241291
+  },
+  "sq_rest": {
+   "norm": 0.16764579666778445,
+   "consistency": -0.05309340989749346,
+   "norm_of_mean": 0.05929809436202049,
+   "cos_with_dist_moving": 0.2510717948898673,
+   "cos_with_sq_moving": 0.17826916091144085
+  },
+  "edge": {
+   "norm": 0.1927276011556387,
+   "consistency": 0.10003179370791518,
+   "norm_of_mean": 0.11873888969421387,
+   "cos_with_dist_moving": 0.15040595436585136,
+   "cos_with_sq_moving": 0.1300350041128695
+  }
+ },
+ "total": {
+  "norm": 3.1240765303373337,
+  "consistency": -0.08457592834851571,
+  "cos_with_moving": 0.920793280005455,
+  "moving_consistency": -0.09544689095179949,
+  "cos_batch_total_with_mean_moving": 0.07426105439662933,
+  "cos_batch_moving_with_mean_moving": 0.1113223114516586
+ }
+}

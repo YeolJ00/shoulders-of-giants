@@ -1,0 +1,950 @@
+{
+ "semi": {
+  "stretch": {
+   "EA20": {
+    "extension_mm": 4.904951155185689,
+    "closed_form_mm": 4.905,
+    "ratio": 0.9999900418319445,
+    "free_length_m": 1.0,
+    "max_speed_end_m_s": 0.0006057804566808045,
+    "substeps": 300,
+    "sim_s_per_wall_s": 2.7543711144281384,
+    "in_bound": true,
+    "pass": true
+   },
+   "EA1000": {
+    "extension_mm": 0.09819318850834424,
+    "closed_form_mm": 0.0981,
+    "ratio": 1.000949933826139,
+    "free_length_m": 1.0,
+    "max_speed_end_m_s": 0.010647631250321865,
+    "substeps": 1500,
+    "sim_s_per_wall_s": 0.525723339719414,
+    "in_bound": true,
+    "pass": true
+   },
+   "EA10000": {
+    "extension_mm": 0.009847184022276911,
+    "closed_form_mm": 0.009810000000000001,
+    "ratio": 1.0037904202117136,
+    "free_length_m": 1.0,
+    "max_speed_end_m_s": 0.09338247776031494,
+    "substeps": 4750,
+    "sim_s_per_wall_s": 0.19473416441745023,
+    "in_bound": true,
+    "pass": true
+   },
+   "pass": true,
+   "summary": "ratio 1.000 / 1.001 / 1.004",
+   "wall_s": 30.414669513702393
+  },
+  "catenary": {
+   "sag_m": 0.31977420647939037,
+   "catenary_sag_m": 0.31972049403464126,
+   "sag_rel_error": 0.00016799812883849796,
+   "shape_rms_mm": 0.04763054728789858,
+   "shape_rms_over_sag": 0.00014897558391342247,
+   "in_bound": true,
+   "max_speed_end_m_s": 0.012096446007490158,
+   "pass": true,
+   "summary": "sag +0.02%, shape rms 0.01% of sag",
+   "wall_s": 12.020575523376465
+  },
+  "bend": {
+   "EI": {
+    "overhang_m": 0.16,
+    "bending_length_m": 0.07987919244865516,
+    "tip_drop_over_l": 0.6877928972244263,
+    "elastica_drop_over_l": 0.6419184784894117,
+    "tip_angle_deg": 45.09954049770226,
+    "elastica_angle_deg": 41.59705585017534,
+    "ratio": 1.071464555503945,
+    "max_speed_end_m_s": 0.005705720279365778,
+    "in_bound": true,
+    "pass": true
+   },
+   "EI_half_segment": {
+    "overhang_m": 0.16,
+    "bending_length_m": 0.07987919244865516,
+    "tip_drop_over_l": 0.6678242236375809,
+    "elastica_drop_over_l": 0.6419184784894117,
+    "tip_angle_deg": 43.41716705434881,
+    "elastica_angle_deg": 41.59705585017534,
+    "ratio": 1.0403567524791177,
+    "max_speed_end_m_s": 0.001613650587387383,
+    "in_bound": true,
+    "pass": true
+   },
+   "8EI_double_overhang": {
+    "overhang_m": 0.32,
+    "bending_length_m": 0.1597583848973103,
+    "tip_drop_over_l": 0.6650520488619804,
+    "elastica_drop_over_l": 0.6419184784894117,
+    "tip_angle_deg": 43.34600123287853,
+    "elastica_angle_deg": 41.59705585017534,
+    "ratio": 1.0360381748582896,
+    "max_speed_end_m_s": 0.006390109658241272,
+    "in_bound": true,
+    "pass": true
+   },
+   "pass": true,
+   "summary": "ratio 1.071 / 1.040 / 1.036",
+   "wall_s": 31.758296012878418
+  },
+  "swing": {
+   "drag0": {
+    "energy_gain_J": -8.838925751208926e-06,
+    "energy_released_J": 0.024222971555196177,
+    "gain_fraction": -0.000364898490305697,
+    "max_move_last_second_mm": 198.63866968099333,
+    "in_bound": true,
+    "sim_s_per_wall_s": 0.8964234995540987,
+    "pass": true
+   },
+   "drag2": {
+    "energy_gain_J": -3.0036619281831323e-05,
+    "energy_released_J": 0.024526607061939154,
+    "gain_fraction": -0.001224654482618703,
+    "max_move_last_second_mm": 2.875107954181827,
+    "in_bound": true,
+    "sim_s_per_wall_s": 0.80224791655084,
+    "pass": true
+   },
+   "pass": true,
+   "summary": "gain -0.036%, 6th-second move 2.88 mm",
+   "wall_s": 14.365336418151855
+  },
+  "freefall": {
+   "accel_m_s2": 9.809856538477439,
+   "rel_error": -1.4624008416119771e-05,
+   "shape_change_mm": 0.0006296489834245467,
+   "pass": true,
+   "summary": "accel -0.0015% of g, shape 0.0006 mm",
+   "wall_s": 0.8060600757598877
+  },
+  "slide": {
+   "mu0.2": {
+    "accel_m_s2": 1.5115135679150773,
+    "slide_law_m_s2": 1.5115406840428576,
+    "rel_error": -1.7939396581567735e-05,
+    "in_bound": true,
+    "pass": true
+   },
+   "mu0.5": {
+    "drift_mm_s": -6.431909139515814e-08,
+    "travel_mm": -1.263247006999535e-07,
+    "in_bound": true,
+    "pass": true
+   },
+   "pass": true,
+   "summary": "mu0.2 -0.00%, mu0.5 drift -0.000 mm/s",
+   "wall_s": 2.718740701675415
+  },
+  "drop": {
+   "creep_mm_s": 0.20126004790447782,
+   "penetration_min_mm": -0.0008859634399414895,
+   "in_bound": true,
+   "max_speed_end_m_s": 0.0011669392697513103,
+   "sim_s_per_wall_s": 0.7337708697983493,
+   "pass": true,
+   "summary": "creep 0.201 mm/s, penetration -0.001 mm",
+   "wall_s": 5.510403871536255
+  },
+  "cross": {
+   "self_contact0": {
+    "crossings": 1,
+    "min_centerline_distance_mm": 3.7202045217273616,
+    "A_lowest_below_B_lowest_mm": 7033.804774284363,
+    "A_held": false,
+    "in_bound": true
+   },
+   "self_contact1": {
+    "crossings": 0,
+    "min_centerline_distance_mm": 7.894850260482479,
+    "A_lowest_below_B_lowest_mm": 223.16908836364746,
+    "A_held": true,
+    "in_bound": true
+   },
+   "counter_can_fail": true,
+   "pass": true,
+   "summary": "control 1 crossings (A fell 7.0 m), with contact 0 (A held: True)",
+   "wall_s": 4.151803731918335
+  },
+  "pile": {
+   "self_contact1": {
+    "crossings": 0,
+    "min_centerline_distance_mm": 7.9330707452006655,
+    "in_bound": true,
+    "max_speed_m_s": 2.4770848751068115,
+    "penetration_end_mm": -0.012151241302490318,
+    "pile_height_mm": 28.304338455200195,
+    "sim_s_per_wall_s": 0.578248300260712
+   },
+   "self_contact0": {
+    "crossings": 137,
+    "min_centerline_distance_mm": 0.0,
+    "in_bound": true,
+    "max_speed_m_s": 2.953134059906006,
+    "penetration_end_mm": -0.0009455680847168801,
+    "pile_height_mm": 3.999769687652588,
+    "sim_s_per_wall_s": 1.5425089660569646
+   },
+   "pass": true,
+   "counter_can_fail": true,
+   "summary": "0 crossings, closest 7.93 mm (control 137)",
+   "wall_s": 8.17891526222229
+  },
+  "gripper": {
+   "in_bound": true,
+   "max_speed_m_s": 1.1091560125350952,
+   "bottom_offset_mm": 4.393652450388715,
+   "hanging_length_m": 0.49999332427978516,
+   "length_m": 0.5,
+   "lowest_above_table_mm": 253.10683250427246,
+   "grip_force_N": [
+    -0.0003067920015917884,
+    -0.0010966331839561462,
+    0.09707203843858507
+   ],
+   "weight_N": 0.09711898120120169,
+   "force_ratio": 0.9995166468795696,
+   "pass": true,
+   "summary": "bound True, vmax 1.11 m/s, bottom off 4.4 mm, hang 1.0000 L, force/weight 0.9995",
+   "wall_s": 14.34478759765625
+  },
+  "stability": {
+   "EA1000": {
+    "spp0.8": {
+     "steps_per_sqrt_m_k": 0.8049844718999205,
+     "substeps": 600,
+     "stable": false,
+     "gain_fraction": 4.9499998451255525e+19
+    },
+    "spp1": {
+     "steps_per_sqrt_m_k": 1.0062305898749007,
+     "substeps": 750,
+     "stable": false,
+     "gain_fraction": 154522223.9167316
+    },
+    "spp1.2": {
+     "steps_per_sqrt_m_k": 1.207476707849881,
+     "substeps": 900,
+     "stable": true,
+     "gain_fraction": -0.00037347981339504345
+    },
+    "spp1.5": {
+     "steps_per_sqrt_m_k": 1.5026376808798516,
+     "substeps": 1120,
+     "stable": true,
+     "gain_fraction": -0.00036931620518845847
+    },
+    "spp2": {
+     "steps_per_sqrt_m_k": 2.0124611797498013,
+     "substeps": 1500,
+     "stable": true,
+     "gain_fraction": -0.00036489846123819754
+    },
+    "min_stable_steps_per_sqrt_m_k": 1.207476707849881
+   },
+   "EA10000": {
+    "spp0.8": {
+     "steps_per_sqrt_m_k": 0.8018590898655413,
+     "substeps": 1890,
+     "stable": false,
+     "gain_fraction": 701514431.5460999
+    },
+    "spp1": {
+     "steps_per_sqrt_m_k": 1.0012632021601466,
+     "substeps": 2360,
+     "stable": false,
+     "gain_fraction": 1.2140764954045331e+19
+    },
+    "spp1.2": {
+     "steps_per_sqrt_m_k": 1.2006673144547522,
+     "substeps": 2830,
+     "stable": true,
+     "gain_fraction": -0.00035357727739936774
+    },
+    "spp1.5": {
+     "steps_per_sqrt_m_k": 1.50189480324022,
+     "substeps": 3540,
+     "stable": true,
+     "gain_fraction": -0.0003579534131467849
+    },
+    "spp2": {
+     "steps_per_sqrt_m_k": 2.0025264043202933,
+     "substeps": 4720,
+     "stable": true,
+     "gain_fraction": -0.0003480566583583522
+    },
+    "min_stable_steps_per_sqrt_m_k": 1.2006673144547522
+   },
+   "pass": true,
+   "summary": "min stable steps per sqrt(m/k): 1.207476707849881 / 1.2006673144547522",
+   "wall_s": 14.514069318771362
+  },
+  "throughput": {
+   "worlds": 64,
+   "sim_seconds_per_wall_second": 54.50203837906683,
+   "four_second_episodes_per_hour": 49051.83454116015,
+   "substeps": 1400,
+   "pass": true,
+   "summary": "54.5 sim-s/wall-s (49052 4-s episodes/h)",
+   "wall_s": 2.510507822036743
+  }
+ },
+ "_versions": {
+  "newton": "1.7.0",
+  "warp": "1.18.0",
+  "rope": {
+   "lam": 0.02,
+   "EA": 1000.0,
+   "EI": 0.0001,
+   "mu": 0.5,
+   "r": 0.004,
+   "l": 0.01
+  },
+  "solvers": {
+   "vbd": {
+    "substeps": 20,
+    "iters": 5
+   },
+   "semi": {
+    "spp": 2.0,
+    "ce": 50
+   },
+   "xpbd": {
+    "substeps": 100,
+    "iters": 4,
+    "ce": 10
+   }
+  }
+ },
+ "xpbd": {
+  "stretch": {
+   "EA20": {
+    "extension_mm": 3.9646262923876407,
+    "closed_form_mm": 4.905,
+    "ratio": 0.8082826284174598,
+    "free_length_m": 1.0,
+    "max_speed_end_m_s": 0.0004464391677174717,
+    "substeps": 100,
+    "sim_s_per_wall_s": 2.792625313639891,
+    "in_bound": true,
+    "pass": false
+   },
+   "EA1000": {
+    "extension_mm": 2.791374921798706,
+    "closed_form_mm": 0.0981,
+    "ratio": 28.45438248520597,
+    "free_length_m": 1.0,
+    "max_speed_end_m_s": 0.0,
+    "substeps": 100,
+    "sim_s_per_wall_s": 2.8336694440559715,
+    "in_bound": true,
+    "pass": false
+   },
+   "EA10000": {
+    "extension_mm": 2.7895167469978444,
+    "closed_form_mm": 0.009810000000000001,
+    "ratio": 284.35440846053456,
+    "free_length_m": 1.0,
+    "max_speed_end_m_s": 0.00017857567581813782,
+    "substeps": 100,
+    "sim_s_per_wall_s": 2.8735106390631384,
+    "in_bound": true,
+    "pass": false
+   },
+   "pass": false,
+   "summary": "ratio 0.808 / 28.454 / 284.354",
+   "wall_s": 5.077357769012451
+  },
+  "catenary": {
+   "sag_m": 0.3211093823115031,
+   "catenary_sag_m": 0.31972049403464126,
+   "sag_rel_error": 0.004344070220007046,
+   "shape_rms_mm": 0.8625059017586818,
+   "shape_rms_over_sag": 0.002697687254496831,
+   "in_bound": true,
+   "max_speed_end_m_s": 0.004844687879085541,
+   "pass": true,
+   "summary": "sag +0.43%, shape rms 0.27% of sag",
+   "wall_s": 2.490968704223633
+  },
+  "bend": {
+   "EI": {
+    "overhang_m": 0.16,
+    "bending_length_m": 0.07987919244865516,
+    "tip_drop_over_l": 0.689411535859108,
+    "elastica_drop_over_l": 0.6419184784894117,
+    "tip_angle_deg": 45.22989943792951,
+    "elastica_angle_deg": 41.59705585017534,
+    "ratio": 1.0739861196727951,
+    "max_speed_end_m_s": 0.0021772279869765043,
+    "in_bound": true,
+    "pass": true
+   },
+   "EI_half_segment": {
+    "overhang_m": 0.16,
+    "bending_length_m": 0.07987919244865516,
+    "tip_drop_over_l": 0.7469415664672852,
+    "elastica_drop_over_l": 0.6419184784894117,
+    "tip_angle_deg": 43.63460775665633,
+    "elastica_angle_deg": 41.59705585017534,
+    "ratio": 1.1636081395024147,
+    "max_speed_end_m_s": 6.975668907165527,
+    "in_bound": true,
+    "pass": false
+   },
+   "8EI_double_overhang": {
+    "overhang_m": 0.32,
+    "bending_length_m": 0.1597583848973103,
+    "tip_drop_over_l": 0.6847646087408066,
+    "elastica_drop_over_l": 0.6419184784894117,
+    "tip_angle_deg": 48.599841665752116,
+    "elastica_angle_deg": 41.59705585017534,
+    "ratio": 1.0667469962108305,
+    "max_speed_end_m_s": 11.265595436096191,
+    "in_bound": true,
+    "pass": true
+   },
+   "pass": false,
+   "summary": "ratio 1.074 / 1.164 / 1.067",
+   "wall_s": 4.8410093784332275
+  },
+  "swing": {
+   "drag0": {
+    "energy_gain_J": -1.5105840547743887e-05,
+    "energy_released_J": 0.024699628515374827,
+    "gain_fraction": -0.0006115816899165478,
+    "max_move_last_second_mm": 712.0525470537482,
+    "in_bound": true,
+    "sim_s_per_wall_s": 2.7443655652231893,
+    "pass": true
+   },
+   "drag2": {
+    "energy_gain_J": -3.017348580479362e-05,
+    "energy_released_J": 0.024575708120789103,
+    "gain_fraction": -0.0012277768622776424,
+    "max_move_last_second_mm": 3.4368278478626597,
+    "in_bound": true,
+    "sim_s_per_wall_s": 2.7507555995691138,
+    "pass": true
+   },
+   "pass": true,
+   "summary": "gain -0.061%, 6th-second move 3.44 mm",
+   "wall_s": 4.530256986618042
+  },
+  "freefall": {
+   "accel_m_s2": 9.810294339605305,
+   "rel_error": 3.0004037237851833e-05,
+   "shape_change_mm": 0.0003879248642313371,
+   "pass": true,
+   "summary": "accel +0.0030% of g, shape 0.0004 mm",
+   "wall_s": 0.23293781280517578
+  },
+  "slide": {
+   "mu0.2": {
+    "accel_m_s2": 1.5110042852224086,
+    "slide_law_m_s2": 1.5115406840428576,
+    "rel_error": -0.0003548689268583205,
+    "in_bound": true,
+    "pass": true
+   },
+   "mu0.5": {
+    "drift_mm_s": 4.410879793040587,
+    "travel_mm": 8.683971761374366,
+    "in_bound": true,
+    "pass": false
+   },
+   "pass": false,
+   "summary": "mu0.2 -0.04%, mu0.5 drift +4.411 mm/s",
+   "wall_s": 2.3084731101989746
+  },
+  "drop": {
+   "creep_mm_s": 0.3167200760697738,
+   "penetration_min_mm": 8.106231689369858e-06,
+   "in_bound": true,
+   "max_speed_end_m_s": 0.023627499118447304,
+   "sim_s_per_wall_s": 2.281848838199317,
+   "pass": true,
+   "summary": "creep 0.317 mm/s, penetration +0.000 mm",
+   "wall_s": 1.8230681419372559
+  },
+  "cross": {
+   "self_contact0": {
+    "crossings": 1,
+    "min_centerline_distance_mm": 10.002211970819564,
+    "A_lowest_below_B_lowest_mm": 7070.598244667053,
+    "A_held": false,
+    "in_bound": true
+   },
+   "self_contact1": {
+    "crossings": 0,
+    "min_centerline_distance_mm": 7.928892088097317,
+    "A_lowest_below_B_lowest_mm": 189.72408771514893,
+    "A_held": true,
+    "in_bound": true
+   },
+   "counter_can_fail": true,
+   "pass": true,
+   "summary": "control 1 crossings (A fell 7.1 m), with contact 0 (A held: True)",
+   "wall_s": 1.344428539276123
+  },
+  "pile": {
+   "self_contact1": {
+    "crossings": 0,
+    "min_centerline_distance_mm": 0.3410011896236617,
+    "in_bound": true,
+    "max_speed_m_s": 28.145841598510742,
+    "penetration_end_mm": -750.0000058636069,
+    "pile_height_mm": -736.6028958931565,
+    "sim_s_per_wall_s": 1.7524956838416061
+   },
+   "self_contact0": {
+    "crossings": 42,
+    "min_centerline_distance_mm": 0.0,
+    "in_bound": true,
+    "max_speed_m_s": 2.839794397354126,
+    "penetration_end_mm": 8.106231689369858e-06,
+    "pile_height_mm": 4.0000081062316895,
+    "sim_s_per_wall_s": 2.1541489870738166
+   },
+   "pass": false,
+   "counter_can_fail": true,
+   "summary": "0 crossings, closest 0.34 mm (control 42)",
+   "wall_s": 4.172859191894531
+  },
+  "gripper": {
+   "in_bound": true,
+   "max_speed_m_s": 0.9994573593139648,
+   "bottom_offset_mm": 8.445271519313613,
+   "hanging_length_m": 0.5005937814712524,
+   "length_m": 0.5,
+   "lowest_above_table_mm": 253.36456298828125,
+   "pass": true,
+   "summary": "bound True, vmax 1.00 m/s, bottom off 8.4 mm, hang 1.0012 L",
+   "wall_s": 9.767928123474121
+  },
+  "stability": {
+   "skipped": "explicit-step sweep, semi only",
+   "wall_s": 5.245208740234375e-06
+  },
+  "throughput": {
+   "worlds": 64,
+   "sim_seconds_per_wall_second": 172.28638635959584,
+   "four_second_episodes_per_hour": 155057.74772363625,
+   "substeps": 100,
+   "pass": true,
+   "summary": "172.3 sim-s/wall-s (155058 4-s episodes/h)",
+   "wall_s": 0.8867306709289551
+  }
+ },
+ "vbd": {
+  "stretch": {
+   "EA20": {
+    "extension_mm": 26.99172099431349,
+    "closed_form_mm": 4.8073904999999995,
+    "ratio": 5.614630430857134,
+    "free_length_m": 0.99,
+    "max_speed_end_m_s": 0.00015986322316620432,
+    "substeps": 20,
+    "sim_s_per_wall_s": 1.5236655996210349,
+    "in_bound": true,
+    "pass": false
+   },
+   "EA1000": {
+    "extension_mm": 24.08755769332241,
+    "closed_form_mm": 0.09614781,
+    "ratio": 250.52632705126,
+    "free_length_m": 0.99,
+    "max_speed_end_m_s": 0.00015986322258352046,
+    "substeps": 20,
+    "sim_s_per_wall_s": 2.199635780561063,
+    "in_bound": true,
+    "pass": false
+   },
+   "EA10000": {
+    "extension_mm": 24.000283579031557,
+    "closed_form_mm": 0.009614781,
+    "ratio": 2496.1861928037215,
+    "free_length_m": 0.99,
+    "max_speed_end_m_s": 0.0001421006454870781,
+    "substeps": 20,
+    "sim_s_per_wall_s": 2.2105161080871385,
+    "in_bound": true,
+    "pass": false
+   },
+   "pass": false,
+   "summary": "ratio 5.615 / 250.526 / 2496.186",
+   "wall_s": 7.931909561157227
+  },
+  "catenary": {
+   "sag_m": 0.3315025650009389,
+   "catenary_sag_m": 0.31972049403464126,
+   "sag_rel_error": 0.0368511596413994,
+   "shape_rms_mm": 7.488982352301327,
+   "shape_rms_over_sag": 0.023423529276449532,
+   "in_bound": true,
+   "max_speed_end_m_s": 0.00050951583463271,
+   "pass": false,
+   "summary": "sag +3.69%, shape rms 2.34% of sag",
+   "wall_s": 2.9603328704833984
+  },
+  "bend": {
+   "EI": {
+    "overhang_m": 0.16,
+    "bending_length_m": 0.07987919244865516,
+    "tip_drop_over_l": 1.001302182674408,
+    "elastica_drop_over_l": 0.6419184784894117,
+    "tip_angle_deg": 88.8602371046684,
+    "elastica_angle_deg": 41.59705585017534,
+    "ratio": 1.5598587923979261,
+    "max_speed_end_m_s": 1.2348961354291532e-05,
+    "in_bound": true,
+    "pass": false
+   },
+   "EI_half_segment": {
+    "overhang_m": 0.16,
+    "bending_length_m": 0.07987919244865516,
+    "tip_drop_over_l": 1.0847852448265498,
+    "elastica_drop_over_l": 0.6419184784894117,
+    "tip_angle_deg": 77.94092670408087,
+    "elastica_angle_deg": 41.59705585017534,
+    "ratio": 1.689911228882692,
+    "max_speed_end_m_s": 0.22130764917095266,
+    "in_bound": true,
+    "pass": false
+   },
+   "8EI_double_overhang": {
+    "overhang_m": 0.32,
+    "bending_length_m": 0.1597583848973103,
+    "tip_drop_over_l": 1.0025490224361415,
+    "elastica_drop_over_l": 0.6419184784894117,
+    "tip_angle_deg": 88.63091822643203,
+    "elastica_angle_deg": 41.59705585017534,
+    "ratio": 1.561801157049381,
+    "max_speed_end_m_s": 0.00010106719855684787,
+    "in_bound": true,
+    "pass": false
+   },
+   "pass": false,
+   "summary": "ratio 1.560 / 1.690 / 1.562",
+   "wall_s": 6.4784462451934814
+  },
+  "swing": {
+   "drag0": {
+    "energy_gain_J": -3.2147184822806096e-05,
+    "energy_released_J": 0.02504614193479661,
+    "gain_fraction": -0.0012835184319603334,
+    "max_move_last_second_mm": 253.8230692191273,
+    "in_bound": true,
+    "sim_s_per_wall_s": 2.5528984009123334,
+    "pass": true
+   },
+   "drag2": {
+    "energy_gain_J": -5.573778665628193e-05,
+    "energy_released_J": 0.024276899570749216,
+    "gain_fraction": -0.0022959186569045807,
+    "max_move_last_second_mm": 1.8461103648621149,
+    "in_bound": true,
+    "sim_s_per_wall_s": 2.6295928334473624,
+    "pass": true
+   },
+   "pass": true,
+   "summary": "gain -0.128%, 6th-second move 1.85 mm",
+   "wall_s": 5.097588539123535
+  },
+  "freefall": {
+   "accel_m_s2": 9.807881458762026,
+   "rel_error": -0.00021595731273948982,
+   "shape_change_mm": 0.0007864563243975553,
+   "pass": true,
+   "summary": "accel -0.0216% of g, shape 0.0008 mm",
+   "wall_s": 0.5062551498413086
+  },
+  "slide": {
+   "mu0.2": {
+    "accel_m_s2": 0.0015764415983251475,
+    "slide_law_m_s2": 1.5115406840428576,
+    "rel_error": -0.9989570630714956,
+    "in_bound": true,
+    "pass": false
+   },
+   "mu0.5": {
+    "drift_mm_s": 3.0426675452752017,
+    "travel_mm": 5.310701086207708,
+    "in_bound": true,
+    "pass": false
+   },
+   "pass": false,
+   "summary": "mu0.2 -99.90%, mu0.5 drift +3.043 mm/s",
+   "wall_s": 13.304686069488525
+  },
+  "drop": {
+   "creep_mm_s": 28.16365892649602,
+   "penetration_min_mm": -0.28775467368302377,
+   "in_bound": true,
+   "max_speed_end_m_s": 0.15458125084546376,
+   "sim_s_per_wall_s": 1.4395384475459416,
+   "pass": false,
+   "summary": "creep 28.164 mm/s, penetration -0.288 mm",
+   "wall_s": 2.9170613288879395
+  },
+  "cross": {
+   "self_contact0": {
+    "crossings": 1,
+    "min_centerline_distance_mm": 9.999974898935806,
+    "A_lowest_below_B_lowest_mm": 7023.826139954043,
+    "A_held": false,
+    "in_bound": true
+   },
+   "self_contact1": {
+    "crossings": 0,
+    "min_centerline_distance_mm": 7.272660881580774,
+    "A_lowest_below_B_lowest_mm": 680.0859108892778,
+    "A_held": false,
+    "in_bound": true
+   },
+   "counter_can_fail": true,
+   "pass": false,
+   "summary": "control 1 crossings (A fell 7.0 m), with contact 0 (A held: False)",
+   "wall_s": 2.688447952270508
+  },
+  "pile": {
+   "self_contact1": {
+    "crossings": 0,
+    "min_centerline_distance_mm": 6.539630055609511,
+    "in_bound": true,
+    "max_speed_m_s": 2.0761505920490677,
+    "penetration_end_mm": -0.1298556858998455,
+    "pile_height_mm": 20.59301835395444,
+    "sim_s_per_wall_s": 1.0204506785480836
+   },
+   "pass": true,
+   "summary": "0 crossings, closest 6.54 mm",
+   "wall_s": 3.839402914047241
+  },
+  "gripper": {
+   "in_bound": true,
+   "max_speed_m_s": 1.6043161774285517,
+   "bottom_offset_mm": 14.046675366077817,
+   "hanging_length_m": 0.49581079510843695,
+   "length_m": 0.5,
+   "lowest_above_table_mm": 258.1992860116191,
+   "pass": true,
+   "summary": "bound True, vmax 1.60 m/s, bottom off 14.0 mm, hang 0.9916 L",
+   "wall_s": 5.166911363601685
+  },
+  "stability": {
+   "skipped": "explicit-step sweep, semi only",
+   "wall_s": 6.198883056640625e-06
+  },
+  "throughput": {
+   "worlds": 64,
+   "sim_seconds_per_wall_second": 69.82124480766579,
+   "four_second_episodes_per_hour": 62839.12032689921,
+   "substeps": 20,
+   "pass": true,
+   "summary": "69.8 sim-s/wall-s (62839 4-s episodes/h)",
+   "wall_s": 2.540086507797241
+  }
+ },
+ "vbd_substeps100_iters20": {
+  "stretch": {
+   "EA20": {
+    "extension_mm": 4.843354225158608,
+    "closed_form_mm": 4.8073904999999995,
+    "ratio": 1.007480924455504,
+    "free_length_m": 0.99,
+    "max_speed_end_m_s": 1.1431632356007083e-10,
+    "substeps": 100,
+    "sim_s_per_wall_s": 0.09739449143337733,
+    "in_bound": true,
+    "pass": true
+   },
+   "EA1000": {
+    "extension_mm": 0.30376513799024174,
+    "closed_form_mm": 0.09614781,
+    "ratio": 3.1593557668161316,
+    "free_length_m": 0.99,
+    "max_speed_end_m_s": 0.002053620351138844,
+    "substeps": 100,
+    "sim_s_per_wall_s": 0.10581219196439487,
+    "in_bound": true,
+    "pass": false
+   },
+   "EA10000": {
+    "extension_mm": 0.18836557865134496,
+    "closed_form_mm": 0.009614781,
+    "ratio": 19.59125004005239,
+    "free_length_m": 0.99,
+    "max_speed_end_m_s": 4.79997488977979e-11,
+    "substeps": 100,
+    "sim_s_per_wall_s": 0.12936967398436788,
+    "in_bound": true,
+    "pass": false
+   },
+   "pass": false,
+   "summary": "ratio 1.007 / 3.159 / 19.591",
+   "wall_s": 111.61250138282776
+  },
+  "catenary": {
+   "sag_m": 0.3171898121597011,
+   "catenary_sag_m": 0.31972049403464126,
+   "sag_rel_error": -0.00791529452180173,
+   "shape_rms_mm": 3.9367053167960258,
+   "shape_rms_over_sag": 0.01231295894460081,
+   "in_bound": true,
+   "max_speed_end_m_s": 0.026790773933580637,
+   "pass": true,
+   "summary": "sag -0.79%, shape rms 1.23% of sag",
+   "wall_s": 49.95034623146057
+  },
+  "bend": {
+   "EI": {
+    "overhang_m": 0.16,
+    "bending_length_m": 0.07987919244865516,
+    "tip_drop_over_l": 0.8793515891952985,
+    "elastica_drop_over_l": 0.6419184784894117,
+    "tip_angle_deg": 67.16814486848017,
+    "elastica_angle_deg": 41.59705585017534,
+    "ratio": 1.3698804733969083,
+    "max_speed_end_m_s": 0.003406642219778723,
+    "in_bound": true,
+    "pass": false
+   },
+   "EI_half_segment": {
+    "overhang_m": 0.16,
+    "bending_length_m": 0.07987919244865516,
+    "tip_drop_over_l": 0.544697586230361,
+    "elastica_drop_over_l": 0.6419184784894117,
+    "tip_angle_deg": 54.62606282328004,
+    "elastica_angle_deg": 41.59705585017534,
+    "ratio": 0.8485463567152096,
+    "max_speed_end_m_s": 2.718959393979956,
+    "in_bound": true,
+    "pass": false
+   },
+   "8EI_double_overhang": {
+    "overhang_m": 0.32,
+    "bending_length_m": 0.1597583848973103,
+    "tip_drop_over_l": 0.8694966221191924,
+    "elastica_drop_over_l": 0.6419184784894117,
+    "tip_angle_deg": 66.57052476848618,
+    "elastica_angle_deg": 41.59705585017534,
+    "ratio": 1.354528107938763,
+    "max_speed_end_m_s": 0.006700939408470379,
+    "in_bound": true,
+    "pass": false
+   },
+   "pass": false,
+   "summary": "ratio 1.370 / 0.849 / 1.355",
+   "wall_s": 115.68371081352234
+  },
+  "swing": {
+   "drag0": {
+    "energy_gain_J": 0.0008052107046412765,
+    "energy_released_J": 0.023043795261823638,
+    "gain_fraction": 0.03494262535717191,
+    "max_move_last_second_mm": 177.02438014194462,
+    "in_bound": true,
+    "sim_s_per_wall_s": 0.1320388739098739,
+    "pass": false
+   },
+   "drag2": {
+    "energy_gain_J": -2.3754714965323886e-05,
+    "energy_released_J": 0.023072007725801133,
+    "gain_fraction": -0.0010295902830666657,
+    "max_move_last_second_mm": 3.7758507750019614,
+    "in_bound": true,
+    "sim_s_per_wall_s": 0.131761845317496,
+    "pass": true
+   },
+   "pass": false,
+   "summary": "gain +3.494%, 6th-second move 3.78 mm",
+   "wall_s": 91.55985760688782
+  },
+  "freefall": {
+   "accel_m_s2": 9.710730454169328,
+   "rel_error": -0.010119219758478404,
+   "shape_change_mm": 0.0015583717088429871,
+   "pass": false,
+   "summary": "accel -1.0119% of g, shape 0.0016 mm",
+   "wall_s": 5.512072563171387
+  },
+  "slide": {
+   "mu0.2": {
+    "accel_m_s2": 0.0013442927400467975,
+    "slide_law_m_s2": 1.5115406840428576,
+    "rel_error": -0.9991106473320643,
+    "in_bound": true,
+    "pass": false
+   },
+   "mu0.5": {
+    "drift_mm_s": 3.4653581525879935,
+    "travel_mm": 14.620544348875248,
+    "in_bound": true,
+    "pass": false
+   },
+   "pass": false,
+   "summary": "mu0.2 -99.91%, mu0.5 drift +3.465 mm/s",
+   "wall_s": 33.55249309539795
+  },
+  "drop": {
+   "creep_mm_s": 65.22166955800863,
+   "penetration_min_mm": -0.10685991287373228,
+   "in_bound": true,
+   "max_speed_end_m_s": 0.3537845028655043,
+   "sim_s_per_wall_s": 0.12565144665552863,
+   "pass": false,
+   "summary": "creep 65.222 mm/s, penetration -0.107 mm",
+   "wall_s": 32.02869129180908
+  },
+  "cross": {
+   "self_contact0": {
+    "crossings": 1,
+    "min_centerline_distance_mm": 5.191556401224735,
+    "A_lowest_below_B_lowest_mm": 7082.0886316585,
+    "A_held": false,
+    "in_bound": true
+   },
+   "self_contact1": {
+    "crossings": 0,
+    "min_centerline_distance_mm": 7.945236302995983,
+    "A_lowest_below_B_lowest_mm": 310.36878598318276,
+    "A_held": true,
+    "in_bound": true
+   },
+   "counter_can_fail": true,
+   "pass": true,
+   "summary": "control 1 crossings (A fell 7.1 m), with contact 0 (A held: True)",
+   "wall_s": 48.11555099487305
+  },
+  "pile": {
+   "self_contact1": {
+    "crossings": 0,
+    "min_centerline_distance_mm": 7.908392085215784,
+    "in_bound": true,
+    "max_speed_m_s": 2.2343922088254393,
+    "penetration_end_mm": 0.0035644012413883763,
+    "pile_height_mm": 23.352065866354966,
+    "sim_s_per_wall_s": 0.0571068799653277
+   },
+   "pass": true,
+   "summary": "0 crossings, closest 7.91 mm",
+   "wall_s": 53.525874614715576
+  },
+  "gripper": {
+   "in_bound": true,
+   "max_speed_m_s": 1.933817675092712,
+   "bottom_offset_mm": 16.593046258806126,
+   "hanging_length_m": 0.48520712083060036,
+   "length_m": 0.5,
+   "lowest_above_table_mm": 268.7512234577907,
+   "pass": false,
+   "summary": "bound True, vmax 1.93 m/s, bottom off 16.6 mm, hang 0.9704 L",
+   "wall_s": 102.43124675750732
+  }
+ }
+}
