@@ -19,7 +19,7 @@ language model in the method. The Python package is `lsim`.
    prediction written before it.
 6. [`CLAUDE.md`](CLAUDE.md): the working rules and the full current state. The coding agent reads it too.
 
-## Where it stands (2026-11-24)
+## Where it stands (2026-11-25)
 
 The one-frame score is the error over one frame divided by the error of simply continuing at constant velocity, on
 episodes never trained on. Lower is better, and 1 means no better than that guess.
@@ -29,10 +29,12 @@ episodes never trained on. Lower is better, and 1 means no better than that gues
   closer to the teacher. Longer training improves the one-frame fit, and more episodes improve the replays; a bigger
   network does not help.
   - Not yet working: shut drawers drift open, and objects the gripper knocks over stay standing.
-  - A real cube does not slide down a real ramp, because the data has no release events.
+  - A real cube does not slide down a real ramp. The ramp data does show objects let go on a slope, but no training
+    window starts from rest the way the real test does (`l2_overfit.py --p_start` adds such windows; under test).
 - **Cloth.** A 64M transformer predicts a force on each vertex, and an exact physics layer (gravity, F = ma, air drag,
-  contact with fixed surfaces, held vertices) moves the cloth. It scores 0.52 over one frame and is 15 / 57 / 85 mm from
-  the teacher after 1 / 2 / 3.8 s.
+  contact with fixed surfaces, held vertices) moves the cloth. It scores 0.475 over one frame and is 14 / 50 / 77 mm
+  from the teacher after 1 / 2 / 3.8 s; 5 of 336 unseen cloths blow up (end above twice their area), against 28 for
+  the same training with the material hidden.
   - Ten times the data was worth 0.015 on that score, twice the training 0.068. More than the 20k episodes is not needed
     now.
   - On real cloth (PGND recordings), its shorter-trained version (24k steps) after fine-tuning on real data is about
@@ -70,13 +72,14 @@ python scripts/l2_overfit.py --data data/datasets/v0 --episodes 1024 --steps 360
 python scripts/l2_small_fit_rigid.py --ckpt outputs/lsim/rigid.pt --episodes 32 --shard 8 --tag held   # unseen shard
 # For new rigid runs add --aug 1 (a random turn of each scene): at 128 episodes it closed the gap to unseen episodes.
 
-# Cloth (outputs/lsim/cloth_q64_ownup_cont/step23999.pt): this run, then the same again with
-# --init <its step23999.pt>. That is 48,000 steps on two GPUs, about 34 h.
+# Cloth (outputs/lsim/cloth_q64_ownup_cont2_given/step23999.pt): three 24,000-step stretches of this command, each
+# from the last one's step23999.pt with --init <path>. The first two ran without --given, the third with it (a run
+# with --given from the start is untested at full data). 72,000 steps on two GPUs, about 51 h.
 torchrun --nproc_per_node 2 -m lsim.train.cloth_train --data data/datasets/c1 --arch qwen --d 512 --layers 16 \
   --heads 8 --kv_heads 4 --mlp 1536 --steps 24000 --lr 6e-4 --batch 4 --sig 1e-3 --pf 4 --prob_slots --unc --accel \
-  --layer 2 --edge 1.0 --side_apart --own_up --save_every 4000 --keep --val "data/datasets/c1_test/shard_*.npz" \
+  --layer 2 --edge 1.0 --side_apart --own_up --given --save_every 4000 --keep --val "data/datasets/c1_test/shard_*.npz" \
   --out outputs/lsim/cloth
-python scripts/l2_coverage_score.py --ckpt outputs/lsim/cloth/step23999.pt --tag cloth   # one frame + rollouts, c1_test
+python scripts/l2_coverage_score.py --ckpt outputs/lsim/cloth/step23999.pt --tag cloth --roll_given   # c1_test
 ```
 
 ## Layout

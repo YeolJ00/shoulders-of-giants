@@ -452,9 +452,12 @@ table.res th.n{white-space:normal}
   <div class="col">
     <p><b>What the layer still does better is hold things at rest.</b> On the real ramp nothing without it
     slides: the plain transformer is 82 mm off, like the earlier baselines, where the layer's built-in friction
-    alone is within 1 mm. Training it on ramp episodes does not change that (81 mm), as we predicted: episodes are
-    recorded after everything has settled, so every object the data shows at rest on a slope is one that stays
-    there, and the real cube is let go from rest. With drawers, doors and lids (52 in 128 unseen episodes), the plain transformer follows
+    alone is within 1 mm. Training it on ramp episodes does not change that (81 mm), as we predicted, but our
+    reason was wrong. We said the episodes start settled, so the data never shows an object let go on a slope. In
+    fact the ramp episodes set their objects down at rest on the slope at the first frame, and two thirds of them
+    then slide. What training never shows is the real test's start: the network is given eight frames of rest and
+    then has to begin the slide, while training windows start one frame after the let-go. A run that adds such
+    windows is going (below). With drawers, doors and lids (52 in 128 unseen episodes), the plain transformer follows
     the ones the gripper moves as well as the physics-layer network does (11 mm against 9 mm; the graph baseline
     does not move them at all). But it lets the ones that should stay shut drift open by 27 mm, where the
     layer's joint holds them to 0.1 mm.</p>
@@ -970,8 +973,36 @@ table.res th.n{white-space:normal}
     <p>Rolled out alone on unseen episodes, the longer-trained network is 15, 57 and 85 mm from the teacher after
     one, two and 3.8 seconds, against 18, 65 and 97 before the extra training and 24, 80 and 122 for the original
     network. It stretches the cloth by 6% on average (1% at the median), half of what it did before the extra
-    training. It is the best cloth network we have on every measure. The four videos of the full-data runs
-    below show it beside the original network.</p>
+    training. It was the best cloth network we had on every measure until the third stretch below. The four
+    videos of the full-data runs below show it beside the original network.</p>
+    <p><b>Every input given keeps the cloth (2026-11-25).</b> We trained the third stretch again from the same start
+    with every input given: the material, the gripper's force and all eight past frames. Then we ran both versions
+    alone on the same 336 unseen episodes with the material given. One frame ahead the new version is slightly
+    better, 0.475 against 0.486 (lower by 0.010 [0.005, 0.016]). Positions over seconds are level: 14, 50 and
+    77 mm at 1, 2 and 3.8 s, against 14, 51 and 80. What changes is the shape. 5 cloths blow up against 28, the
+    mean stretch is 4% against 24%, and the mean area is 1.01 against 1.89 times the start's. The blow-up tail grew
+    during the third stretch trained with the material hidden (6 blow-ups before it). Trained with every input
+    given, the tail did not grow. We predicted this: one frame within 0.015, positions within 3 and 8 mm, at most
+    half the stretch. This network is now the cloth reference. It scores the same on its own training episodes
+    (0.49), so there is still no gap for more data to close. A second checkpoint, 4,000 steps earlier, is being
+    scored to rule out one checkpoint's luck.</p>
+  </div>
+  <div class="tablewrap"><table class="res">
+    <thead><tr><th>cloth, full data, 336 unseen episodes, material given</th><th class="n">one frame</th><th class="n">mm at 1 / 2 / 3.8 s</th><th class="n">stretch, mean (median)</th><th class="n">area, mean</th><th class="n">blow-ups</th></tr></thead>
+    <tbody>
+    <tr><td>Second stretch (48,000 steps)*</td><td class="n">0.520</td><td class="n">15.0 / 57.2 / 85.1</td><td class="n">6.1% (1.3%)</td><td class="n">1.04&times;</td><td class="n">6</td></tr>
+    <tr><td>Third stretch, material hidden in training</td><td class="n">0.486</td><td class="n">13.7 / 50.9 / 79.9</td><td class="n">24.3% (1.1%)</td><td class="n">1.89&times;</td><td class="n">28</td></tr>
+    <tr><td><b>Third stretch, every input given</b></td><td class="n"><b>0.475</b></td><td class="n">13.7 / 50.4 / 76.7</td><td class="n"><b>4.2% (1.1%)</b></td><td class="n"><b>1.01&times;</b></td><td class="n"><b>5</b></td></tr>
+    </tbody></table></div>
+  <p class="note">A blow-up is a rollout that ends above twice the cloth's starting area. *The second stretch was run
+  alone with the material hidden, as it was trained; the third-stretch network trained that way scores within 3 mm
+  either way (21 blow-ups with the material hidden, 28 given). Paired over episodes, every input given against the material hidden: 3.8 s &minus;3.1 mm
+  [&minus;8.8, +1.9], stretch &minus;20 points [&minus;29, &minus;13], area &minus;0.88 [&minus;1.27, &minus;0.54].</p>
+  <figure class="vid">
+    <div class="frame"><video data-auto src="media/cloth_given3_drop.mp4" poster="media/cloth_given3_drop.jpg" controls loop muted playsinline preload="metadata"></video></div>
+    <figcaption>An unseen lift and drop. Both third-stretch networks run alone after eight frames, with the material given. Top: trained with the material hidden, the towel bunches up after it lands and grows into a ball, 16 times its area at the end (126 mm off). Bottom: trained with every input given, it lands flat and stays whole (30 mm off, 0.97 of its area). The episode was picked from the 24 where the top network blows up and the bottom one does not; in 4 others both blow up. Two more picked the same way, a fold and a shake, did not blow up on screen: the top network's rollouts sit near an instability.</figcaption>
+  </figure>
+  <div class="col">
     <p>On real cloth, held-out recordings, 2 seconds into each window, the original network after real
     fine-tuning is 17.8 mm from the observed cloth, against 15.8 mm for the teacher with its material fitted to
     each recording. The local-frame network before any real data keeps real cloth's shape (stretched 5%, where
@@ -1644,11 +1675,21 @@ table.res th.n{white-space:normal}
   </figure>
   </div>
   <p class="note">The two episodes were picked from those where the 16-frame network blew up and the control did not. A third such episode, a shake, does not blow up in its video (1.6 times its area against 13.6 when scored): these rollouts sit near an instability, and small differences decide whether they cross it.</p>
+  <div class="col">
+    <p><b>A loss on the network's own runs.</b> The next trial adds a loss on the network's own 2 s and 3.3 s runs,
+    measured against the teacher's, in 400-step fine-tunes beside a control without it. The 2 s arm is done.
+    It runs closer: 2.6 mm [1.1, 4.2] at 2 s and 3.5 mm [&minus;0.3, 7.2] at 3.8 s, for a one-frame cost of 0.004.
+    But it blows up as often as the control (32 against 30 of 336) and stretches as much. We predicted a third
+    fewer blow-ups. The 3.3 s arm is due at about 23:00 UTC.</p>
+    <p>Both trials fine-tuned the third stretch that was trained with the material hidden, giving it every input
+    for 400 to 3,000 steps. Their controls kept 25 to 30 blow-ups, so a short fine-tune does not undo the tail.
+    The third stretch trained with every input given throughout has 5 (see the cloth section).</p>
+  </div>
 </section>
 
 <section id="running">
   <div class="col">
-    <div class="eyebrow">Running now · as of 2026-11-25 14:30 UTC</div>
+    <div class="eyebrow">Running now · as of 2026-11-25 20:45 UTC</div>
     <h2>Runs in progress, each with its prediction on file</h2>
     <p>Rigid runs train with every input given from 2026-11-24, cloth runs from 2026-11-25; hidden material and
     hidden forces come back once a forward simulator fits.</p>
@@ -1656,8 +1697,10 @@ table.res th.n{white-space:normal}
   <div class="tablewrap"><table class="res">
     <thead><tr><th>run</th><th>prediction written before it started</th><th>so far / due (UTC)</th></tr></thead>
     <tbody>
-    <tr><td>Cloth: the third stretch of training again, with every input given, from the same start</td><td>one frame within 0.015 of the usual recipe's third stretch; within 3 mm at 1 s; at most half the stretch</td><td>25 Nov, ~19:00</td></tr>
-    <tr><td>Cloth: short fine-tunes from the third stretch (400 steps each) with a loss on the network's own 2 s or 3.3 s runs against the teacher's, beside a control without it. Started because longer practice did not help (above)</td><td>control within 0.01 of the third stretch on one frame. With the loss: one frame within +0.02 of the control, level at 1 s, 3&ndash;10 mm closer at 3.8 s, at most two thirds (2 s) or half (3.3 s) of the control's blow-ups</td><td>2 s arm ~19:45, 3.3 s arm ~23:00</td></tr>
+    <tr><td>Rigid objects: the plain transformer on 1,024 ramp episodes, with one training window in ten starting from rest (eight frames of rest, then let go, as the real ramp test starts), beside a control without</td><td>control still does not slide on the real ramp (70&ndash;85 mm); with the rest starts it slides, under 20 mm; one frame within 0.03</td><td>26 Nov, ~02:00</td></tr>
+    <tr><td>Cloth: a fourth stretch of training (24,000 steps) from the reference network, every input given</td><td>one frame 0.450&ndash;0.465; 13&ndash;14 / 46&ndash;50 / 70&ndash;77 mm at 1 / 2 / 3.8 s; at most 8 blow-ups and 6% mean stretch; no gap between its own and unseen episodes</td><td>26 Nov, ~15:00</td></tr>
+    <tr><td>Cloth: the every-input-given result at a second checkpoint (4,000 steps before the end), both recipes, material given</td><td>at most 10 blow-ups for every input given, at least 20 for the material hidden; one frame within 0.01</td><td>25 Nov, ~22:15</td></tr>
+    <tr><td>Cloth: short fine-tunes from the third stretch (400 steps each) with a loss on the network's own 2 s or 3.3 s runs against the teacher's, beside a control without it. Started because longer practice did not help (above)</td><td>control within 0.01 of the third stretch on one frame (held: +0.001). With the loss: one frame within +0.02 of the control, level at 1 s, 3&ndash;10 mm closer at 3.8 s, at most two thirds (2 s) or half (3.3 s) of the control's blow-ups</td><td>2 s arm done (above: closer, blow-ups level); 3.3 s arm ~23:00</td></tr>
         </tbody></table></div>
   <p class="foot">Numbers come from the experiment log in <code>docs/DIRECTION.md</code>, where each one has its date,
   test set and script. Part of <a href="https://claude.ai/artifact/5WR9dMDTujSfrNAyhjCEQJ">[SoG] Shoulder of Giants</a>; how the episodes are made: <a href="https://claude.ai/artifact/Bqgkb28DtrCtLMpWj1hLtt">[SoG] Making the Training Data</a>.</p>

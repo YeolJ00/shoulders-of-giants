@@ -465,11 +465,11 @@ code{font-family:var(--mono);font-size:.88em;background:var(--sunk);padding:1px 
       <p role="cell">Without the physics layer nothing slides on the real ramp (82 mm off; the layer alone is within 1 mm),
       and shut drawers drift open by 27 mm.</p></div>
     <div class="row" role="row"><span class="what" role="cell">Cloth, one frame ahead</span><span class="tag open" role="cell">Open</span>
-      <p role="cell">The best network removes about half of the simple guess's error (0.49). More data does not help;
-      longer training and the local frame do.</p></div>
+      <p role="cell">The best network removes about half of the simple guess's error (0.475). More data does not help;
+      longer training, the local frame and giving it every input do.</p></div>
     <div class="row" role="row"><span class="what" role="cell">Cloth over seconds</span><span class="tag ok" role="cell">Works</span>
-      <p role="cell">15, 57 and 85 mm from the teacher after 1, 2 and 3.8 seconds on unseen episodes, with the cloth
-      stretched by 1% at the median. Not yet a usable simulator.</p></div>
+      <p role="cell">14, 50 and 77 mm from the teacher after 1, 2 and 3.8 seconds on unseen episodes; 5 of 336 cloths
+      blow up, and the rest keep their shape (stretched 1% at the median). Not yet a usable simulator.</p></div>
     <div class="row" role="row"><span class="what" role="cell">Real cloth</span><span class="tag ok" role="cell">Works</span>
       <p role="cell">After fine-tuning on real recordings, 17.6 mm from the observed cloth at 2 seconds, against 15.8 mm for
       the teacher with fitted material. The third claim (beating the teacher) is not shown. The same fine-tuning went
@@ -508,9 +508,10 @@ code{font-family:var(--mono);font-size:.88em;background:var(--sunk);padding:1px 
     of the simple guess's error. More data does not change that; longer training does: training for as long
     again took it from 0.59 to 0.52, brought its rollouts 12 mm closer at 3.8 seconds, and also brought it 6 mm
     closer to real cloth before any real data, a lead the same real fine-tuning then lost (it went unstable). A third
-    stretch took it to 0.49, closer again over seconds, but with more cloths blowing up (21 of 336 against 6). An
-    earlier checkpoint confirms the blow-ups are real (27 against 12), and they show on real cloth too. It now
-    follows an unseen fold (first clip) but not yet a shake (second clip).</p>
+    stretch took it to 0.49, closer again over seconds, but with more cloths blowing up (21 of 336 against 6). The
+    same third stretch trained with every input given does not grow that tail: 5 blow-ups against 28, at 0.475 on
+    one frame, so it is the cloth network to build on. The network follows an unseen fold (first clip) but not yet
+    a shake (second clip); the third clip shows what giving every input fixed.</p>
   </div>
   <figure class="vid">
     <div class="frame"><video data-auto src="media/cloth_cont_fold.mp4" poster="media/cloth_cont_fold.jpg" controls loop muted playsinline preload="metadata"></video></div>
@@ -519,6 +520,10 @@ code{font-family:var(--mono);font-size:.88em;background:var(--sunk);padding:1px 
   <figure class="vid">
     <div class="frame"><video data-auto src="media/cloth_cont_shake.mp4" poster="media/cloth_cont_shake.jpg" controls loop muted playsinline preload="metadata"></video></div>
     <figcaption><b>Where it does not yet.</b> An unseen shake, same layout. The original network's cloth shrinks to half its area (121 mm off). The local-frame network keeps the cloth's size but ends further from the teacher (156 mm).</figcaption>
+  </figure>
+  <figure class="vid">
+    <div class="frame"><video data-auto src="media/cloth_given3_drop.mp4" poster="media/cloth_given3_drop.jpg" controls loop muted playsinline preload="metadata"></video></div>
+    <figcaption><b>What giving every input fixed.</b> An unseen lift and drop, both third-stretch networks running alone. Top: trained with the material hidden, the towel bunches into a ball after landing (16 times its area). Bottom: trained with every input given, it lands flat and whole (30 mm off).</figcaption>
   </figure>
   <div class="col">
     <p class="more">Every chart, table and video behind these statements is on the
@@ -533,19 +538,20 @@ code{font-family:var(--mono);font-size:.88em;background:var(--sunk);padding:1px 
   </div>
   <ol class="next col">
     <li><p><span class="cur">Now:</span> <b>Fit the teacher data, with every input given.</b> One frame ahead,
-    cloth is at 0.49 of the simple guess's error and rigid objects at 0.37. For both, longer training still
+    cloth is at 0.475 of the simple guess's error and rigid objects at 0.37. For both, longer training still
     improves single frames but no longer how the network runs alone: more cloths blow up, and rigid replays end
     farther off. Dropping the physics layer, which made rigid objects fit, does not help cloth: it ends
     level on one frame and rolls out much worse, so cloth keeps it. Giving cloth every input fits one frame as
     well, and running alone its cloth stretches a fifth as much (12% against 61%); cloth now trains that way.
-    Practising running alone for longer during training does not stop them: cloth's blow-ups grow with the length
-    practised (25 to 44 of 336 unseen episodes), and rigid objects trade single-frame fit for a few millimetres.
-    Running: cloth's third stretch again with every input given, which tests whether that removes the blow-ups;
-    and a loss on the network's own 2&ndash;3 s runs against the teacher's.</p></li>
+    Practising running alone for longer during training does not stop the blow-ups (25 to 44 of 336 unseen
+    episodes as the practice grows), and rigid objects trade single-frame fit for a few millimetres. Training
+    cloth's third stretch with every input given does stop them (5 against 28). Running: a fourth stretch of
+    cloth training with every input given.</p></li>
     <li><p><b>Rigid objects: scale up the plain transformer.</b> Longer training improves single frames and more
     episodes improve the rollouts; a network five times larger is worse at both training lengths tried. Three
     times longer again took one frame from 0.45 to 0.37, but its replays end a few millimetres farther off. Open: holding things at rest without the physics layer. On the real ramp it
-    probably needs data that shows an object being let go on a slope, which the current episodes never do.</p></li>
+    probably needs training windows that start from rest, as the real test does: the ramp episodes do show
+    objects let go on a slope, but training starts a frame later. Running: a test of that.</p></li>
     <li><p><b>Scale data beyond 20,000 episodes? Not for now.</b> For cloth, ten times the data is worth 0.015 at
     full training, and the full-data network does as well on unseen episodes as on its own. The question returns
     when a network does better on its own episodes than on unseen ones. The rigid network did so on 128 episodes,

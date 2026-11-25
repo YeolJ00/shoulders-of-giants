@@ -56,6 +56,9 @@ def main():
     ap.add_argument("--p_hist_noise", type=float, default=-1.0, help="probability of flagged history noise (collate; -1 = as --plain sets it)")
     ap.add_argument("--touch_cv", action="store_true", help="no default on a rigid body the gripper or another moving body is near: zero output = constant velocity there (Simulator touch_cv)")
     ap.add_argument("--n_heads", type=int, default=4)
+    ap.add_argument("--p_start", type=float, default=0.0, help="probability a training window starts at frame 0: its whole "
+                    "past is frame 0 repeated (the scene held still, then let go -- how l2_phys101.py starts the real cube); "
+                    "otherwise starts are uniform from frame 1 as before. 0 draws no extra random numbers")
     ap.add_argument("--init", default="", help="start from this checkpoint's weights (new optimiser and schedule; the "
                     "network flags must match the checkpoint's)")
     ap.add_argument("--K", type=int, default=8, help="chunk frames per window (8 past frames always); --pf can reach K")
@@ -125,7 +128,8 @@ def main():
 
     t0 = time.time()
     for step in range(a.steps + 1):
-        wins = [make_window(e, int(rng.integers(1, e.q.shape[0] - K)), P, K, rng, **wk)
+        wins = [make_window(e, 0 if (a.p_start > 0 and rng.random() < a.p_start) else int(rng.integers(1, e.q.shape[0] - K)),
+                            P, K, rng, **wk)
                 for e in (eps[int(i)] for i in rng.integers(len(eps), size=a.batch))]
         b = collate(wins, dev, rng, **ck)
         loss, info = (step_loss(model, b, rng, K, dev, **noise) if a.mode == "onestep" else

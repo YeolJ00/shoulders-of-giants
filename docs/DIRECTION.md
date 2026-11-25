@@ -2307,6 +2307,19 @@ teacher and the model can be measured on (`lsim.real.cloth`, `scripts/l1_real_cl
     `--roll_given 1`, 400 steps: `cloth_roll_ctl` (no rollout loss, GPU 1, then `cloth_roll100`, R 100, on GPU 1),
     `cloth_roll60` (R 60, GPU 4); smoke test ~40 s a step at R 60, 10 GB. Predicted: one frame within +0.02 of the
     control, 3.8 s closer by 3-10 mm, blow-ups at most two thirds (R 60) / half (R 100) of the control's.
+    **The control and the 2 s arm (19:14 UTC; scratch `blowups.py`, `paired_cov.py`, `paired_roll.py`, tags
+    `cov_cloth_roll_ctl_step{200,399}_rg`, `cov_cloth_roll60_step{200,399}_rg`).** Control at 399: one frame +0.001
+    [-0.001, +0.003] against cont2 (prediction held), blow-ups 30 (200: 32; predicted 20-30), rollouts within 2 mm of
+    cont2. R 60 at 399 against the control: one frame +0.004 [+0.001, +0.008] (held), 1 s -0.41 [-0.81, -0.02] mm
+    (held), 2 s -2.58 [-4.18, -1.08], 3.8 s -3.47 [-7.23, +0.34] (at the low edge of 3-10, interval through zero);
+    blow-ups 32 against 30 (FAILED: at most 20 predicted), strain mean 24.7% against 26.0% (median 1.5 vs 1.0%; level,
+    FAILED: lower predicted). At 200: 2 s -1.3 [-3.0, +0.4], blow-ups 41 against 32, strain +10.8 [+3.4, +19.1].
+    READ's second branch: rollouts closer, tail unchanged -- the distance to a chaotic teacher does not reach the
+    instability. R 100 (GPU 1) due ~21:00, scored ~22:45. **Both trials (pushforward and this) fine-tune the
+    hidden-input third stretch with every input given for 400-3,000 steps; their controls keep 25-30 blow-ups. The
+    same third stretch trained with every input given THROUGHOUT has 5 (`cloth_q64_ownup_cont2_given`, the entry
+    "Every input given" below, 19:58 UTC): the tail grew during the hidden-input stretch (6 at 48k, 21-28 at 72k) and
+    a short given fine-tune does not undo it.**
     Also started: its PGND evaluation before real
     data (tag `q64_ownup_cont`) and renders of the four fixed held-out episodes (`outputs/lsim/render_cont.sh`, tag
     `localcont`).
@@ -2819,6 +2832,28 @@ teacher and the model can be measured on (`lsim.real.cloth`, `scripts/l1_real_cl
       at 2 s; strain mean at most half of cont2's; area closer to 1. READ: lower stretch at no cost in position =
       `--given` is the recipe and the reference network for the hand-over; worse by over 3 mm at 1 s = keep the
       old recipe.
+      **RESULT (19:58 UTC 2026-11-25; tags `cov_cloth_q64_ownup_cont2_given_step23999_rg` / `_train`,
+      `cov_cloth_q64_ownup_cont2_step23999_rg`; 336 held-out episodes, both rolled out with the material given): every
+      prediction held. One frame 0.475 against 0.486 (-0.010 [-0.016, -0.005]; lower in every family, slide level);
+      its own 2,000 training episodes 0.489 (no gap); rollouts 13.7 / 50.4 / 76.7 mm against 13.7 / 50.9 / 79.9
+      (-0.03 [-1.01, +0.95] / -0.43 [-5.69, +3.90] / -3.13 [-8.79, +1.90]); strain mean 4.2% against 24.3% (-20.1
+      [-28.8, -12.6]; median 1.1 / 1.1), area mean 1.01 against 1.89 (-0.88 [-1.27, -0.54]); blow-ups (area > 2x at
+      the end) 5 against 28 (cont2 scored with the material hidden: 21; the 48k network: 6). By family the stretch
+      falls everywhere (fold 37 -> 8%, shake 40 -> 7, lift_place 33 -> 3, lift_drop 50 -> 9). Of cont2's 28 blow-ups
+      the given network keeps 24 (e.g. fold shard 2 ep 27: 17x -> 1.0x, end 162 -> 3 mm); 4 blow up in both (fold
+      shard 13 ep 61: 15x / 4.4x; shake shard 5 ep 61: 13x / 4.6x), 1 only in the given one (lift-drop shard 11
+      ep 16: 0.9x / 2.6x). **`cloth_q64_ownup_cont2_given/step23999.pt` is the reference cloth network.** Checked at a
+      second checkpoint (`outputs/lsim/given_step20k_check.sh`, both networks at step 20,000 with the material given,
+      GPU 5; predicted: given at most 10 blow-ups, hidden at least 20). Rendered: `outputs/lsim/render_given3.sh`
+      (both networks on three episodes cont2 blows up and the given one keeps, and the fold that blows up in both;
+      `outputs/lsim/render_given/`; 20:21 UTC): lift-drop shard 2 ep 54 -- the hidden-input network's towel bunches
+      after landing into a ball, 16-18.5x, 128 mm at the end; the given one lands it flat, 0.97x, 30 mm (prediction
+      held; media `cloth_given3_drop`, stacked old over given); fold shard 2 ep 27 -- neither blows up on screen (4.8 /
+      3.3 mm; the old one scored 17x: near the instability, as before); shake shard 12 ep 38 -- old 2.9x at the end,
+      given 0.90x, both ~145 mm; fold shard 13 ep 61 -- old 15.3x, given whole (0.90x) but 410 mm off. Next on the fit: a fourth 24,000 steps from it with `--given`
+      (`outputs/lsim/full_ownup_cont3_given.sh`, `cloth_q64_ownup_cont3_given`, GPUs 2,3, from 20:15 UTC, ~17 h;
+      predicted one frame 0.450-0.465, rollouts 13-14 / 46-50 / 70-77 mm, at most 8 blow-ups, no gap; READ in its
+      header: below 0.01 of gain = the fit is flattening at this size and data, the size question returns).
       Rendered on the four fixed held-out episodes beside the twin (`outputs/lsim/render_given.sh`, tag
       `local2kgiven`, `render_heldout_pair/*_pair_given.mp4`, `pair_given_sheet.jpg`; media `cloth2k_given_*`): lift and
       drop -- the twin crushes the towel into a torn ball (area 4.5x, 103 mm), `--given` lands it flat (0.90x, 71 mm);
@@ -2896,6 +2931,18 @@ teacher and the model can be measured on (`lsim.real.cloth`, `scripts/l1_real_cl
       data -- an object held on a slope and let go, or set down unsettled -- which is PHASE1_AMENDMENT's rule
       (every parameter needs an interaction that makes it observable) applied to the friction threshold, and a
       "which data" item for the user's third question. Not built.
+      **CORRECTION (2026-11-25): the reading's premise is wrong.** v0r's ramp objects are put at rest on the plank
+      at frame 0, AFTER the settle (`lsim.data.episode.run_batch`, step 3: `ramp_pose`, velocity zeroed), so the data
+      does contain releases: of the 288 ramp objects in v0r's first 1,024 episodes, 196 move by frame 8 (177 by over
+      5 cm; scratch `ramp_release_count.py`), 92 stay. What training never draws is the real test's window:
+      `l2_phys101.py` rolls the cube out from 8 identical frames of rest ("released at now"), and `l2_overfit.py`
+      draws window starts from frame 1 (`make_window` clips earlier frames to frame 0), so no training window has a
+      whole past of rest -- the nearest, a start at frame 1, already shows the first frame of the slide. New option
+      `l2_overfit.py --p_start p` (a window starts at frame 0 with probability p; default 0 draws nothing, runs
+      unchanged). **Running since ~21:00 UTC (`outputs/lsim/rigid_release.sh`, prediction in its header; GPU 4, both
+      arms on one card): `rigid_ramp1024_ctl` (p 0) and `rigid_ramp1024_start` (p 0.1), 1,024 episodes of v0r,
+      12,000 steps, the plain transformer's recipe; scored by `l2_phys101.py` and on held-out v0r (shard 9) and v0
+      (shard 8). Predicted: control 70-85 mm, start arm under 20 mm, one frame within 0.03.**
     - **The 2 x 2 is whole: steps set the one-frame fit, episodes set the replay -- and 1,024 episodes at 36,000
       steps is the first rigid network clearly ahead of B1 on both** (2026-11-24 06:59 UTC;
       `rigid_pilot1024p_attn_direct_36k`; the plain transformer, all inputs given; the 32 unseen episodes of shard
