@@ -4,8 +4,12 @@ __pycache__/
 .ipynb_checkpoints/
 .claude/
 
-# Run outputs (regenerable).
-outputs/
+# Run outputs (regenerable). The run scripts in outputs/lsim/ are tracked: each holds its recipe and the
+# prediction written before the run, and docs/DIRECTION.md cites them by path.
+outputs/*
+!outputs/lsim/
+outputs/lsim/*
+!outputs/lsim/*.sh
 
 # Raw datasets, downloaded assets and generated datasets (large). data/real/ holds small files
 # derived from real recordings and IS tracked.
