@@ -545,8 +545,9 @@ code{font-family:var(--mono);font-size:.88em;background:var(--sunk);padding:1px 
     well, and running alone its cloth stretches a fifth as much (12% against 61%); cloth now trains that way.
     Practising running alone for longer during training does not stop the blow-ups (25 to 44 of 336 unseen
     episodes as the practice grows), and rigid objects trade single-frame fit for a few millimetres. Training
-    cloth's third stretch with every input given does stop them (5 against 28). Running: a fourth stretch of
-    cloth training with every input given.</p></li>
+    cloth's third stretch with every input given does stop them (5 against 28), and a loss on the network's own
+    3.3-second runs halves them where they appear. Running: a fourth stretch of cloth training with every input
+    given, and that loss on the best network.</p></li>
     <li><p><b>Rigid objects: scale up the plain transformer.</b> Longer training improves single frames and more
     episodes improve the rollouts; a network five times larger is worse at both training lengths tried. Three
     times longer again took one frame from 0.45 to 0.37, but its replays end a few millimetres farther off. Open: holding things at rest without the physics layer. On the real ramp it

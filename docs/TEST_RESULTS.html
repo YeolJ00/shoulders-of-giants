@@ -984,8 +984,9 @@ table.res th.n{white-space:normal}
     during the third stretch trained with the material hidden (6 blow-ups before it). Trained with every input
     given, the tail did not grow. We predicted this: one frame within 0.015, positions within 3 and 8 mm, at most
     half the stretch. This network is now the cloth reference. It scores the same on its own training episodes
-    (0.49), so there is still no gap for more data to close. A second checkpoint, 4,000 steps earlier, is being
-    scored to rule out one checkpoint's luck.</p>
+    (0.49), so there is still no gap for more data to close. A second checkpoint, 4,000 steps earlier, gives the
+    same picture: 5 blow-ups against 28, one frame 0.481 against 0.490, positions level. We had predicted at most
+    10 against at least 20, so the result is not one checkpoint's luck.</p>
   </div>
   <div class="tablewrap"><table class="res">
     <thead><tr><th>cloth, full data, 336 unseen episodes, material given</th><th class="n">one frame</th><th class="n">mm at 1 / 2 / 3.8 s</th><th class="n">stretch, mean (median)</th><th class="n">area, mean</th><th class="n">blow-ups</th></tr></thead>
@@ -1680,7 +1681,12 @@ table.res th.n{white-space:normal}
     measured against the teacher's, in 400-step fine-tunes beside a control without it. The 2 s arm is done.
     It runs closer: 2.6 mm [1.1, 4.2] at 2 s and 3.5 mm [&minus;0.3, 7.2] at 3.8 s, for a one-frame cost of 0.004.
     But it blows up as often as the control (32 against 30 of 336) and stretches as much. We predicted a third
-    fewer blow-ups. The 3.3 s arm is due at about 23:00 UTC.</p>
+    fewer blow-ups. The 3.3 s arm, whose runs reach close to the 3.8 s mark where blow-ups are counted, halves
+    them: 14 against the control's 30, as we predicted. It also runs closer, by 4.5 mm [2.5, 6.9] at 2 s and
+    6.2 mm [3.6, 9.0] at 3.8 s, for a one-frame cost of 0.005. Its mean stretch falls from 26% to 10%, but the
+    typical cloth stretches a little more (median 1.8% against 1.0%): fewer cloths blow up, and most stretch
+    slightly. Against the reference network trained with every input given, it is a few millimetres closer over
+    seconds but still blows up more (14 against 5). Next: the same loss on the reference network itself.</p>
     <p>Both trials fine-tuned the third stretch that was trained with the material hidden, giving it every input
     for 400 to 3,000 steps. Their controls kept 25 to 30 blow-ups, so a short fine-tune does not undo the tail.
     The third stretch trained with every input given throughout has 5 (see the cloth section).</p>
@@ -1689,7 +1695,7 @@ table.res th.n{white-space:normal}
 
 <section id="running">
   <div class="col">
-    <div class="eyebrow">Running now · as of 2026-11-25 20:45 UTC</div>
+    <div class="eyebrow">Running now · as of 2026-11-25 22:50 UTC</div>
     <h2>Runs in progress, each with its prediction on file</h2>
     <p>Rigid runs train with every input given from 2026-11-24, cloth runs from 2026-11-25; hidden material and
     hidden forces come back once a forward simulator fits.</p>
@@ -1697,10 +1703,10 @@ table.res th.n{white-space:normal}
   <div class="tablewrap"><table class="res">
     <thead><tr><th>run</th><th>prediction written before it started</th><th>so far / due (UTC)</th></tr></thead>
     <tbody>
-    <tr><td>Rigid objects: the plain transformer on 1,024 ramp episodes, with one training window in ten starting from rest (eight frames of rest, then let go, as the real ramp test starts), beside a control without</td><td>control still does not slide on the real ramp (70&ndash;85 mm); with the rest starts it slides, under 20 mm; one frame within 0.03</td><td>26 Nov, ~02:00</td></tr>
+    <tr><td>Rigid objects: the plain transformer on 1,024 ramp episodes, with one training window in ten starting from rest (eight frames of rest, then let go, as the real ramp test starts), beside a control without</td><td>control still does not slide on the real ramp (70&ndash;85 mm); with the rest starts it slides, under 20 mm; one frame within 0.03</td><td>26 Nov, ~03:00</td></tr>
     <tr><td>Cloth: a fourth stretch of training (24,000 steps) from the reference network, every input given</td><td>one frame 0.450&ndash;0.465; 13&ndash;14 / 46&ndash;50 / 70&ndash;77 mm at 1 / 2 / 3.8 s; at most 8 blow-ups and 6% mean stretch; no gap between its own and unseen episodes</td><td>26 Nov, ~15:00</td></tr>
-    <tr><td>Cloth: the every-input-given result at a second checkpoint (4,000 steps before the end), both recipes, material given</td><td>at most 10 blow-ups for every input given, at least 20 for the material hidden; one frame within 0.01</td><td>25 Nov, ~22:15</td></tr>
-    <tr><td>Cloth: short fine-tunes from the third stretch (400 steps each) with a loss on the network's own 2 s or 3.3 s runs against the teacher's, beside a control without it. Started because longer practice did not help (above)</td><td>control within 0.01 of the third stretch on one frame (held: +0.001). With the loss: one frame within +0.02 of the control, level at 1 s, 3&ndash;10 mm closer at 3.8 s, at most two thirds (2 s) or half (3.3 s) of the control's blow-ups</td><td>2 s arm done (above: closer, blow-ups level); 3.3 s arm ~23:00</td></tr>
+    <tr><td>Rigid objects: does more data help the network run alone? The plain transformer at its 36,000-step budget on 8,192 episodes, and on 1,024 with random turning, each beside the 1,024-episode run</td><td>one frame level for both (steps set it); 8,192 episodes: no gap and replays of moved bodies closer (15&ndash;30% at 2 s, 3&ndash;10 mm at the end); random turning: 0&ndash;5 mm closer at the end</td><td>26 Nov, ~06:00</td></tr>
+    <tr><td>Cloth: the loss on the network's own 3.3 s runs, on the reference network (800 steps), beside a control without it. Started because on the network trained with the material hidden it halved the blow-ups (above)</td><td>control: level with the reference (one frame within 0.005, 3&ndash;8 blow-ups). With the loss: one frame 0.003&ndash;0.010 worse, level at 1 s, 2&ndash;6 mm closer at 2 s and 3&ndash;8 mm at 3.8 s, at most 5 blow-ups, typical stretch at most 1.8%</td><td>halfway ~08:00, done 26 Nov ~15:00</td></tr>
         </tbody></table></div>
   <p class="foot">Numbers come from the experiment log in <code>docs/DIRECTION.md</code>, where each one has its date,
   test set and script. Part of <a href="https://claude.ai/artifact/5WR9dMDTujSfrNAyhjCEQJ">[SoG] Shoulder of Giants</a>; how the episodes are made: <a href="https://claude.ai/artifact/Bqgkb28DtrCtLMpWj1hLtt">[SoG] Making the Training Data</a>.</p>

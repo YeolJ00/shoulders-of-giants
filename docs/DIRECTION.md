@@ -2315,7 +2315,21 @@ teacher and the model can be measured on (`lsim.real.cloth`, `scripts/l1_real_cl
     blow-ups 32 against 30 (FAILED: at most 20 predicted), strain mean 24.7% against 26.0% (median 1.5 vs 1.0%; level,
     FAILED: lower predicted). At 200: 2 s -1.3 [-3.0, +0.4], blow-ups 41 against 32, strain +10.8 [+3.4, +19.1].
     READ's second branch: rollouts closer, tail unchanged -- the distance to a chaotic teacher does not reach the
-    instability. R 100 (GPU 1) due ~21:00, scored ~22:45. **Both trials (pushforward and this) fine-tune the
+    instability. **The 3.3 s arm (R 100, 22:40 UTC; tags `cov_cloth_roll100_step{200,399}_rg`): it halves the
+    blow-ups -- 14 against the control's 30 at 399 (200: 20 against 32) -- with rollouts closer at 2 s and 3.8 s
+    (-4.49 [-6.86, -2.50] / -6.20 [-9.01, -3.63] mm; 200: -3.55 / -7.23), level at 1 s (-0.32 [-0.73, +0.08]), one
+    frame +0.005 [+0.002, +0.008] (both checkpoints), strain mean 9.5% against 26.0% (-16.4 [-24.8, -9.0]) but the
+    median up (1.8% against 1.0%; lower in only 25% of episodes) and area mean 1.18 against 1.96. Every prediction
+    held (blow-ups "at most half": 14 of 30 at 399, not at 200). The 2 s rollouts did not reach the tail; the 3.3 s
+    ones, near the 3.8 s horizon where blow-ups are counted, do. By family the stretch falls in fold, shake and the
+    lifts (fold 53 -> 11%, lift_drop 50 -> 20) and rises a little where there was none (drag 1.1 -> 2.2%, slide
+    13 -> 2.3 falls). Against the every-input-given reference (`cont2_given/step23999`): closer over seconds (2 s
+    -3.6 [-7.3, +0.8], 3.8 s -4.8 [-10.8, +1.1]), worse on one frame (+0.016 [+0.011, +0.022]), stretch (9.5% against
+    4.2%) and blow-ups (14 against 5). READ, first branch: the loss joins the recipe; a longer fine-tune of the
+    reference with it is next -- `outputs/lsim/roll_given.sh` (GPU 1, from 22:45 UTC): `cloth_roll100_given` (800
+    steps, R 100, from `cont2_given/step23999`, scored at 400 and 799) beside `cloth_roll_ctl_given` (800 steps, no
+    rollout loss); predicted: one frame +0.003 to +0.010, closer by 2-6 mm at 2 s and 3-8 at 3.8 s, at most 5
+    blow-ups, strain median at most 1.8%; ~15 h.** **Both trials (pushforward and this) fine-tune the
     hidden-input third stretch with every input given for 400-3,000 steps; their controls keep 25-30 blow-ups. The
     same third stretch trained with every input given THROUGHOUT has 5 (`cloth_q64_ownup_cont2_given`, the entry
     "Every input given" below, 19:58 UTC): the tail grew during the hidden-input stretch (6 at 48k, 21-28 at 72k) and
@@ -2844,7 +2858,12 @@ teacher and the model can be measured on (`lsim.real.cloth`, `scripts/l1_real_cl
       shard 13 ep 61: 15x / 4.4x; shake shard 5 ep 61: 13x / 4.6x), 1 only in the given one (lift-drop shard 11
       ep 16: 0.9x / 2.6x). **`cloth_q64_ownup_cont2_given/step23999.pt` is the reference cloth network.** Checked at a
       second checkpoint (`outputs/lsim/given_step20k_check.sh`, both networks at step 20,000 with the material given,
-      GPU 5; predicted: given at most 10 blow-ups, hidden at least 20). Rendered: `outputs/lsim/render_given3.sh`
+      GPU 5; predicted: given at most 10 blow-ups, hidden at least 20; one frame within 0.01). **Held (21:57 UTC;
+      tags `cov_cloth_q64_ownup_cont2{_given,}_step20000_rg`): blow-ups 5 against 28 again, one frame 0.481 against
+      0.490 (-0.009 [-0.018, -0.002]), rollouts level (13.9 / 53.3 / 78.4 against 13.9 / 51.1 / 76.3 mm; +2.2
+      [-2.2, +6.9] at 2 s), strain mean 4.6% against 27.6% (-23.0 [-32.9, -14.5]), area mean 1.02 against 2.06 --
+      the same picture at both checkpoints, not one checkpoint's luck. By family the given network is behind on slide
+      over seconds at step 20,000 (end 51.9 against 33.8 mm), ahead on the lifts and the shake.** Rendered: `outputs/lsim/render_given3.sh`
       (both networks on three episodes cont2 blows up and the given one keeps, and the fold that blows up in both;
       `outputs/lsim/render_given/`; 20:21 UTC): lift-drop shard 2 ep 54 -- the hidden-input network's towel bunches
       after landing into a ball, 16-18.5x, 128 mm at the end; the given one lands it flat, 0.97x, 30 mm (prediction
@@ -3017,6 +3036,14 @@ teacher and the model can be measured on (`lsim.real.cloth`, `scripts/l1_real_cl
       rollout, a growing tail): both tracks now improve one frame with training while running alone stalls or
       worsens at the end. One checkpoint only (`l2_overfit.py` writes the last); rendered on shard 8 episodes 15 and 0
       (where the 108k replay ends farthest behind) in `outputs/lsim/render_rigid_held108k/`.
+      **Does more data help it run alone?** (`outputs/lsim/rigid_data_8k.sh`, GPUs 5 and 6, from 22:02 UTC
+      2026-11-25, ~7.5 h, prediction and READ in its header): at the 36,000-step budget (OneCycle over the run, so
+      not a checkpoint of a longer one), `rigid_pilot8192p_attn_direct_36k` (8,192 episodes, shards 0-63) and
+      `rigid_pilot1024p_attn_direct_yaw_36k` (1,024 with `--aug 1`), each against `rigid_pilot1024p_attn_direct_36k`;
+      shard 8 is inside the 8,192 arm's data, so all score on shard 64 (tag `held64`; the 1,024 x 36k and x 108k
+      networks scored there first). PREDICTION: one frame level for both; 8,192 no gap and replays of moved bodies
+      15-30% closer at 2 s, 3-10 mm at the end; the yaw 0-5 mm closer at the end. READ: 8,192 closer = episodes are
+      the lever for running alone, the scale-up takes all 50,048; level = not a data question at this budget.
     - **The given gripper force does not carry the timing inside a frame** (2026-11-23). On the 16 gripper-driven
       body-frames constant velocity (0.99 mm) beats the layer with the given force (1.98 mm) and every network
       (1.1-1.9). The slot is the frame-averaged contact force (`teacher.contacts`: impulse / frame time), entered as
