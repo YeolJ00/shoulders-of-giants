@@ -1,0 +1,86 @@
+{
+ "source": "phystwin",
+ "case": "single_clift_cloth_3",
+ "notes": "grey woven cloth; one hand lifts a corner diagonally",
+ "fps": 30.0,
+ "frames": 97,
+ "split": {
+  "train_end": 67,
+  "test_end": 97
+ },
+ "rest_frame": 5,
+ "grid": {
+  "nx": 42,
+  "ny": 56,
+  "h": 0.009994463260620402,
+  "origin": [
+   -0.22803152787292266,
+   -0.32918834559609267,
+   0.0
+  ],
+  "u": [
+   0.999914327574007,
+   0.013089595571344441,
+   0.0
+  ],
+  "v": [
+   -0.013089595571344441,
+   0.999914327574007,
+   0.0
+  ]
+ },
+ "grasp": [
+  {
+   "grasp": "corner",
+   "vertex": 0,
+   "from_frame": 11,
+   "vertices": 4,
+   "lift_frame": 20,
+   "hand_horizontal_m": 0.047032139774142605,
+   "held": true
+  }
+ ],
+ "qc": {
+  "residual": {
+   "median_mm": 2.1852618690544325,
+   "p90_mm": 4.9123426611294185
+  },
+  "residual_train": {
+   "median_mm": 2.084146702901032,
+   "p90_mm": 3.837099321214664
+  },
+  "residual_test": {
+   "median_mm": 2.638828709765381,
+   "p90_mm": 14.767404914668722
+  },
+  "residual_median_mm_every_10th": [
+   2.25208445813771,
+   2.4550689070278118,
+   2.0219162510120596,
+   2.030643606217797,
+   2.120654116333869,
+   2.0857918479886886,
+   2.074158803446181,
+   2.190914503815157,
+   2.742867674925046,
+   3.2379659601365938
+  ],
+  "annotated": {
+   "median_mm": 5.337878120386514,
+   "p90_mm": 43.149144958803966
+  },
+  "annotated_test": {
+   "median_mm": NaN,
+   "p90_mm": NaN
+  },
+  "drift_train_mm": 7.804069237517167,
+  "drift_test_mm": 11.867016360016374,
+  "strain_median": 0.0001192311595422102,
+  "strain_p90": 0.0005193258866579511,
+  "strain_p99": 0.0015336108323723784,
+  "rest_height_spread_mm": 5.570379372208104,
+  "tracked_points": 8158,
+  "visible_share": 0.9100684599516318
+ },
+ "frame": "z up, table top at z = 0 (PhysTwin's frame turned half about x)"
+}

@@ -1,0 +1,26 @@
+{
+ "outputs/lsim/cloth_v3/last.pt": {
+  "f_int": "cc8419bc9c5a4c38f51336e2 float32 [562, 16, 3] max 2.25353",
+  "f_con": "a34fe4cd25de97b90394cdab float32 [562, 16, 3] max 3.17642",
+  "params": "cb3131d5ae55e65e7c9a22b8 float32 [1, 4] max 0.732814",
+  "ec": "db252fd160a305e1d1d70f14 int64 [2, 6844] max 7487",
+  "step": "424e1a1e60197acee55423df float32 [562, 3] max 0.434223",
+  "rollout": "f1d208b94d239decff77c21f float32 [3, 378, 3] max 0.261182"
+ },
+ "outputs/lsim/cloth_q64/step23999.pt": {
+  "f_int": "5206c3a40575496c5b9aa224 float32 [562, 16, 3] max 19.0275",
+  "f_con": "a0d7a35f420f81a1639ffce7 float32 [562, 16, 3] max 17.1451",
+  "params": "9a2b111e6cc74e82f29220ff float32 [1, 4] max 1.51359",
+  "ec": "db252fd160a305e1d1d70f14 int64 [2, 6844] max 7487",
+  "step": "70fd9008a3aa1baaed2bdbaf float32 [562, 3] max 0.434223",
+  "rollout": "0ea0a671285b9d3e0680eff4 float32 [3, 378, 3] max 0.261786"
+ },
+ "outputs/lsim/cloth_rq64/step1000.pt": {
+  "f_int": "0304807e67144b165a53c867 float32 [562, 16, 3] max 18.3969",
+  "f_con": "48e42b676bb80be127e9db39 float32 [562, 16, 3] max 17.9171",
+  "params": "bd02a954240ed9106a36e49f float32 [1, 4] max 1.51817",
+  "ec": "db252fd160a305e1d1d70f14 int64 [2, 6844] max 7487",
+  "step": "954e84fc5db571375b4aaafa float32 [562, 3] max 0.434223",
+  "rollout": "311b8b15a51b1c18f5099283 float32 [3, 378, 3] max 0.26177"
+ }
+}

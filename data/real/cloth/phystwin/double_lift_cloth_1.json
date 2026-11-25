@@ -1,0 +1,97 @@
+{
+ "source": "phystwin",
+ "case": "double_lift_cloth_1",
+ "notes": "green cloth; two hands take the two far corners and raise that edge, the cloth hangs like a curtain",
+ "fps": 30.0,
+ "frames": 116,
+ "split": {
+  "train_end": 81,
+  "test_end": 116
+ },
+ "rest_frame": 1,
+ "grid": {
+  "nx": 33,
+  "ny": 33,
+  "h": 0.009966450849263253,
+  "origin": [
+   0.15642258461179778,
+   -0.19975435465774263,
+   9.407776795955503e-05
+  ],
+  "u": [
+   0.004363309284746582,
+   0.9999904807207345,
+   0.0
+  ],
+  "v": [
+   -0.9999904807207345,
+   0.004363309284746582,
+   0.0
+  ]
+ },
+ "grasp": [
+  {
+   "grasp": "corners",
+   "vertex": 1155,
+   "from_frame": 3,
+   "vertices": 4,
+   "lift_frame": 12,
+   "hand_horizontal_m": 0.022837114690460486,
+   "held": true
+  },
+  {
+   "grasp": "corners",
+   "vertex": 1122,
+   "from_frame": 3,
+   "vertices": 4,
+   "lift_frame": 12,
+   "hand_horizontal_m": 0.034684590940899936,
+   "held": true
+  }
+ ],
+ "qc": {
+  "residual": {
+   "median_mm": 2.979286565716692,
+   "p90_mm": 7.864733013076225
+  },
+  "residual_train": {
+   "median_mm": 2.741473345008806,
+   "p90_mm": 6.242373000299835
+  },
+  "residual_test": {
+   "median_mm": 4.482642959278912,
+   "p90_mm": 12.68056395049546
+  },
+  "residual_median_mm_every_10th": [
+   2.0859299285500494,
+   2.508769141388331,
+   2.5573242511267567,
+   2.5293541808752162,
+   2.7963192232931084,
+   2.7838453836393304,
+   3.054293061390542,
+   3.264483440672638,
+   4.017125517907933,
+   3.960944639675319,
+   3.9391909749468157,
+   5.242978837254056
+  ],
+  "annotated": {
+   "median_mm": 3.728723728350328,
+   "p90_mm": 11.309948542893745
+  },
+  "annotated_test": {
+   "median_mm": NaN,
+   "p90_mm": NaN
+  },
+  "drift_train_mm": 7.141276330776129,
+  "drift_test_mm": 9.326309390174071,
+  "strain_median": 0.00013967574806422745,
+  "strain_p90": 0.0005654952315583438,
+  "strain_p99": 0.0015743547385322272,
+  "rest_height_spread_mm": 5.583121379108361,
+  "tracked_points": 4742,
+  "visible_share": 0.7687875512020061
+ },
+ "frame": "z up, table top at z = 0 (PhysTwin's frame turned half about x)"
+}

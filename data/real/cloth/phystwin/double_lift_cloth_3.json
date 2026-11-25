@@ -1,0 +1,97 @@
+{
+ "source": "phystwin",
+ "case": "double_lift_cloth_3",
+ "notes": "grey woven cloth; two hands take the two far corners and raise that edge, the cloth folds over",
+ "fps": 30.0,
+ "frames": 118,
+ "split": {
+  "train_end": 82,
+  "test_end": 118
+ },
+ "rest_frame": 0,
+ "grid": {
+  "nx": 42,
+  "ny": 56,
+  "h": 0.010006247802152061,
+  "origin": [
+   -0.21839686181112036,
+   -0.32280134554860596,
+   0.0
+  ],
+  "u": [
+   0.999914327574007,
+   0.013089595571344441,
+   0.0
+  ],
+  "v": [
+   -0.013089595571344441,
+   0.999914327574007,
+   0.0
+  ]
+ },
+ "grasp": [
+  {
+   "grasp": "corners",
+   "vertex": 0,
+   "from_frame": 1,
+   "vertices": 4,
+   "lift_frame": 8,
+   "hand_horizontal_m": 0.07357247380957362,
+   "held": true
+  },
+  {
+   "grasp": "corners",
+   "vertex": 2408,
+   "from_frame": 1,
+   "vertices": 4,
+   "lift_frame": 8,
+   "hand_horizontal_m": 0.05627065313505703,
+   "held": true
+  }
+ ],
+ "qc": {
+  "residual": {
+   "median_mm": 2.2438620058995817,
+   "p90_mm": 8.998224195178912
+  },
+  "residual_train": {
+   "median_mm": 2.126427784932931,
+   "p90_mm": 4.488843427613152
+  },
+  "residual_test": {
+   "median_mm": 3.147062873138396,
+   "p90_mm": 116.89204462557574
+  },
+  "residual_median_mm_every_10th": [
+   1.1443916996305594e-13,
+   2.0385773228665283,
+   2.008962081335013,
+   2.0873637034152117,
+   2.1700697408999847,
+   2.259600243586602,
+   2.142379833938669,
+   2.180933193028248,
+   2.452515007689426,
+   2.633039090486218,
+   3.338472879242556,
+   7.622827614184828
+  ],
+  "annotated": {
+   "median_mm": 3.119046145356587,
+   "p90_mm": 5.903858862450666
+  },
+  "annotated_test": {
+   "median_mm": NaN,
+   "p90_mm": NaN
+  },
+  "drift_train_mm": 7.062297960047366,
+  "drift_test_mm": 7.947628085387709,
+  "strain_median": 9.31316199933585e-05,
+  "strain_p90": 0.00035342028589577804,
+  "strain_p99": 0.0010373009494540654,
+  "rest_height_spread_mm": 7.0701804259921115,
+  "tracked_points": 7521,
+  "visible_share": 0.7628549665456495
+ },
+ "frame": "z up, table top at z = 0 (PhysTwin's frame turned half about x)"
+}
