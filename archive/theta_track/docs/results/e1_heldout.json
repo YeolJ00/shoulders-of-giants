@@ -1,0 +1,788 @@
+{
+ "friction": {
+  "oracle": {
+   "n_trials": 359,
+   "n_objects": 69,
+   "rms_mm_median": 1.7744802280922682,
+   "rms_mm_p90": 6.184061708151509,
+   "dmu_median": 0.010346893631704213
+  },
+  "material": {
+   "n_trials": 360,
+   "n_objects": 70,
+   "rms_mm_median": 2.550377775373982,
+   "rms_mm_p90": 12.428125335407142,
+   "dmu_median": 0.01746504324147248
+  },
+  "pipeline": {
+   "n_trials": 355,
+   "n_objects": 69,
+   "rms_mm_median": 2.72495471762815,
+   "rms_mm_p90": 16.7442657338256,
+   "dmu_median": 0.018995790251220696
+  },
+  "LLM direct mu": {
+   "n_trials": 346,
+   "n_objects": 67,
+   "rms_mm_median": 7.53254551929935,
+   "rms_mm_p90": 44.94806280842338,
+   "dmu_median": 0.05180218141888526
+  },
+  "generic 0.40": {
+   "n_trials": 360,
+   "n_objects": 70,
+   "rms_mm_median": 86.85135659678045,
+   "rms_mm_p90": 104.15426753404324,
+   "dmu_median": 0.17655474891079048
+  },
+  "global": {
+   "n_trials": 360,
+   "n_objects": 70,
+   "rms_mm_median": 4.396722802462085,
+   "rms_mm_p90": 15.447439569950603,
+   "dmu_median": 0.03073540228695816
+  }
+ },
+ "outcome": {
+  "material": {
+   "acc": 0.9444444444444444,
+   "n": 198
+  },
+  "pipeline": {
+   "acc": 0.9242424242424242,
+   "n": 198
+  },
+  "LLM direct mu": {
+   "acc": 0.8465608465608465,
+   "n": 189
+  },
+  "generic 0.40": {
+   "acc": 0.6212121212121212,
+   "n": 198
+  },
+  "global": {
+   "acc": 0.803030303030303,
+   "n": 198
+  }
+ },
+ "llm_material_acc": 0.801980198019802,
+ "mass": {
+  "material density (volumetric)": {
+   "n": 101,
+   "median_factor": 1.1707052441229655,
+   "within_25pct": 0.6336633663366337
+  },
+  "build-aware (areal for cardboard)": {
+   "n": 101,
+   "median_factor": 1.112935233627999,
+   "within_25pct": 0.693069306930693
+  },
+  "LLM direct guess": {
+   "n": 101,
+   "median_factor": 1.3043478260869565,
+   "within_25pct": 0.45544554455445546
+  }
+ },
+ "per_object": {
+  "cardboard_01": {
+   "material_true": "cardboard",
+   "material_llm": "w_block",
+   "mu_own": 0.27953939547419715,
+   "material": 0.2231959829675627,
+   "pipeline": 0.2305114700222935,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "cardboard_02": {
+   "material_true": "cardboard",
+   "material_llm": "cardboard",
+   "mu_own": 0.24998270164456804,
+   "material": 0.2231959829675627,
+   "pipeline": 0.2231959829675627,
+   "LLM direct mu": 0.3,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "cardboard_03": {
+   "material_true": "cardboard",
+   "material_llm": "cardboard",
+   "mu_own": 0.2810661262001206,
+   "material": 0.2231959829675627,
+   "pipeline": 0.2231959829675627,
+   "LLM direct mu": 0.27,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "cardboard_04": {
+   "material_true": "cardboard",
+   "material_llm": "cardboard",
+   "mu_own": 0.21712252858728245,
+   "material": 0.23962606949620552,
+   "pipeline": 0.23962606949620552,
+   "LLM direct mu": 0.28,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "cardboard_05": {
+   "material_true": "cardboard",
+   "material_llm": "cardboard",
+   "mu_own": 0.229269437347843,
+   "material": 0.23355261511592523,
+   "pipeline": 0.23355261511592523,
+   "LLM direct mu": 0.28,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "cardboard_06": {
+   "material_true": "cardboard",
+   "material_llm": "cardboard",
+   "mu_own": 0.25248841360781615,
+   "material": 0.2231959829675627,
+   "pipeline": 0.2231959829675627,
+   "LLM direct mu": 0.28,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "cardboard_07": {
+   "material_true": "cardboard",
+   "material_llm": "cardboard",
+   "mu_own": 0.21366311078135153,
+   "material": 0.23962606949620552,
+   "pipeline": 0.23962606949620552,
+   "LLM direct mu": 0.27,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "cardboard_08": {
+   "material_true": "cardboard",
+   "material_llm": "cardboard",
+   "mu_own": 0.20064879045991083,
+   "material": 0.23962606949620552,
+   "pipeline": 0.23962606949620552,
+   "LLM direct mu": 0.27,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "cardboard_09": {
+   "material_true": "cardboard",
+   "material_llm": "cardboard",
+   "mu_own": 0.211256904565404,
+   "material": 0.23962606949620552,
+   "pipeline": 0.23962606949620552,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "dough_01": {
+   "material_true": "dough",
+   "material_llm": "dough",
+   "mu_own": 0.13125318775500255,
+   "material": 0.16462734587420247,
+   "pipeline": 0.16462734587420247,
+   "LLM direct mu": 0.6,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "dough_02": {
+   "material_true": "dough",
+   "material_llm": "dough",
+   "mu_own": 0.15770805528436713,
+   "material": 0.16462734587420247,
+   "pipeline": 0.16462734587420247,
+   "LLM direct mu": 0.55,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "dough_03": {
+   "material_true": "dough",
+   "material_llm": "dough",
+   "mu_own": 0.16462734587420247,
+   "material": 0.15770805528436713,
+   "pipeline": 0.15770805528436713,
+   "LLM direct mu": 0.55,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "dough_04": {
+   "material_true": "dough",
+   "material_llm": "dough",
+   "mu_own": 0.1911694745521734,
+   "material": 0.15770805528436713,
+   "pipeline": 0.15770805528436713,
+   "LLM direct mu": 0.55,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "h_wood_02": {
+   "material_true": "h_wood",
+   "material_llm": "w_block",
+   "mu_own": 0.18954863518467752,
+   "material": 0.2026196079448728,
+   "pipeline": 0.2305114700222935,
+   "LLM direct mu": 0.3,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "h_wood_03": {
+   "material_true": "h_wood",
+   "material_llm": "w_block",
+   "mu_own": 0.19399044495552395,
+   "material": 0.2026196079448728,
+   "pipeline": 0.2305114700222935,
+   "LLM direct mu": 0.3,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "h_wood_05": {
+   "material_true": "h_wood",
+   "material_llm": "w_block",
+   "mu_own": 0.2026196079448728,
+   "material": 0.19399044495552395,
+   "pipeline": 0.2305114700222935,
+   "LLM direct mu": 0.3,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "h_wood_07": {
+   "material_true": "h_wood",
+   "material_llm": "w_block",
+   "mu_own": 0.22385499425331756,
+   "material": 0.19399044495552395,
+   "pipeline": 0.2305114700222935,
+   "LLM direct mu": 0.3,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "m_pole_03": {
+   "material_true": "m_pole",
+   "material_llm": "m_pole",
+   "mu_own": 0.17201186772882968,
+   "material": 0.19668236888869883,
+   "pipeline": 0.19668236888869883,
+   "LLM direct mu": 0.22,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "m_pole_04": {
+   "material_true": "m_pole",
+   "material_llm": "m_pole",
+   "mu_own": 0.22346607810937946,
+   "material": 0.191929812667675,
+   "pipeline": 0.191929812667675,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "m_pole_05": {
+   "material_true": "m_pole",
+   "material_llm": "m_pole",
+   "mu_own": 0.20061358165401005,
+   "material": 0.191929812667675,
+   "pipeline": 0.191929812667675,
+   "LLM direct mu": 0.22,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "m_pole_06": {
+   "material_true": "m_pole",
+   "material_llm": "m_pole",
+   "mu_own": 0.19275115612338764,
+   "material": 0.19586102543298622,
+   "pipeline": 0.19586102543298622,
+   "LLM direct mu": 0.22,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "m_pole_07": {
+   "material_true": "m_pole",
+   "material_llm": "m_pole",
+   "mu_own": 0.19110846921196237,
+   "material": 0.19668236888869883,
+   "pipeline": 0.19668236888869883,
+   "LLM direct mu": null,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "p_block_01": {
+   "material_true": "p_block",
+   "material_llm": "p_ring",
+   "mu_own": 0.28558053142200446,
+   "material": 0.24734208384262674,
+   "pipeline": 0.3303388994661185,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "p_block_02": {
+   "material_true": "p_block",
+   "material_llm": "p_block",
+   "mu_own": 0.2682827058522497,
+   "material": 0.24734208384262674,
+   "pipeline": 0.24734208384262674,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "p_block_03": {
+   "material_true": "p_block",
+   "material_llm": "p_block",
+   "mu_own": 0.26742955102740107,
+   "material": 0.24734208384262674,
+   "pipeline": 0.24734208384262674,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "p_block_04": {
+   "material_true": "p_block",
+   "material_llm": "p_block",
+   "mu_own": 0.2523944727916453,
+   "material": 0.24734208384262674,
+   "pipeline": 0.24734208384262674,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "p_block_05": {
+   "material_true": "p_block",
+   "material_llm": "p_block",
+   "mu_own": 0.24184682953745074,
+   "material": 0.24802313227103018,
+   "pipeline": 0.24802313227103018,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "p_block_06": {
+   "material_true": "p_block",
+   "material_llm": "p_block",
+   "mu_own": 0.23668858389735342,
+   "material": 0.24802313227103018,
+   "pipeline": 0.24802313227103018,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "p_block_07": {
+   "material_true": "p_block",
+   "material_llm": "p_block",
+   "mu_own": 0.24145924574310396,
+   "material": 0.24802313227103018,
+   "pipeline": 0.24802313227103018,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "p_block_08": {
+   "material_true": "p_block",
+   "material_llm": "p_block",
+   "mu_own": 0.24802313227103018,
+   "material": 0.24734208384262674,
+   "pipeline": 0.24734208384262674,
+   "LLM direct mu": 0.23,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "p_block_09": {
+   "material_true": "p_block",
+   "material_llm": "p_block",
+   "mu_own": 0.24734208384262674,
+   "material": 0.24802313227103018,
+   "pipeline": 0.24802313227103018,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "p_block_10": {
+   "material_true": "p_block",
+   "material_llm": "p_block",
+   "mu_own": 0.2512596499629922,
+   "material": 0.24734208384262674,
+   "pipeline": 0.24734208384262674,
+   "LLM direct mu": 0.22,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "p_block_11": {
+   "material_true": "p_block",
+   "material_llm": "p_block",
+   "mu_own": 0.23518840629523757,
+   "material": 0.24802313227103018,
+   "pipeline": 0.24802313227103018,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "p_block_12": {
+   "material_true": "p_block",
+   "material_llm": "p_block",
+   "mu_own": 0.23115150898703146,
+   "material": 0.24802313227103018,
+   "pipeline": 0.24802313227103018,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "p_doll_01": {
+   "material_true": "p_doll",
+   "material_llm": "w_block",
+   "mu_own": 0.1456433335034315,
+   "material": 0.16835222198891275,
+   "pipeline": 0.2305114700222935,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "p_doll_02": {
+   "material_true": "p_doll",
+   "material_llm": "h_wood",
+   "mu_own": 0.1501812754828685,
+   "material": 0.16835222198891275,
+   "pipeline": 0.19830502645019837,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "p_doll_03": {
+   "material_true": "p_doll",
+   "material_llm": "p_doll",
+   "mu_own": 0.16835222198891275,
+   "material": 0.16269744932069755,
+   "pipeline": 0.16269744932069755,
+   "LLM direct mu": 0.3,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "p_doll_04": {
+   "material_true": "p_doll",
+   "material_llm": "p_doll",
+   "mu_own": 0.16269744932069755,
+   "material": 0.16835222198891275,
+   "pipeline": 0.16835222198891275,
+   "LLM direct mu": 0.3,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "p_doll_05": {
+   "material_true": "p_doll",
+   "material_llm": "p_doll",
+   "mu_own": 0.17758457566067798,
+   "material": 0.16269744932069755,
+   "pipeline": 0.16269744932069755,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "p_doll_06": {
+   "material_true": "p_doll",
+   "material_llm": "p_doll",
+   "mu_own": 0.1734959265653273,
+   "material": 0.16269744932069755,
+   "pipeline": 0.16269744932069755,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "p_ring_01": {
+   "material_true": "p_ring",
+   "material_llm": "p_ring",
+   "mu_own": 0.22009006628352742,
+   "material": 0.3317669114952993,
+   "pipeline": 0.3317669114952993,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "p_ring_02": {
+   "material_true": "p_ring",
+   "material_llm": "p_ring",
+   "mu_own": 0.30375466404889306,
+   "material": 0.3317669114952993,
+   "pipeline": 0.3317669114952993,
+   "LLM direct mu": null,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "p_ring_03": {
+   "material_true": "p_ring",
+   "material_llm": "p_ring",
+   "mu_own": 0.336187295960376,
+   "material": 0.3170467817575058,
+   "pipeline": 0.3170467817575058,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "p_ring_04": {
+   "material_true": "p_ring",
+   "material_llm": "p_ring",
+   "mu_own": 0.3303388994661185,
+   "material": 0.3184747937866866,
+   "pipeline": 0.3184747937866866,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "p_ring_05": {
+   "material_true": "p_ring",
+   "material_llm": "rubber",
+   "mu_own": 0.3331949235244801,
+   "material": 0.3170467817575058,
+   "pipeline": null,
+   "LLM direct mu": null,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "p_toy_01": {
+   "material_true": "p_toy",
+   "material_llm": "p_toy",
+   "mu_own": 0.2563712333968251,
+   "material": 0.24905319280633603,
+   "pipeline": 0.24905319280633603,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "p_toy_02": {
+   "material_true": "p_toy",
+   "material_llm": "p_toy",
+   "mu_own": 0.22184848947467428,
+   "material": 0.2563712333968251,
+   "pipeline": 0.2563712333968251,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "p_toy_03": {
+   "material_true": "p_toy",
+   "material_llm": "p_toy",
+   "mu_own": 0.24905319280633603,
+   "material": 0.2563712333968251,
+   "pipeline": 0.2563712333968251,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "p_toy_04": {
+   "material_true": "p_toy",
+   "material_llm": "p_doll",
+   "mu_own": 0.2671338958155088,
+   "material": 0.24905319280633603,
+   "pipeline": 0.16552483565480514,
+   "LLM direct mu": 0.5,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "porcelain_01": {
+   "material_true": "porcelain",
+   "material_llm": "porcelain",
+   "mu_own": 0.1552485826720971,
+   "material": 0.17534901319163898,
+   "pipeline": 0.17534901319163898,
+   "LLM direct mu": 0.27,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "porcelain_02": {
+   "material_true": "porcelain",
+   "material_llm": "porcelain",
+   "mu_own": 0.21463608654998478,
+   "material": 0.16289095224342728,
+   "pipeline": 0.16289095224342728,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "porcelain_03": {
+   "material_true": "porcelain",
+   "material_llm": "porcelain",
+   "mu_own": 0.16289095224342728,
+   "material": 0.17534901319163898,
+   "pipeline": 0.17534901319163898,
+   "LLM direct mu": 0.3,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "porcelain_04": {
+   "material_true": "porcelain",
+   "material_llm": "porcelain",
+   "mu_own": 0.17534901319163898,
+   "material": 0.16289095224342728,
+   "pipeline": 0.16289095224342728,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "w_block_01": {
+   "material_true": "w_block",
+   "material_llm": "w_block",
+   "mu_own": 0.22863825951569136,
+   "material": 0.2323846805288956,
+   "pipeline": 0.2323846805288956,
+   "LLM direct mu": 0.3,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "w_block_02": {
+   "material_true": "w_block",
+   "material_llm": "w_block",
+   "mu_own": 0.25153265521033863,
+   "material": 0.22863825951569136,
+   "pipeline": 0.22863825951569136,
+   "LLM direct mu": 0.3,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "w_block_03": {
+   "material_true": "w_block",
+   "material_llm": "w_block",
+   "mu_own": 0.22324998976093147,
+   "material": 0.2323846805288956,
+   "pipeline": 0.2323846805288956,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "w_block_04": {
+   "material_true": "w_block",
+   "material_llm": "w_block",
+   "mu_own": 0.25205157379113513,
+   "material": 0.22863825951569136,
+   "pipeline": 0.22863825951569136,
+   "LLM direct mu": 0.3,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "w_block_05": {
+   "material_true": "w_block",
+   "material_llm": "w_block",
+   "mu_own": 0.22582974714897586,
+   "material": 0.2323846805288956,
+   "pipeline": 0.2323846805288956,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "w_block_06": {
+   "material_true": "w_block",
+   "material_llm": "w_block",
+   "mu_own": 0.2153081327984907,
+   "material": 0.2323846805288956,
+   "pipeline": 0.2323846805288956,
+   "LLM direct mu": 0.27,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "w_block_07": {
+   "material_true": "w_block",
+   "material_llm": "w_pole",
+   "mu_own": 0.2336704271496248,
+   "material": 0.22863825951569136,
+   "pipeline": 0.20315344522800877,
+   "LLM direct mu": 0.3,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "w_block_08": {
+   "material_true": "w_block",
+   "material_llm": "w_block",
+   "mu_own": 0.2323846805288956,
+   "material": 0.22863825951569136,
+   "pipeline": 0.22863825951569136,
+   "LLM direct mu": 0.3,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "w_block_09": {
+   "material_true": "w_block",
+   "material_llm": "w_block",
+   "mu_own": 0.2399475940853286,
+   "material": 0.22863825951569136,
+   "pipeline": 0.22863825951569136,
+   "LLM direct mu": 0.28,
+   "generic 0.40": 0.4,
+   "global": 0.22009006628352742
+  },
+  "w_block_10": {
+   "material_true": "w_block",
+   "material_llm": "w_block",
+   "mu_own": 0.21297081423695205,
+   "material": 0.2323846805288956,
+   "pipeline": 0.2323846805288956,
+   "LLM direct mu": 0.3,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "w_pole_01": {
+   "material_true": "w_pole",
+   "material_llm": "w_pole",
+   "mu_own": 0.20081025583702333,
+   "material": 0.20499668460321135,
+   "pipeline": 0.20499668460321135,
+   "LLM direct mu": 0.3,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "w_pole_02": {
+   "material_true": "w_pole",
+   "material_llm": "w_pole",
+   "mu_own": 0.20302538652073895,
+   "material": 0.20499668460321135,
+   "pipeline": 0.20499668460321135,
+   "LLM direct mu": 0.3,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "w_pole_03": {
+   "material_true": "w_pole",
+   "material_llm": "w_pole",
+   "mu_own": 0.20315344522800877,
+   "material": 0.20493265524957643,
+   "pipeline": 0.20493265524957643,
+   "LLM direct mu": 0.27,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "w_pole_04": {
+   "material_true": "w_pole",
+   "material_llm": "w_pole",
+   "mu_own": 0.21403137869595273,
+   "material": 0.20308941587437385,
+   "pipeline": 0.20308941587437385,
+   "LLM direct mu": 0.3,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "w_pole_05": {
+   "material_true": "w_pole",
+   "material_llm": "w_pole",
+   "mu_own": 0.20683992397841391,
+   "material": 0.20308941587437385,
+   "pipeline": 0.20308941587437385,
+   "LLM direct mu": 0.3,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "w_pole_06": {
+   "material_true": "w_pole",
+   "material_llm": "w_pole",
+   "mu_own": 0.21653187712896493,
+   "material": 0.20308941587437385,
+   "pipeline": 0.20308941587437385,
+   "LLM direct mu": 0.25,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  },
+  "w_pole_07": {
+   "material_true": "w_pole",
+   "material_llm": "w_pole",
+   "mu_own": 0.20179126312798512,
+   "material": 0.20499668460321135,
+   "pipeline": 0.20499668460321135,
+   "LLM direct mu": 0.3,
+   "generic 0.40": 0.4,
+   "global": 0.22184848947467428
+  }
+ }
+}
