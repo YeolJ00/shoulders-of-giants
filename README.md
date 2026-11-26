@@ -29,8 +29,10 @@ episodes never trained on. Lower is better, and 1 means no better than that gues
   closer to the teacher. Longer training improves the one-frame fit, and more episodes improve the replays; a bigger
   network does not help.
   - Not yet working: shut drawers drift open, and objects the gripper knocks over stay standing.
-  - A real cube does not slide down a real ramp. The ramp data does show objects let go on a slope, but no training
-    window starts from rest the way the real test does (`l2_overfit.py --p_start` adds such windows; under test).
+  - A real cube does not slide down a real ramp. Without the physics layer the network predicts rest from rest:
+    even on the teacher's own ramps it does not start a slide from eight frames of rest, with or without training
+    windows that start that way (`l2_overfit.py --p_start`). The layer's friction alone is within 1 mm there; whether
+    rigid objects keep the layer is open. Those windows did lower the one-frame error (under test in the main recipe).
 - **Cloth.** A 64M transformer predicts a force on each vertex, and an exact physics layer (gravity, F = ma, air drag,
   contact with fixed surfaces, held vertices) moves the cloth. It scores 0.475 over one frame and is 14 / 50 / 77 mm
   from the teacher after 1 / 2 / 3.8 s; 5 of 336 unseen cloths blow up (end above twice their area), against 28 for

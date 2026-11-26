@@ -2962,6 +2962,24 @@ teacher and the model can be measured on (`lsim.real.cloth`, `scripts/l1_real_cl
       arms on one card): `rigid_ramp1024_ctl` (p 0) and `rigid_ramp1024_start` (p 0.1), 1,024 episodes of v0r,
       12,000 steps, the plain transformer's recipe; scored by `l2_phys101.py` and on held-out v0r (shard 9) and v0
       (shard 8). Predicted: control 70-85 mm, start arm under 20 mm, one frame within 0.03.**
+      **RESULT (02:29 UTC 2026-11-26): FAILED -- the real cube still does not slide: 81.2 mm (start) against 82.2
+      (control; prediction held), best friction of the sweep at its lowest value (0.15) for the start arm. Not the
+      real ramp's presentation: on v0r's OWN unseen ramp objects (shard 9, 37 objects; scratch
+      `ramp_release_check.py`: rolled out 36 frames from frame 0 with the past = frame 0 repeated, the p_start window)
+      neither network starts a slide from rest -- the 19 that the teacher slides over 5 cm in 1.2 s (median 320 mm)
+      move 3 mm (control) / 5 mm (start arm); from frame 8 with their true, already moving history the start arm
+      follows 60% of the teacher's travel (error 81 mm) and the control 37% (173 mm). ~1,800 training windows had a
+      sliding-from-rest object (12k steps x batch x 0.1 x the share of ramp episodes) and it learned to continue a
+      slide better, not to begin one: from 8 frames of rest the plain transformer predicts rest (zero output =
+      constant velocity = stay; the mean of household futures brakes, as v1's head did). READ, third branch: the
+      physics layer's Coulomb default (exact on the real board alone, 0.99 mm) stays the only route to the real ramp;
+      whether rigid keeps a layer is the user's design question. Unexpected: the windows from frame 0 lowered one
+      frame on unseen episodes -- v0 shard 8 0.787 -> 0.729 (-0.057 [-0.092, -0.024], 27 of 32), v0r shard 9 0.895
+      -> 0.816 (-0.079 [-0.114, -0.048], 28 of 32) (tags `rigid_ramp1024_{ctl,start}_{held,v0r_held}`; one run
+      each). v0 episodes start with objects lifted and let go at frame 0, so these windows are the drops' first
+      frames, never drawn before. Tested in the main recipe: `outputs/lsim/rigid_pstart_v0.sh`
+      (`rigid_pilot1024p_attn_direct_36k_start`, 1,024 v0 episodes x 36k, `--p_start 0.1`, GPU 4, from 02:45 UTC,
+      ~7.5 h, against `rigid_pilot1024p_attn_direct_36k`; predicted lower by 0.03-0.08 on shards 8 and 64).**
     - **The 2 x 2 is whole: steps set the one-frame fit, episodes set the replay -- and 1,024 episodes at 36,000
       steps is the first rigid network clearly ahead of B1 on both** (2026-11-24 06:59 UTC;
       `rigid_pilot1024p_attn_direct_36k`; the plain transformer, all inputs given; the 32 unseen episodes of shard

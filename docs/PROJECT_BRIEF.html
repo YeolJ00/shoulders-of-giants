@@ -550,9 +550,11 @@ code{font-family:var(--mono);font-size:.88em;background:var(--sunk);padding:1px 
     given, and that loss on the best network.</p></li>
     <li><p><b>Rigid objects: scale up the plain transformer.</b> Longer training improves single frames and more
     episodes improve the rollouts; a network five times larger is worse at both training lengths tried. Three
-    times longer again took one frame from 0.45 to 0.37, but its replays end a few millimetres farther off. Open: holding things at rest without the physics layer. On the real ramp it
-    probably needs training windows that start from rest, as the real test does: the ramp episodes do show
-    objects let go on a slope, but training starts a frame later. Running: a test of that.</p></li>
+    times longer again took one frame from 0.45 to 0.37, but its replays end a few millimetres farther off. Open: holding things at rest without the physics layer. On the real ramp the
+    cube does not slide, and training windows that start from rest did not change that, even on the teacher's own
+    ramps: without the layer the network predicts rest from rest. Whether rigid objects keep the layer for this is
+    open. Those windows did lower the one-frame error on unseen episodes; running: a test of them in the main
+    recipe, and whether eight times the episodes makes the network run alone better.</p></li>
     <li><p><b>Scale data beyond 20,000 episodes? Not for now.</b> For cloth, ten times the data is worth 0.015 at
     full training, and the full-data network does as well on unseen episodes as on its own. The question returns
     when a network does better on its own episodes than on unseen ones. The rigid network did so on 128 episodes,
