@@ -2329,7 +2329,12 @@ teacher and the model can be measured on (`lsim.real.cloth`, `scripts/l1_real_cl
     reference with it is next -- `outputs/lsim/roll_given.sh` (GPU 1, from 22:45 UTC): `cloth_roll100_given` (800
     steps, R 100, from `cont2_given/step23999`, scored at 400 and 799) beside `cloth_roll_ctl_given` (800 steps, no
     rollout loss); predicted: one frame +0.003 to +0.010, closer by 2-6 mm at 2 s and 3-8 at 3.8 s, at most 5
-    blow-ups, strain median at most 1.8%; ~15 h.** **Both trials (pushforward and this) fine-tune the
+    blow-ups, strain median at most 1.8%; ~15 h.** Rendered (`outputs/lsim/render_roll.sh`, GPU 0, 02:44 UTC;
+    `outputs/lsim/render_roll/`, media `cloth_roll_fold`, control over rollout arm): fold shard 14 ep 19 -- the
+    control crumples the towel into a ball after the fold (11.2x, 91 mm), the rollout arm folds it over the plank edge
+    as the teacher does (0.97x, 45 mm); shake shard 3 ep 28 -- both whole while held (2.5 s: 39 mm, 1.0x), after the
+    release the control's lands as a spiky ball (14.7x, 102 mm) and the rollout arm's folded like the teacher's
+    (0.90x, 54 mm). Prediction held (the slight even stretch is not visible). **Both trials (pushforward and this) fine-tune the
     hidden-input third stretch with every input given for 400-3,000 steps; their controls keep 25-30 blow-ups. The
     same third stretch trained with every input given THROUGHOUT has 5 (`cloth_q64_ownup_cont2_given`, the entry
     "Every input given" below, 19:58 UTC): the tail grew during the hidden-input stretch (6 at 48k, 21-28 at 72k) and

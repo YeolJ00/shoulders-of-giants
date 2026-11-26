@@ -1694,6 +1694,12 @@ table.res th.n{white-space:normal}
     typical cloth stretches a little more (median 1.8% against 1.0%): fewer cloths blow up, and most stretch
     slightly. Against the reference network trained with every input given, it is a few millimetres closer over
     seconds but still blows up more (14 against 5). Next: the same loss on the reference network itself.</p>
+  </div>
+  <figure class="vid">
+    <div class="frame"><video data-auto src="media/cloth_roll_fold.mp4" poster="media/cloth_roll_fold.jpg" controls loop muted playsinline preload="metadata"></video></div>
+    <figcaption>An unseen fold over a plank's edge, both networks running alone after eight frames with the material given. Top: the third stretch trained with the material hidden, after 400 more steps of its usual training. The towel crumples into a ball after the fold, 11 times its area at the end (91 mm off). Bottom: the same 400 steps with a loss on its own 3.3 s runs. The towel folds over the edge as the teacher's does and keeps its size (0.97 times, 45 mm off). Picked from the episodes where the top network blows up and the bottom one does not. A shake picked the same way looks the same: both stay whole while the gripper holds the towel; once it is let go and lands, the top one balls up (15 times its area) and the bottom one lies folded like the teacher's (54 mm off).</figcaption>
+  </figure>
+  <div class="col">
     <p>Both trials fine-tuned the third stretch that was trained with the material hidden, giving it every input
     for 400 to 3,000 steps. Their controls kept 25 to 30 blow-ups, so a short fine-tune does not undo the tail.
     The third stretch trained with every input given throughout has 5 (see the cloth section).</p>
